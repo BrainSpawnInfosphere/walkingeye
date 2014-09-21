@@ -16,3 +16,12 @@
 2014-08-26 20:13:18,023 - __main__ - INFO - RobotSensorServer-1[13802] started on192.168.1.12:9100, Daemon: False
 2014-08-26 20:13:18,024 - __main__ - INFO - RobotCmdServer-2[13803] started on192.168.1.12:9000, Daemon: False
 2014-08-26 20:13:20,820 - __main__ - INFO - Accepted connection: 
+2014-09-07 20:00:34,345 - __main__ - INFO - Create RobotSensorServer and RobotCmdServer
+2014-09-07 20:00:34,349 - __main__ - INFO - RobotSensorServer-1[50104] started on192.168.1.12:9000, Daemon: False
+2014-09-07 20:00:34,350 - __main__ - INFO - RobotCmdServer-2[50105] started on192.168.1.12:9100, Daemon: False
+2014-09-07 20:03:38,105 - __main__ - INFO - Create RobotSensorServer and RobotCmdServer
+2014-09-07 20:03:38,108 - __main__ - INFO - RobotSensorServer-1[50211] started on192.168.1.13:9000, Daemon: False
+2014-09-07 20:03:38,109 - __main__ - INFO - RobotCmdServer-2[50212] started on192.168.1.13:9100, Daemon: False
+2014-09-07 20:14:40,989 - __main__ - INFO - Create RobotSensorServer and RobotCmdServer
+2014-09-07 20:14:41,295 - __main__ - INFO - RobotSensorServer-1[50569] started on192.168.1.13:9000, Daemon: False
+2014-09-07 20:14:41,296 - __main__ - INFO - RobotCmdServer-2[50570] started on192.168.1.13:9100, Daemon: False

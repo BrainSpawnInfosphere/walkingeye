@@ -1,0 +1,8 @@
+# robot params
+servers:
+    sensor: 
+        port: 9000
+        camera: 0
+    cmd: 
+        port: 9100
+logfile: test.log

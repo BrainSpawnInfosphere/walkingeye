@@ -11,6 +11,8 @@ import datetime as dt
 from multiprocessing.connection import Listener as Publisher
 import multiprocessing as mp
 import logging
+import yaml
+import socket
 
 ####################################################################
 # RobotCmdServer handles incoming commands streamed from somewhere else.
@@ -115,17 +117,20 @@ class RobotSensorServer(mp.Process):
 
 
 ####################################################################
-#
-#
+# This is the main class that runs on the robot. It spawns all of the
+# processes which control the robot.
 ####################################################################
 class Robot:
 	def __init__(self):
 		logging.basicConfig(level=logging.INFO)
 		logger = logging.getLogger(__name__)
 		
+		f = open('robot.yaml')
+		conf = yaml.safe_load(f)
+		f.close()
 		
 		# Save logs to file
-		handler = logging.FileHandler('test.log')
+		handler = logging.FileHandler( conf['logfile'] )
 		handler.setLevel(logging.INFO)
 		formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 		handler.setFormatter(formatter)
@@ -134,10 +139,20 @@ class Robot:
 		
 		logger.info("Create RobotSensorServer and RobotCmdServer")
 		
-		# create processes
+		
 		mp.log_to_stderr(logging.DEBUG)
-		self.sensors = RobotSensorServer("192.168.1.12")
-		self.cmds = RobotCmdServer("192.168.1.12")
+		
+		# grab localhosts IP address
+		ip = socket.gethostbyname(socket.gethostname())
+		
+		# create processes using IP and yaml config
+		self.sensors = RobotSensorServer( 
+				ip, 
+				conf['servers']['sensor']['port'],
+				conf['servers']['sensor']['camera'] )
+		self.cmds = RobotCmdServer( 
+				ip, 
+				conf['servers']['cmd']['port'])
 	
 	def run(self):
 		try:
