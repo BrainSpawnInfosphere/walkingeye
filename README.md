@@ -13,11 +13,12 @@ This is the second version of my soccer robot.
 
 ## Basic Diagram
                 
+```                
 AI ---+---> robot.py <--- sensors
       |        | |
 PS4 --+        | +---> actuators
 Sensor Proc <--+
-
+```
 (I need a better diagram)
 
 **Note:** This re-write is still very early and not fully running yet, just parts. 
