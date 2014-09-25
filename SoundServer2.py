@@ -31,7 +31,7 @@ CONTENT_TYPE = 'raw;encoding=signed-integer;bits=16;rate={0};endian={1}'.format(
 
 
 ####################################################################
-# 
+# Base class
 # 
 ####################################################################
 class Module(mod_name='none'):
@@ -42,14 +42,50 @@ class Module(mod_name='none'):
 		self.logger = logging.getLogger(__name__)
 		self.modName = mod_name
 		self.logger.info('[+] Init module %s'%(self.modName))
+		
+		# get parameters
+		# does this get called everytime? Can i share, like static in C++?
+		f = open('/Users/kevin/Dropbox/accounts.yaml')
+		self.info = yaml.safe_load(f)
+		f.close()
+		
 	"""
 	"""
 	def handleIntent(self,intent):
+		ans = false
 		if self.intent == intent:
-			return True
-		else:
-			return False
+			ans = True
+		return ans
 
+
+####################################################################
+# 
+# 
+####################################################################
+class SMSModule(Module):
+	def __init__(self):
+		# Your Account Sid and Auth Token from twilio.com/user/account
+		account_sid = info['Twilio']['sid'] 
+		auth_token  = info['Twilio']['token'] 
+		self.client = TwilioRestClient(account_sid, auth_token)
+		self.from_phone=info['Twilio']['phone']['Twilio']
+		
+		self.logger.debug('Twilio sid: %s'%(account_sid))
+		self.logger.debug('Twilio token: %s'%(auth_token))
+			
+	"""
+	"""
+	def process(self, entity):
+		try:
+			who = entity['contact']['value']
+			msg = entity['message_body']['value']
+			message = self.client.messages.create(body=msg,
+				to=self.info['Twilio']['phone'][who] ,    
+				self.from_phone ) 
+			self.logger.debug( 'Good SMS: %s'%(message.sid) )
+		
+		except TwilioRestException as e:
+			self.logger.error( e )
 
 ####################################################################
 # 
@@ -57,28 +93,20 @@ class Module(mod_name='none'):
 ####################################################################
 class WeatherModule(Module):
 	def __init__(self):
-		api_key = os.environ.get('FORECAST_API_KEY')
+		api_key = self.info['FORECAST_API_KEY']
 	
 		if api_key is None:
 			self.logger.error('Need Forecast.io token, exiting now ...')
 			exit()
 
 		# Latitude, Longitude for location
-		lat = os.environ.get('FORECAST_LATITUDE')
-		long = os.environ.get('FORECAST_LONGITUDE')  
+		lat = self.info['Geolocation']['LATITUDE']
+		long = self.info['Geolocation']['LONGITUDE']  
 	
 		self.forecast = forecastio.load_forecast(api_key, lat, long)
 		self.weather_time = time.gmtime()
 		
 		self.intent = 'weather'
-	
-	"""
-	"""
-	def handleIntent(self,intent):
-		if self.intent == intent:
-			return True
-		else:
-			return False
 	
 	"""
 	Grab a forcast
@@ -156,14 +184,6 @@ class StarWarsModule(Module):
 		# setup Star Wars
 		file = '/Users/kevin/Desktop/star_wars_sounds'
 		self.star_wars_sounds = glob.glob(file + '/*.wav')
-		
-	"""
-	"""
-	def handleIntent(self,intent):
-		if self.intent == intent:
-			return True
-		else:
-			return False
 			
 	"""
 	"""
@@ -218,14 +238,6 @@ class TimeModule(Module):
 		self.intent = 'time'
 		
 	"""
-	"""
-	def handleIntent(self,intent):
-		if self.intent == intent:
-			return True
-		else:
-			return False
-		
-	"""
 	"""	
 	def process(self, entity):
 		t = time.localtime()
@@ -250,14 +262,6 @@ class DateModule(Module):
 		
 	"""
 	"""
-	def handleIntent(self,intent):
-		if self.intent == intent:
-			return True
-		else:
-			return False
-			
-	"""
-	"""
 	def process(self, entity):
 		t = time.localtime()
 		day = t[2]
@@ -277,7 +281,7 @@ class RandomModule(Module):
 		self.intent = ['greeting','feelings','error','joke','mean']
 		
 		# get canned responces
-		f = open( 'responce.yaml' )
+		f = open( self.info['reponse_path'] )
 		self.msglist = yaml.safe_load(f)
 		f.close()
 		
@@ -305,11 +309,6 @@ class RandomModule(Module):
 class NewsModule(Module):
 	def __init__(self):
 		self.intent = 'news'
-		
-	def handleIntent(self,intent):
-		if self.intent == intent:
-			return True		
-		return False
 			
 	def process(self, entity):
 		return 'News module is not  implemented yet'
@@ -321,11 +320,6 @@ class NewsModule(Module):
 class ExitModule(Module):
 	def __init__(self):
 		self.intent = 'safe_word'
-		
-	def handleIntent(self,intent):
-		if self.intent == intent:
-			return True		
-		return False
 			
 	def process(self, entity):
 		return 'exit_loop'
@@ -360,7 +354,7 @@ class SoundServer(mp.Process):
 		self.logger = logging.getLogger(__name__)
 		
 		# setup WIT.ai
-		wit_token = os.environ.get('WIT_TOKEN')
+		wit_token = self.info['WIT_TOKEN']
 		self.logger.debug('Wit.ai API token %s'%(wit_token))
 		
 		if wit_token is None:

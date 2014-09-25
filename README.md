@@ -7,9 +7,11 @@ This is the second version of my soccer robot.
 	* Want to re-write to get rid of pickle and replace with json (faster, better)
 * Uses my PS4 controller with PySDL2
 * Uses Google-translate to for TTS
-* Users OpenCV to compress and send video stream off-board
+* Uses OpenCV to compress and send video stream off-board
 	* Might use a separate IP camera to reduce CPU usage and get faster performance
 * All of this runs on Raspberry Pi B+
+
+This is still in development, but various parts are working.
 
 ## Basic Diagram
                 
