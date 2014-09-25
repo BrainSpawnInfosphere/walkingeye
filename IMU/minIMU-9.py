@@ -34,11 +34,11 @@ class minIMU9:
 	
 	"""	
 	from "tilt compensated compass.pdf" (LSM303DLH tech note)
-    calculate heading from magnetometers and return heading in degrees.
-    in: magnetic and quaternion
-    out: compass heading in degrees
-    """
-    def heading(self,m,q):
+	calculate heading from magnetometers and return heading in degrees.
+	in: magnetic and quaternion
+	out: compass heading in degrees
+	"""
+	def heading(self,m,q):
 		mx,my,mz = m # magnetic
 		q0,q1,q2,q3 = q
     	
@@ -63,15 +63,15 @@ class minIMU9:
     	heading = atan2(my2,mx2) # double check this
     	
     	# eqn 13
-    	if mx2 > 0.0 && my2 >= 0.0: 
+    	if mx2 > 0.0 and my2 >= 0.0: 
     		pass # all good 
     	elif mx2 < 0.0: 
     		heading = M_PI+heading
-    	elif mx2>0.0 && my2 <=0.0: 
+    	elif mx2>0.0 and my2 <=0.0: 
     		heading = 2.0*M_PI+heading
-    	elif mx2 == 0.0 && my2 < 0.0: 
+    	elif mx2 == 0.0 and my2 < 0.0: 
     		heading = M_PI/2.0 # 90 deg
-    	elif mx2 == 0.0 && my2 > 0.0:
+    	elif mx2 == 0.0 and my2 > 0.0:
     		heading = 1.5*M_PI # 270 deg
     	
     	#print "heading: {:.2f}".format(heading)
