@@ -27,4 +27,4 @@ Sensor Proc <--+
 
 ## To Do's
 
-* 
+* put it all together :)
