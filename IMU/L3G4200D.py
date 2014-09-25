@@ -97,7 +97,7 @@ class L3G4200D(Adafruit_I2C):
 		
 		self.calibrate()
 		
-	__del__(self):
+	def __del__(self):
 		print 'Gyro: Good bye ...'
 
 	"""
