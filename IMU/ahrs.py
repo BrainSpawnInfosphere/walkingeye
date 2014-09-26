@@ -6,10 +6,10 @@
 # This is a port of my C++ code
 #
 
-import minIMU-9
+
 import numpy as np
 import time
-import math as *
+from math import *
 
 class AHRS:
 	def __init__(self, beta):
@@ -118,7 +118,9 @@ class AHRS:
 		q2 *= recipNorm
 		q3 *= recipNorm
 		
-		return self.q = [q0,q1,q2,q3]
+		self.q = [q0,q1,q2,q3]
+		
+		return self.q
 		
 	"""
 	IMU update
@@ -187,6 +189,8 @@ class AHRS:
 		q2 *= recipNorm
 		q3 *= recipNorm
 		
-		return self.q = [q0,q1,q2,q3]
+		self.q = [q0,q1,q2,q3]
+		
+		return self.q
 	
 		
