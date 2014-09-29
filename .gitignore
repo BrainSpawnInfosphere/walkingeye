@@ -4,3 +4,8 @@ old
 *.mp3
 *.log
 .AppleDouble
+.DS_Store
+.aux
+.log
+.out
+.gz
