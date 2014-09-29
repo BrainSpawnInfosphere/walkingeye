@@ -240,12 +240,12 @@ Now we make the following assumptions: ${B`}$ is coincident with ${B}$, $x_m = 0
 Now looking at figure \ref{coordinate}, and breaking equation \ref{one} up into its x and y components
 
 \begin{eqnarray}
-	\sum F_x=-f_1 \sin(\phi) - f_2 \sin(\phi) + f_3 \sin(\phi) + f_4 \sin(\phi)  \label{two} \\
-	\sum F_y=f_1 \cos(\phi) - f_2 \cos(\phi) - f_3 \cos(\phi) + f_4 \cos(\phi) \label{three} \\
+	\sum F_x=f_1 \sin(\phi) - f_2 \sin(\phi) - f_3 \sin(\phi) + f_4 \sin(\phi)  \label{two} \\
+	\sum F_y=f_1 \cos(\phi) + f_2 \cos(\phi) - f_3 \cos(\phi) - f_4 \cos(\phi) \label{three} \\
 	\sum T=L(f_1+f_2+f_3+f_4) \label{four}
 \end{eqnarray}
 
-Now combining these into a matirx and making $\phi_1$ = $\phi_2$ = $\phi_3$ = $\phi_4$.
+Now combining these into a matrix and making $\phi_1$ = $\phi_2$ = $\phi_3$ = $\phi_4$.
 
 \begin{eqnarray}
 \begin{bmatrix}
@@ -306,10 +306,10 @@ Now combining these into a matirx and making $\phi_1$ = $\phi_2$ = $\phi_3$ = $\
 where $\phi$ is the angle of the motors as defined in \figref{coordinate}, $f_i$ is the magnitude of the force produced by the motors, and $R$ is the radius of the robot. This can be simplified into the following:
 
 \begin{equation}
-	\sum F = A(\phi) [1] [f_i]
+	Q = A(\phi) [1] [f_i]
 \end{equation}
 
-where $\sum F$ is the generalized forces,  $A(\phi)$ is the matrix which defines the orientation of the motors, $[1]$ defines the coupling of the motor forces, and $[f_i]$ is the vector of forces produced by the motors. The individual motor forces can further be expressed as:
+where $Q$ is the generalized forces,  $A(\phi)$ is the matrix which defines the orientation of the motors, $[1]$ defines the coupling of the motor forces, and $[f_i]$ is the vector of forces produced by the motors. The individual motor forces can further be expressed as:
 
 stop here
 
