@@ -232,6 +232,34 @@ Now we make the following assumptions: ${B`}$ is coincident with ${B}$, $x_m = 0
 	\tau_w = J_w \ddot \theta_4 
 \end{eqnarray}
 
+
+\begin{eqnarray}
+\begin{bmatrix}
+	F_x \\
+	F_y \\
+	T
+\end{bmatrix} = 
+\begin{bmatrix}
+	M & 0 & 0 \\
+	0 & M & 0 \\
+	0 & 0 & J
+\end{bmatrix}
+\begin{bmatrix}
+	\ddot x \\
+	\ddot y \\
+	\ddot \psi
+\end{bmatrix} +
+\begin{bmatrix}
+	0 & -2M \dot \psi & 0 \\
+	2M \dot \psi & 0 & 0 \\
+	0 & 0 & 0
+\end{bmatrix} 
+\begin{bmatrix}
+	\dot x \\
+	\dot y \\
+	\dot \psi
+\end{bmatrix}
+\end{eqnarray}
 %\begin{eqnarray}
 %	a=\sum \limits_{i=1}^4 \frac{F_i}{M_i}=\frac{1}{M}(F_1+F_2+F_3+F_4) \label{one} \\
 %	\dot{\omega}= \sum \limits_{i=1}^4 \frac{\tau_i}{J_R}=\frac{R}{J_R}(f_i+f_2+f_3+f_4)  where \tau_i=Rf_i
@@ -303,50 +331,7 @@ Now combining these into a matrix and making $\phi_1$ = $\phi_2$ = $\phi_3$ = $\
 \end{eqnarray}
 
 
-where $\phi$ is the angle of the motors as defined in \figref{coordinate}, $f_i$ is the magnitude of the force produced by the motors, and $R$ is the radius of the robot. This can be simplified into the following:
-
-\begin{equation}
-	Q = A(\phi) [1] [f_i]
-\end{equation}
-
-where $Q$ is the generalized forces,  $A(\phi)$ is the matrix which defines the orientation of the motors, $[1]$ defines the coupling of the motor forces, and $[f_i]$ is the vector of forces produced by the motors. The individual motor forces can further be expressed as:
-
-stop here
-
-%\begin{eqnarray}
-%	f_i = \frac{\tau_i}{r_w} \\
-%	F = \frac{1}{r_w} \begin{bmatrix} \tau_1 \\  \tau_2 \\  \tau_3 \\  \tau_4 \end{bmatrix} = \frac{1}{r_w}T
-%\end{eqnarray}
-
-where $\tau_i$ is the torque produced by the $i^{th}$ motor and $r_w$ is the radius of the wheel. Here we are assuming that all wheels have the same radius $r_w$.
-
-\begin{equation}
-	P = \frac{1}{M r_w} A(\phi) C T
-\end{equation}
-
-For a given motor orientation (e.g., $\phi$ = 45$^\circ$) this equations provides the acceleration states as a function of motor velocity. However, the reverse would be more useful. Meaning, given a desired set of states, what are the motor velocities required?
-
-\begin{equation}
-	T = M r_w pinv(C)A(\phi)^{-1} P
-\end{equation}
-
-where
-
-\begin{eqnarray}
-	A(\phi)^{-1} = 
-	\begin{bmatrix}
-		\frac{1}{\sin(\phi)} & 0 & 0 \\
-		0 & \frac{1}{\cos(\phi)} & 0 \\
-		0 & 0 & \frac{1}{2}
-	\end{bmatrix} \\
-	pinv(C) = \frac{1}{4}
-	\begin{bmatrix}
-		-1 & 1 & 1 \\
-		-1 & -1 & 1 \\
-		1 & -1 & 1 \\
-		1 & 1 & 1
-	\end{bmatrix}	
-\end{eqnarray}
+where $\phi$ is the angle of the motors as defined in \figref{coordinate}, $f_i$ is the magnitude of the force produced by the motors, and $L$ is the radius of the robot.
 
 where $pinv()$\footnote[1]{Pseudoinverse: for $m > n$: $A_{left}^{-1}=(A^TA)^{-1}A^T$ or $m < n$: $A_{right}^{-1}=A^T(AA^T)^{-1}$ such that $AA^{-1}=I$ or $A^{-1}A=I$} is defined as the pseudoinverse since $A(\phi)$ is not a square matrix. Finally, substituting these into the original equation, we can calculate the torques given the desired accelerations. 
 
@@ -372,62 +357,6 @@ where $pinv()$\footnote[1]{Pseudoinverse: for $m > n$: $A_{left}^{-1}=(A^TA)^{-1
 
 Now looking at this equation, we notice that $\phi$ can not be equal to 0, 90, 180, 270, or 360 otherwise we get a singularity in the $A(\phi)$ matrix. This however is not an issue in the real world, since the motors would occupy the same physical space and the robot would essentially only have 2 and not 4 motors.
 
-\subsection{State Space}
-
-Now rearranging equations \eqref{two}, \eqref{three}, and \eqref{four} into a state space representation where the state vector is $X = \begin{bmatrix} x & y & R \theta & v_x & v_y & R \omega \end{bmatrix}^T$ and its derivative is $\dot X = \begin{bmatrix} v_x & v_y & R \omega & a_x & a_y & R \dot \omega \end{bmatrix}^T$, the standard formulation is:
-
-\begin{eqnarray}
-	\dot X = A X + B u \\
-	Y = CX 
-\end{eqnarray}
-
-where $A$ is the state transition matrix, $B$ is the input matrix, $u$ is the control input to the system, $C$ is the output matrix which determines which states are visible, and $Y$ is the output vector which is the observable states. Again, the nice thing about formulating the state vector $X$ this way is that all of the units for position are in meters and all of the velocity units are in m/sec.
-
-\begin{eqnarray}
-	%X = \begin{bmatrix} x & y & R \theta & v_x & v_y & R \omega \end{bmatrix}^T \\
-	%\dot X = \begin{bmatrix} v_x & v_y & R \omega & a_x & a_y & R \dot \omega \end{bmatrix}^T \\
-	A = \begin{bmatrix}
-		0_{3x3} & I_{3x3} \\
-		0_{3x3} & 0_{3x3}
-	\end{bmatrix} \\
-	B = \frac{1}{M r_w}\begin{bmatrix}
-		& 0_{3x4} & \\
-		-\sin(\phi) & -\sin(\phi) & \sin(\phi) & \sin(\phi) \\
-		\cos(\phi) & -\cos(\phi) & -\cos(\phi) & \cos(\phi) \\
-		2 & 2 & 2 & 2 
-	\end{bmatrix} \\
-	u = \begin{bmatrix} \tau_1 &  \tau_2 &  \tau_3 &  \tau_4 \end{bmatrix}^T \\
-	C = \begin{bmatrix} 0 & 0 & 1 & 0 & 0 & 0\\ 0 & 0 & 0 & 0 & 0 & 1 \end{bmatrix}
-\end{eqnarray}
-
-The only directly measurable states come from the compass ($\theta$) and the gyro ($\omega$) on the IMU. Position and velocity are not directly measured. Acceleration is also measurable from the IMU and can be used to estimate the velocity and position. 
-
-\begin{eqnarray}
-	\dot M X = A X + B u \\
-	\begin{bmatrix} v_x \\ v_y \\ R \omega \\ a_x \\ a_y \\ R \dot \omega \end{bmatrix} =
-	\begin{bmatrix}
-		0_{3x3} & I_{3x3} \\
-		0_{3x3} & 0_{3x3}
-	\end{bmatrix} 
-	\begin{bmatrix} x \\ y \\ R \theta \\ v_x \\ v_y \\ R \omega \end{bmatrix} +
-	\frac{1}{M r_w}\begin{bmatrix}
-		& 0_{3x4} & \\
-		-\sin(\phi) & -\sin(\phi) & \sin(\phi) & \sin(\phi) \\
-		\cos(\phi) & -\cos(\phi) & -\cos(\phi) & \cos(\phi) \\
-		2 & 2 & 2 & 2 
-	\end{bmatrix} 
-	\begin{bmatrix} \tau_1 \\  \tau_2 \\  \tau_3 \\  \tau_4 \end{bmatrix}
-\end{eqnarray}
-
-Now using this we can show that this system is controllable but not fully observable.
-
-\begin{eqnarray}
-	rank \left( \begin{bmatrix} B & AB & A^2B & ... & A^5B \end{bmatrix} \right) = 6 \\
-	rank \left( \begin{bmatrix} C \\ CA \\ \vdots \\ CA^5 \end{bmatrix} \right) = 2
-\end{eqnarray}
-
-An estimator must be developed in order to properly control the system and keep it stable.
-
 \section{Holonomic Robot Kinematics}
 
 Now performing a similar exercise for what was done with the dynamics, looking at \figref{coordinate}, the velocity of motor 1is given by $v_1 = -\sin(\phi) v_x + \cos(\phi) v_y + R \omega$. Performing this for each wheel gives:
@@ -440,15 +369,15 @@ Now performing a similar exercise for what was done with the dynamics, looking a
 		v_4
 	\end{bmatrix} = 
 	\begin{bmatrix}
-		-\sin(\phi)  & \cos(\phi) & 1 \\
-		-\sin(\phi) & -\cos(\phi) & 1 \\
-		 \sin(\phi) & -\cos(\phi) & 1 \\
-		 \sin(\phi)  & \cos(\phi) & 1 
+		-\sin(\phi)  & \cos(\phi) & L \\
+		-\sin(\phi) & -\cos(\phi) & L \\
+		 \sin(\phi) & -\cos(\phi) & L \\
+		 \sin(\phi)  & \cos(\phi) & L 
 	\end{bmatrix}
 	\begin{bmatrix}
 		v_x \\
 		v_y \\
-		R \omega
+		\omega
 	\end{bmatrix} = 
 	\begin{bmatrix}
 		-1 & 1 & 1 \\
@@ -459,27 +388,27 @@ Now performing a similar exercise for what was done with the dynamics, looking a
 	\begin{bmatrix}
 		\sin(\phi) & 0 & 0 \\
 		0 & \cos(\phi) & 0 \\
-		0 & 0 & 1
+		0 & 0 & L
 	\end{bmatrix}
 	\begin{bmatrix}
 		v_x \\
 		v_y \\
-		R \omega
+		\omega
 	\end{bmatrix}
 \end{equation}
 
-Now setting $\omega$ to zero and calculating only linear movement, we can determine the number of equivalent motors as shown in \figref{fig:equivalent_motors}. For example, setting $\phi$ to 30$^\circ$ (the red line in \figref{fig:equivalent_motors}) and traveling in the x direction only ($ \begin{bmatrix} v_x & v_y & R \omega \end{bmatrix}^T = \begin{bmatrix}1& 0 & 0 \end{bmatrix}^T$), the above equation simplifies to $4 \sin(30)$ or 2 equivalent motors. Repeating for the y direction results in $4 \cos(30)$ or 3.46 equivalent motors.
+Now setting $\omega$ to zero and calculating only linear movement, we can determine the number of equivalent motors as shown in \figref{fig:equivalent_motors}. For example, setting $\phi$ to 30$^\circ$ (the red line in \figref{fig:equivalent_motors}) and traveling in the x direction only ($ \begin{bmatrix} v_x & v_y & \omega \end{bmatrix}^T = \begin{bmatrix}1& 0 & 0 \end{bmatrix}^T$), the above equation simplifies to $4 \sin(30)$ or 2 equivalent motors. Repeating for the y direction results in $4 \cos(30)$ or 3.46 equivalent motors.
 
 \begin{figure*}[tb]
 	\begin{minipage}[htb]{3in}
 		\centering
- 		\includegraphics[height=2.5in]{pics/force_cs.png} 
+ 		\includegraphics[height=2.8in]{pics/force_cs.png} 
 		\caption{\label{robot}Configuration of three groups of motors where $\phi$ is 30, 45, and 60 degrees.}  
  	\end{minipage}
  	\hfill
  	\begin{minipage}[htb]{3in}
 		\centering
- 		\includegraphics[height =2.5in]{pics/equiv_motors.png} 
+ 		\includegraphics[height =2.8in]{pics/equiv_motors.png} 
 		\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
  	\end{minipage} 
 \end{figure*}  

@@ -1,18 +1,17 @@
 \BOOKMARK [1][-]{section.1}{Variables}{}% 1
 \BOOKMARK [1][-]{section.2}{Introduction}{}% 2
 \BOOKMARK [1][-]{section.3}{Holonomic Dynamics}{}% 3
-\BOOKMARK [2][-]{subsection.3.1}{State Space}{section.3}% 4
-\BOOKMARK [1][-]{section.4}{Holonomic Robot Kinematics}{}% 5
-\BOOKMARK [1][-]{section.5}{Control}{}% 6
-\BOOKMARK [1][-]{section.6}{Guidance and Navigation}{}% 7
-\BOOKMARK [1][-]{section.7}{Hardware Setup}{}% 8
-\BOOKMARK [2][-]{subsection.7.1}{Chasis}{section.7}% 9
-\BOOKMARK [2][-]{subsection.7.2}{Electronic Power System}{section.7}% 10
-\BOOKMARK [2][-]{subsection.7.3}{Electronics and Sensors}{section.7}% 11
-\BOOKMARK [3][-]{subsubsection.7.3.1}{MiniIMU}{subsection.7.3}% 12
-\BOOKMARK [3][-]{subsubsection.7.3.2}{Camera}{subsection.7.3}% 13
-\BOOKMARK [2][-]{subsection.7.4}{Software}{section.7}% 14
-\BOOKMARK [3][-]{subsubsection.7.4.1}{OpenCV}{subsection.7.4}% 15
-\BOOKMARK [3][-]{subsubsection.7.4.2}{Point Cloud Library}{subsection.7.4}% 16
-\BOOKMARK [1][-]{section.8}{Results}{}% 17
-\BOOKMARK [1][-]{section.9}{References}{}% 18
+\BOOKMARK [1][-]{section.4}{Holonomic Robot Kinematics}{}% 4
+\BOOKMARK [1][-]{section.5}{Control}{}% 5
+\BOOKMARK [1][-]{section.6}{Guidance and Navigation}{}% 6
+\BOOKMARK [1][-]{section.7}{Hardware Setup}{}% 7
+\BOOKMARK [2][-]{subsection.7.1}{Chasis}{section.7}% 8
+\BOOKMARK [2][-]{subsection.7.2}{Electronic Power System}{section.7}% 9
+\BOOKMARK [2][-]{subsection.7.3}{Electronics and Sensors}{section.7}% 10
+\BOOKMARK [3][-]{subsubsection.7.3.1}{MiniIMU}{subsection.7.3}% 11
+\BOOKMARK [3][-]{subsubsection.7.3.2}{Camera}{subsection.7.3}% 12
+\BOOKMARK [2][-]{subsection.7.4}{Software}{section.7}% 13
+\BOOKMARK [3][-]{subsubsection.7.4.1}{OpenCV}{subsection.7.4}% 14
+\BOOKMARK [3][-]{subsubsection.7.4.2}{Point Cloud Library}{subsection.7.4}% 15
+\BOOKMARK [1][-]{section.8}{Results}{}% 16
+\BOOKMARK [1][-]{section.9}{References}{}% 17
