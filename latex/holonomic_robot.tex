@@ -259,13 +259,43 @@ Now we make the following assumptions: ${B`}$ is coincident with ${B}$, $x_m = 0
 	\dot y \\
 	\dot \psi
 \end{bmatrix}
+= \mathcal{M} \ddot X + \mathcal{O} \dot X
 \end{eqnarray}
 %\begin{eqnarray}
 %	a=\sum \limits_{i=1}^4 \frac{F_i}{M_i}=\frac{1}{M}(F_1+F_2+F_3+F_4) \label{one} \\
 %	\dot{\omega}= \sum \limits_{i=1}^4 \frac{\tau_i}{J_R}=\frac{R}{J_R}(f_i+f_2+f_3+f_4)  where \tau_i=Rf_i
 %\end{eqnarray}
 
-Now looking at figure \ref{coordinate}, and breaking equation \ref{one} up into its x and y components
+\subsubsection{World Coordinates}
+
+Now the dynamics derived so far are all in the body frame and we could stop here and develop a controller which performs velocity control. However, position control is more useful and a transform needs to be performed to move the velocities and accelerations into the world frame.
+
+\begin{eqnarray}
+\dot X^W = R_B^W \dot X^B \\
+R_B^W = 
+\begin{bmatrix}
+	\cos \psi & \sin \psi & 0 \\
+	-\sin \psi & \cos \psi & 0 \\
+	0 & 0 & 1
+\end{bmatrix} \\
+\ddot X^W = \dot R_B^W \dot X^B + R_B^W \ddot X^B \\
+\dot R_B^W = 
+\begin{bmatrix}
+	\sin \psi & -\cos \psi & 0 \\
+	\cos \psi & \sin \psi & 0 \\
+	0 & 0 & 1
+\end{bmatrix}
+\end{eqnarray}
+
+Now, substituting this into the dynamics, gives dynamics in the world coordinate system of:
+
+\begin{eqnarray}
+F = \mathcal{M} (\dot R \dot X + R \ddot X )  + \mathcal{O} R \dot X \\
+F = \mathcal{M} R \ddot X + (\mathcal{M}  \dot R + \mathcal{O} R) \dot X 
+\end{eqnarray}
+
+\subsubsection{External Forces and Torques}
+Now looking at figure \ref{robot} and summing the forces into their body referenced $x$ and $y$ directions and the torque about the $z$ axis, gives us:
 
 \begin{eqnarray}
 	\sum F_x=f_1 \sin(\phi) - f_2 \sin(\phi) - f_3 \sin(\phi) + f_4 \sin(\phi)  \label{two} \\
@@ -273,7 +303,7 @@ Now looking at figure \ref{coordinate}, and breaking equation \ref{one} up into 
 	\sum T=L(f_1+f_2+f_3+f_4) \label{four}
 \end{eqnarray}
 
-Now combining these into a matrix and making $\phi_1$ = $\phi_2$ = $\phi_3$ = $\phi_4$.
+Additionally, we can simplify this by assuming all of the angles are the same (e.g., $\phi_1$ = $\phi_2$ = $\phi_3$ = $\phi_4$) and can now put this into a matrix form:
 
 \begin{eqnarray}
 \begin{bmatrix}
@@ -331,7 +361,7 @@ Now combining these into a matrix and making $\phi_1$ = $\phi_2$ = $\phi_3$ = $\
 \end{eqnarray}
 
 
-where $\phi$ is the angle of the motors as defined in \figref{coordinate}, $f_i$ is the magnitude of the force produced by the motors, and $L$ is the radius of the robot.
+where $\phi$ is again the angle of the motors as defined in \figref{robot}, $f_i$ is the magnitude of the force produced by the motors, and $L$ is the radius of the robot.
 
 where $pinv()$\footnote[1]{Pseudoinverse: for $m > n$: $A_{left}^{-1}=(A^TA)^{-1}A^T$ or $m < n$: $A_{right}^{-1}=A^T(AA^T)^{-1}$ such that $AA^{-1}=I$ or $A^{-1}A=I$} is defined as the pseudoinverse since $A(\phi)$ is not a square matrix. Finally, substituting these into the original equation, we can calculate the torques given the desired accelerations. 
 
@@ -436,94 +466,6 @@ In order to have the robot go from one location to another, the position and vel
 
 where the error ($\tilde x$) is the difference between the estimated state ($\hat x$) and the true state ($x$).
 
-\section{Hardware Setup}
-
-\subsection{Chasis}
-
-\subsection{Electronic Power System}
-
-\begin{figure*}[tb]
-	\begin{minipage}[htb]{3in}
-		\centering
- 		\includegraphics[height=2in]{pics/bluetooth_back.jpg} 
-		\caption{\label{fig:imu}IMU.}  
- 	\end{minipage}
- 	\hfill
- 	\begin{minipage}[htb]{3in}
-		%\centering
- 		\includegraphics[height =2in]{pics/motor_driver.jpg} 
-		%\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
- 	\end{minipage} 
-\end{figure*}
-
-\subsection{Electronics and Sensors}
-
-\begin{figure*}[tb]
-	\begin{minipage}[htb]{3in}
-		\centering
- 		\includegraphics[height=2in]{pics/imu.png} 
-		\caption{\label{fig:imu}IMU.}  
- 	\end{minipage}
- 	\hfill
- 	\begin{minipage}[htb]{3in}
-		%\centering
- 		\includegraphics[height =2in]{pics/motor_driver.jpg} 
-		%\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
- 	\end{minipage} 
-\end{figure*}
-
-The robot is teleoperated from a laptop via a bluetooth link to an Arduino microcontroller which runs the motor drivers and sensors.
-
-\subsubsection{MiniIMU}
-
-\subsubsection{Camera}
-
-\subsection{Software}
-
-\begin{figure*}[tb]
-	%\begin{minipage}[htb]{3in}
-		\centering
- 		%\includegraphics[height=2.5in]{pics/holonomic_robot.png} 
-		\caption{\label{fig:ros}The software architecture composed of ROS nodes.}  
- 	%\end{minipage}
- 	%\hfill
- 	%\begin{minipage}[htb]{3in}
-		%\centering
- 		%\includegraphics[height =2.5in]{pics/equiv_motors.png} 
-		%\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
- 	%\end{minipage} 
-\end{figure*}
-  
-The robot utilizes the open source Robotic Operating System (ROS) \cite{ros}. The core software is run on a laptop and commands and telemetry is passed back and forth via serial bluetooth. 
-
-\subsubsection{OpenCV}
-
-The vision system uses the Open Computer Vision (OpenCV \cite{opencv}) is used to track the ball and guide the robot to the ball (visual servoing).
-
-\begin{figure*}[tb]
-	\begin{minipage}[htb]{3in}
-		\centering
- 		\includegraphics[height=2in]{pics/rgb.png} 
-		\caption{\label{fig:rgb}RGB color cube.}  
- 	\end{minipage}
- 	\hfill
- 	\begin{minipage}[htb]{3in}
-		\centering
- 		\includegraphics[height =2in]{pics/hsv.png} 
-		\caption{\label{fig:hsv} HSV color cylinder.} 
- 	\end{minipage} 
-\end{figure*}
-
-The BGR (blue, green, red) image is transformed to the HSV (hue, saturation, and value) system to help account for variable lighting conditions.
-
-\begin{description}
-	\item[Hue] The "attribute of a visual sensation according to which an area appears to be similar to one of the perceived colors: red, yellow, green, and blue, or to a combination of two of them"
-	\item[Saturation] The "colorfulness of a stimulus relative to its own brightness"
-	\item[Value, Lightness] The "brightness relative to the brightness of a similarly illuminated white"
-\end{description}
-
-\subsubsection{Point Cloud Library}
-
 \section{Results}
 
 \section{References}
@@ -555,6 +497,96 @@ R. Balakrishna, Ashitava Ghosal, "Modeling of Slip for Wheeled Mobile Robots," l
 \bibitem{} Xiang Li, Andreas Zell, "Motion Control of an Omnidirectional Mobile Robot," ??
 
 \end{thebibliography}
+
+\appendix
+
+\section{Full Derivation of EOM}
+
+\subsection{EOM}
+hi how are you
+
+\section{Robot Hardware}
+
+
+\begin{figure*}[tb]
+	\begin{minipage}[htb]{3in}
+		\centering
+ 		\includegraphics[height=2in]{pics/imu.png} 
+		\caption{\label{fig:imu}IMU.}  
+ 	\end{minipage}
+ 	\hfill
+ 	\begin{minipage}[htb]{3in}
+		%\centering
+ 		\includegraphics[height =2in]{pics/motor_driver.jpg} 
+		%\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
+ 	\end{minipage} 
+\end{figure*}
+
+The robot is teleoperated from a laptop via a bluetooth link to an Arduino microcontroller which runs the motor drivers and sensors.
+
+\subsubsection{MiniIMU}
+
+\subsubsection{Camera}
+
+
+\begin{figure*}[tb]
+	%\begin{minipage}[htb]{3in}
+		\centering
+ 		%\includegraphics[height=2.5in]{pics/holonomic_robot.png} 
+		\caption{\label{fig:ros}The software architecture composed of ROS nodes.}  
+ 	%\end{minipage}
+ 	%\hfill
+ 	%\begin{minipage}[htb]{3in}
+		%\centering
+ 		%\includegraphics[height =2.5in]{pics/equiv_motors.png} 
+		%\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
+ 	%\end{minipage} 
+\end{figure*}
+
+
+\begin{figure*}[tb]
+	\begin{minipage}[htb]{3in}
+		\centering
+ 		\includegraphics[height=2in]{pics/bluetooth_back.jpg} 
+		\caption{\label{fig:imu}IMU.}  
+ 	\end{minipage}
+ 	\hfill
+ 	\begin{minipage}[htb]{3in}
+		%\centering
+ 		\includegraphics[height =2in]{pics/motor_driver.jpg} 
+		%\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
+ 	\end{minipage} 
+\end{figure*}
+
+
+
+\section{Robot Software}
+
+\subsubsection{OpenCV}
+
+The vision system uses the Open Computer Vision (OpenCV \cite{opencv}) is used to track the ball and guide the robot to the ball (visual servoing).
+
+\begin{figure*}[tb]
+	\begin{minipage}[htb]{3in}
+		\centering
+ 		\includegraphics[height=2in]{pics/rgb.png} 
+		\caption{\label{fig:rgb}RGB color cube.}  
+ 	\end{minipage}
+ 	\hfill
+ 	\begin{minipage}[htb]{3in}
+		\centering
+ 		\includegraphics[height =2in]{pics/hsv.png} 
+		\caption{\label{fig:hsv} HSV color cylinder.} 
+ 	\end{minipage} 
+\end{figure*}
+
+The BGR (blue, green, red) image is transformed to the HSV (hue, saturation, and value) system to help account for variable lighting conditions.
+
+\begin{description}
+	\item[Hue] The "attribute of a visual sensation according to which an area appears to be similar to one of the perceived colors: red, yellow, green, and blue, or to a combination of two of them"
+	\item[Saturation] The "colorfulness of a stimulus relative to its own brightness"
+	\item[Value, Lightness] The "brightness relative to the brightness of a similarly illuminated white"
+\end{description}
 
 
 \end{document}

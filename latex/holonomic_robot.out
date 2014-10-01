@@ -1,17 +1,17 @@
 \BOOKMARK [1][-]{section.1}{Variables}{}% 1
 \BOOKMARK [1][-]{section.2}{Introduction}{}% 2
 \BOOKMARK [1][-]{section.3}{Holonomic Dynamics}{}% 3
-\BOOKMARK [1][-]{section.4}{Holonomic Robot Kinematics}{}% 4
-\BOOKMARK [1][-]{section.5}{Control}{}% 5
-\BOOKMARK [1][-]{section.6}{Guidance and Navigation}{}% 6
-\BOOKMARK [1][-]{section.7}{Hardware Setup}{}% 7
-\BOOKMARK [2][-]{subsection.7.1}{Chasis}{section.7}% 8
-\BOOKMARK [2][-]{subsection.7.2}{Electronic Power System}{section.7}% 9
-\BOOKMARK [2][-]{subsection.7.3}{Electronics and Sensors}{section.7}% 10
-\BOOKMARK [3][-]{subsubsection.7.3.1}{MiniIMU}{subsection.7.3}% 11
-\BOOKMARK [3][-]{subsubsection.7.3.2}{Camera}{subsection.7.3}% 12
-\BOOKMARK [2][-]{subsection.7.4}{Software}{section.7}% 13
-\BOOKMARK [3][-]{subsubsection.7.4.1}{OpenCV}{subsection.7.4}% 14
-\BOOKMARK [3][-]{subsubsection.7.4.2}{Point Cloud Library}{subsection.7.4}% 15
-\BOOKMARK [1][-]{section.8}{Results}{}% 16
-\BOOKMARK [1][-]{section.9}{References}{}% 17
+\BOOKMARK [2][-]{subsubsection.3.0.1}{World Coordinates}{section.3}% 4
+\BOOKMARK [3][-]{subsubsection.3.0.2}{External Forces and Torques}{subsubsection.3.0.1}% 5
+\BOOKMARK [1][-]{section.4}{Holonomic Robot Kinematics}{}% 6
+\BOOKMARK [1][-]{section.5}{Control}{}% 7
+\BOOKMARK [1][-]{section.6}{Guidance and Navigation}{}% 8
+\BOOKMARK [1][-]{section.7}{Results}{}% 9
+\BOOKMARK [1][-]{section.8}{References}{}% 10
+\BOOKMARK [1][-]{appendix.A}{Full Derivation of EOM}{}% 11
+\BOOKMARK [2][-]{subsection.A.1}{EOM}{appendix.A}% 12
+\BOOKMARK [1][-]{appendix.B}{Robot Hardware}{}% 13
+\BOOKMARK [2][-]{subsubsection.B.0.1}{MiniIMU}{appendix.B}% 14
+\BOOKMARK [3][-]{subsubsection.B.0.2}{Camera}{subsubsection.B.0.1}% 15
+\BOOKMARK [1][-]{appendix.C}{Robot Software}{}% 16
+\BOOKMARK [2][-]{subsubsection.C.0.3}{OpenCV}{appendix.C}% 17
