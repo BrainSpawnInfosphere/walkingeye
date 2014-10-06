@@ -302,6 +302,19 @@ class RandomModule(Module):
 		self.save_intent = ''
 		return resp
 
+
+####################################################################
+# Help:
+# Lists available commands, or describes a command in detail
+# 
+####################################################################
+class HelpModules(Module):
+	def __init__(self):
+		self.intent = 'help'
+			
+	def process(self, entity):
+		return 'Help module is not implemented yet'
+
 ####################################################################
 # 
 # 
