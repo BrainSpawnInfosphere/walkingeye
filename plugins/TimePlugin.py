@@ -10,6 +10,7 @@ import time
 ####################################################################
 class Plugin(Module):
 	def __init__(self):
+		Module.__init__(self,'time')
 		self.intent = 'time'
 		
 	"""

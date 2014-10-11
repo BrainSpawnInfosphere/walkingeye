@@ -12,6 +12,7 @@ import wave
 ####################################################################
 class Plugin(Module):
 	def __init__(self):
+		Module.__init__(self,'star_wars')
 		self.intent = 'star_wars'
 		
 		# setup Star Wars

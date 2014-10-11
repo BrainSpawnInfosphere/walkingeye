@@ -9,6 +9,7 @@ from Module import *
 ####################################################################
 class Plugin(Module):
 	def __init__(self):
+		Module.__init__(self,'news')
 		self.intent = 'news'
 			
 	def process(self, entity):

@@ -12,6 +12,7 @@ import time
 class Plugin(Module):
 	def __init__(self):
 		self.intent = 'date'
+		Module.__init__(self,'date')
 		
 	"""
 	"""

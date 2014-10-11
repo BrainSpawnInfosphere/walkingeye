@@ -10,7 +10,7 @@ import random
 ####################################################################
 class Plugin(Module):
 	def __init__(self):
-		Module.__init__(self,'random')
+		Module.__init__(self,['greeting','feelings','error','joke','mean'])
 		self.intent = ['greeting','feelings','error','joke','mean']
 		
 		# get canned responces
