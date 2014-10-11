@@ -11,12 +11,9 @@ import random
 class Plugin(Module):
 	def __init__(self):
 		Module.__init__(self,['greeting','feelings','error','joke','mean'])
-		self.intent = ['greeting','feelings','error','joke','mean']
 		
 		# get canned responces
-		f = open( self.info['response_path'] )
-		self.msglist = yaml.safe_load(f)
-		f.close()
+		self.msglist = self.readYaml( self.info['response_path'] )
 		
 	"""
 	"""
@@ -39,5 +36,7 @@ class Plugin(Module):
 
 
 if __name__ == '__main__':
-	print 'bye ...'
+	r = Plugin()
+	r.intent('greeting')
+	print r.process(0)
 	

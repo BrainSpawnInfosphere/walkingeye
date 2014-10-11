@@ -3,8 +3,8 @@
 from Module import *
 import glob
 import wave  
-
-
+import random
+import pyaudio
 
 ####################################################################
 # 
@@ -13,12 +13,13 @@ import wave
 class Plugin(Module):
 	def __init__(self):
 		Module.__init__(self,'star_wars')
-		self.intent = 'star_wars'
+		#self.intent = 'star_wars'
 		
 		# setup Star Wars
-		file = '/Users/kevin/Desktop/star_wars_sounds'
+		file = '/Users/kevin/github/soccer2/sounds/star_wars'
 		self.star_wars_sounds = glob.glob(file + '/*.wav')
-			
+		#print 'files: ',self.star_wars_sounds, len(self.star_wars_sounds)
+		self.logger.info('[+] Star Wars loaded %d sound files'%(len(self.star_wars_sounds)))	
 	"""
 	"""
 	def process(self, entity):
@@ -65,5 +66,7 @@ class Plugin(Module):
 
 
 if __name__ == '__main__':
-	print 'bye ...'
+	s = Plugin()
+	snd = s.process(0)
+	print snd
 	

@@ -39,8 +39,6 @@ class Plugin(Module):
 if __name__ == '__main__':
 	f = open('/Users/kevin/Dropbox/accounts.yaml')
 	info = yaml.safe_load(f)
-	#pprint.pprint( info )
-	#exit()
 	
 	if len(sys.argv) == 2:
 		ret = sendMsg(info,sys.argv[1])

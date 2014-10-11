@@ -13,7 +13,6 @@ class Module:
 	"""
 	"""
 	def __init__(self,mod_name='none'):
-		print 'Module init()'
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger(__name__)
 		self.intent = mod_name
@@ -22,11 +21,22 @@ class Module:
 		# get parameters
 		# does this get called everytime? Can i share, like static in C++?
 		if not hasattr(self,'info'):
-			f = open('/Users/kevin/Dropbox/accounts.yaml')
-			self.info = yaml.safe_load(f)
-			f.close()
-			self.logger.info('[+] Loaded: %s'%('/Users/kevin/Dropbox/accounts.yaml'))
+			file = '/Users/kevin/Dropbox/accounts.yaml'
+			self.info = self.readYaml(file)
+			self.logger.info('[+] Loaded: %s'%(file))
+	
+	"""
+	Read a yaml file and return the corresponding dictionary
+	in: file name
+	out: dict
+	"""
+	def readYaml(self,fname):
+		f = open( fname )
+		dict = yaml.safe_load(f)
+		f.close()
 		
+		return dict
+	
 	"""
 	"""
 	def handleIntent(self,intent):

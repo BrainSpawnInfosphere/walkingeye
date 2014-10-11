@@ -10,7 +10,6 @@ from Module import *
 class Plugin(Module):
 	def __init__(self):
 		Module.__init__(self,'help')
-		self.intent = 'help'
 			
 	def process(self, entity):
 		return 'Help module is not implemented yet'
@@ -19,5 +18,6 @@ class Plugin(Module):
 
 
 if __name__ == '__main__':
-	print 'bye ...'
+	h = Plugin()
+	print h.process(0)
 	

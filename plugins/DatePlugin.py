@@ -28,5 +28,6 @@ class Plugin(Module):
 
 
 if __name__ == '__main__':
-	print 'bye ...'
+	p = Plugin()
+	print p.process(0)
 	
