@@ -25,6 +25,13 @@ Sensor Proc <--+
 
 **Note:** This re-write is still very early and not fully running yet, just parts. 
 
+## Command Line
+
+You can create ascii art from jpegs or text with the programs:
+
+    jp2a --background=light -i --output='art.txt' <some_file.jpg>
+    figlet 'hello world'
+
 ## To Do's
 
 * put it all together :)

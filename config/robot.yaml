@@ -1,8 +1,15 @@
 # robot params
+name: cal
+accounts: '/Users/kevin/Dropbox/accounts.yaml'
 servers:
     sensor: 
         port: 9000
         camera: 0
-    cmd: 
+    cmd:
         port: 9100
 logfile: test.log
+sounds: 
+    folder: sounds
+    start: beep_hi.wav
+    stop: beep_low.wav
+    tts: google  
