@@ -15,6 +15,7 @@ import socket
 import yaml
 import glob
 import wave  
+import misc
 #import json
 #import forecastio
 
@@ -31,19 +32,26 @@ CONTENT_TYPE = 'raw;encoding=signed-integer;bits=16;rate={0};endian={1}'.format(
 
 ###################################################################################
 
-# generator -- don't change!!
-def listen(p):
-	stream = p.open(
-		format=FORMAT, channels=CHANNELS, rate=RATE,
-		input=True, frames_per_buffer=CHUNK)
-	print("* recording and streaming")
+"""
+generator -- don't change!!
+in: pyaudio and number of seconds to record
+out: audio stream
+"""
+def listen(p,sec):
 	
-	for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)): 
+	stream = p.open(
+		format=FORMAT, 
+		channels=CHANNELS, 
+		rate=RATE,
+		input=True, 
+		frames_per_buffer=CHUNK)
+	
+	for i in range(0, int(RATE / CHUNK * sec)): 
 		yield stream.read(CHUNK)
 	
-	print("* done recording and streaming")
 	stream.stop_stream()
 	stream.close()
+	
 	
 
 ####################################################################
@@ -58,7 +66,8 @@ class SoundServer(mp.Process):
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger(__name__)
 		
-		self.getKeys()
+		#self.getKeys()
+		self.info = self.readYaml('/Users/kevin/Dropbox/accounts.yaml')
 		
 		# setup WIT.ai
 		wit_token = self.info['WIT_TOKEN']
@@ -82,23 +91,41 @@ class SoundServer(mp.Process):
 		#starwars = StarWarsModule()
 		#self.modules = [news,weather,r,t,d,e,starwars]
 		
+		# Grab plugins
 		path = "plugins/"
 		self.modules = []
+		#modules = {}
 		sys.path.insert(0, path)
 		for f in os.listdir(path):
 			fname, ext = os.path.splitext(f)
 			if ext == '.py' and fname != 'Module':
 				mod = __import__(fname)
-				#self.modules[fname] = mod.Plugin()
-				self.modules.append( mod.Plugin() )
+				m=mod.Plugin()
+				# not sure how to handle random with multiple intents??
+				#modules[m.intent] = m
+				#for i in m.intent:
+				#	modules[i] = m
+				self.modules.append( m )
 		sys.path.pop(0)
-	
-	def getKeys(self):
-		f = open('/Users/kevin/Dropbox/accounts.yaml')
-		self.info = yaml.safe_load(f)
-		f.close()
+		#print modules
 	
 	"""
+	Read a yaml file and return the corresponding dictionary
+	todo: duplicate of what is already in Module
+	in: file name
+	out: dict
+	"""
+	def readYaml(self,fname):
+		f = open( fname )
+		dict = yaml.safe_load(f)
+		f.close()
+		
+		return dict
+	
+	"""
+	Converts text to speech
+	in: text
+	out: None
 	"""
 	def playTxt(self,txt):
 		if True:
@@ -114,14 +141,26 @@ class SoundServer(mp.Process):
 	"""
 	def run(self):
 		# main loop
-		while True:
-			result = self.wit.post_speech(listen( self.mic ), content_type=CONTENT_TYPE)
-			txt = self.handleVoice(result)
+		run = True
+		while run:
+			result = self.wit.post_speech(listen( self.mic, 1 ), content_type=CONTENT_TYPE)
+			ans = self.getKey(result)
 			
-			if txt == 'exit_loop':
-				break
-			elif txt != '':
-				self.playTxt(txt)
+			# this doesn't work so good :(
+			if ans == 'attention':
+				self.logger.info('[*] Listening')
+				misc.playWave('sounds/misc/beep_hi.wav')
+				
+				result = self.wit.post_speech(listen( self.mic, 3 ), content_type=CONTENT_TYPE)
+				
+				misc.playWave('sounds/misc/beep_lo.wav')
+				self.logger.info('[*] Done listening')
+				txt = self.handleVoice(result)
+				
+				if txt == 'exit_loop':
+					run = False
+				elif txt != '':
+					self.playTxt(txt)
 		
 		self.playTxt('Good bye ...')
 		self.mic.terminate()
