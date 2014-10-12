@@ -38,6 +38,13 @@ class Plugin(Module):
 		
 		except TwilioRestException as e:
 			self.logger.error( e )
+			return 'error'
+			
+		except:
+			print entity
+			return 'error'
+			
+		return 'empty'
 
 if __name__ == '__main__':
 	f = open('/Users/kevin/Dropbox/accounts.yaml')
