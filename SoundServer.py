@@ -73,7 +73,7 @@ class Microphone:
 				misc.playWave('sounds/misc/beep_hi.wav')
 			
 				txt = self.wit.post_speech(self.grabAudio( self.mic, 3 ), content_type=CONTENT_TYPE)
-			
+				
 				misc.playWave('sounds/misc/beep_lo.wav')
 				self.logger.info('[*] Done listening')
 				ret = True
@@ -81,6 +81,7 @@ class Microphone:
 		else:
 			input = raw_input("YOU: ")
 			txt = self.wit.get_message(input)
+			print txt
 			ret = True
 			
 		return txt, ret
@@ -214,7 +215,8 @@ class SoundServer(mp.Process):
 			self.logger.info('Wit.ai API token %s'%(wit_token))
 		
 		# get microphone	
-		self.mic = Microphone(wit_token,False)
+		use_mic = False
+		self.mic = Microphone(wit_token,use_mic)
 		
 		# Grab plugins
 		path = "plugins/"
@@ -268,6 +270,7 @@ class SoundServer(mp.Process):
 		# main loop
 		run = True
 		while run:			
+			# get wit.ai json or nothing (False)
 			result,ret = self.mic.stt()
 			if ret:
  				txt = self.handleVoice(result)
@@ -304,7 +307,7 @@ class SoundServer(mp.Process):
 			key = 'error'
 		elif msg['outcome']['confidence'] < 0.5:
 			key = 'error'
-			print 'confidence',msg['outcome']['confidence']
+			print '[-] Error confidence:',msg['outcome']['confidence']
 		else:
 			key = msg['outcome']['intent']
 	
@@ -312,7 +315,7 @@ class SoundServer(mp.Process):
 
 	"""
 	Handles intent from wit.ai
-	in: processed voice from wit.ai and a list of standard answers
+	in: processed voice from wit.ai
 	out: text for speech
 	todo: make this more dynamic and pluggin
 	"""
@@ -320,17 +323,16 @@ class SoundServer(mp.Process):
 		# get key and handle errors -----------------
 		key = self.getKey(msg)
 		resp = ''
-	
+		
 		# handle nothing said (empty) ---------------
 		if key == 'empty':
 			resp = ''
-	
-		# handle dynamic responses ------------------
-		for m in self.modules:
-			if m.handleIntent( key ):
-				resp = m.process( msg['outcome']['entities'] )
-	
-		#print 'response',resp
+		else:
+			# handle dynamic responses ------------------
+			for m in self.modules:
+				if m.handleIntent( key ):
+					resp = m.process( msg['outcome']['entities'] )
+			
 		self.logger.debug('response'+resp)
 		
 		return resp

@@ -41,7 +41,7 @@ class Plugin(Module):
 			sound = random.choice( self.star_wars_sounds )
 		elif entity['contact']['body'] == 'Blues Brothers':
 			sound = random.choice( self.blues_bros_sounds )
-		elif entity['contact']['body'] == 'Brothers':
+		elif entity['contact']['body'] == 'Brothers' or entity['contact']['body'] == 'Venture Brothers':
 			sound = random.choice( self.venture_bros_sounds )
 			
 		if sound != '':
@@ -88,6 +88,7 @@ class Plugin(Module):
 
 if __name__ == '__main__':
 	s = Plugin()
-	snd = s.process(0)
+	en = {'contact': {'body' : 'Star Wars'}}
+	snd = s.process(en)
 	print snd
 	

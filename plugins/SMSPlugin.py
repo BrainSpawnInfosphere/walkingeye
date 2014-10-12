@@ -26,6 +26,9 @@ class Plugin(Module):
 	"""
 	def process(self, entity):
 		try:
+			if 'message_body' not in entity or 'contact' not in entity:
+				print 'Error:',entity
+				return
 			who = entity['contact']['value']
 			msg = entity['message_body']['value']
 			message = self.client.messages.create(body=msg,

@@ -37,6 +37,6 @@ class Plugin(Module):
 
 if __name__ == '__main__':
 	r = Plugin()
-	r.intent('greeting')
+	r.handleIntent('greeting')
 	print r.process(0)
 	

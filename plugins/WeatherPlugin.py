@@ -59,7 +59,7 @@ class Plugin(Module):
 	"""
 	def process(self, entity):	
 		resp = ''
-		w_time = ''
+		w_time = 'today'
 		
 		if 'datetime' in entity: 
 			w_time = entity['datetime']['body']
@@ -92,3 +92,7 @@ class Plugin(Module):
 		
 		return resp
 
+
+if __name__ == '__main__':
+	w = Plugin()
+	print w.process({})
