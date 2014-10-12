@@ -32,6 +32,12 @@ CONTENT_TYPE = 'raw;encoding=signed-integer;bits=16;rate={0};endian={1}'.format(
 
 ###################################################################################
 
+class Microphone:
+	def __init__(self,real=True):
+
+
+###################################################################################
+
 """
 generator -- don't change!!
 in: pyaudio and number of seconds to record
@@ -143,7 +149,7 @@ class SoundServer(mp.Process):
 		# main loop
 		run = True
 		while run:
-			result = self.wit.post_speech(listen( self.mic, 1 ), content_type=CONTENT_TYPE)
+			result = self.wit.post_speech(listen( self.mic, 2 ), content_type=CONTENT_TYPE)
 			ans = self.getKey(result)
 			
 			# this doesn't work so good :(
