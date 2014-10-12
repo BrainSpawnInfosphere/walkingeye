@@ -12,19 +12,40 @@ import pyaudio
 ####################################################################
 class Plugin(Module):
 	def __init__(self):
-		Module.__init__(self,'star_wars')
+		Module.__init__(self,'tv_movie_sounds')
 		#self.intent = 'star_wars'
 		
 		# setup Star Wars
-		file = '/Users/kevin/github/soccer2/sounds/star_wars'
-		self.star_wars_sounds = glob.glob(file + '/*.wav')
+		#file = '/Users/kevin/github/soccer2/sounds/star_wars'
+		#self.star_wars_sounds = glob.glob(file + '/*.wav')
 		#print 'files: ',self.star_wars_sounds, len(self.star_wars_sounds)
-		self.logger.info('[+] Star Wars loaded %d sound files'%(len(self.star_wars_sounds)))	
+		#self.logger.info('[+] Star Wars loaded %d sound files'%(len(self.star_wars_sounds)))	
+		self.star_wars_sounds = self.loadSounds('star_wars')
+		self.venture_bros_sounds = self.loadSounds('venture_brothers')
+		self.blues_bros_sounds = self.loadSounds('blues_bros')
+		
+	def loadSounds(self,type):
+		file = '/Users/kevin/github/soccer2/sounds/' + type
+		snds = glob.glob(file + '/*.wav')
+		self.logger.info('   [>] %s loaded %d sound files'%(type,len(snds)))	
+		return snds
+		
 	"""
 	"""
 	def process(self, entity):
-		sound = random.choice( self.star_wars_sounds )
-		self.playWave( sound )
+		print entity
+		sound = ''
+		
+		# venture bros not working??? also, might be a bad wave file
+		if entity['contact']['body'] == 'Star Wars':
+			sound = random.choice( self.star_wars_sounds )
+		elif entity['contact']['body'] == 'Blues Brothers':
+			sound = random.choice( self.blues_bros_sounds )
+		elif entity['contact']['body'] == 'Brothers':
+			sound = random.choice( self.venture_bros_sounds )
+			
+		if sound != '':
+			self.playWave( sound )
 		return ''
 		
 	
