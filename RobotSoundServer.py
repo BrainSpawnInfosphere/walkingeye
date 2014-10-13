@@ -16,6 +16,7 @@ import wave
 import misc
 import pprint
 
+import mqttclass as mq
 
 ###################################################################################
 
@@ -36,6 +37,9 @@ class Microphone:
 		self.logger = logging.getLogger('robot')
 		
 		self.wit = wit.Wit(wit_token)
+		
+		self.pub = mq.PubJSON('sound')
+		self.pub.start()
 
 		# get microphone	
 		if real: 

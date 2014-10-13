@@ -3,10 +3,11 @@
 This is the second version of my soccer robot.
 
 * Doesn't use [ROS](http://ros.org), ROS is a pain to install and maintain on OSX and various linux systems
-	* Uses some of the same ideas, but instead of RPC-XML, simple sockets
-	* Want to re-write to get rid of pickle and replace with json (faster, better)
+	* Uses some of the same ideas, but not RPC-XML
+* Uses [Mosquito]() instead of roscore 
 * Uses my PS4 controller with PySDL2
-* Uses Google-translate to for TTS
+* Uses [wit.ai](http://wit.ai) for speech-to-text
+* Uses Google-translate to for text-to-speech
 * Uses OpenCV to compress and send video stream off-board
 	* Might use a separate IP camera to reduce CPU usage and get faster performance
 * All of this runs on Raspberry Pi B+
@@ -35,6 +36,7 @@ You need the following key python libraries installed:
 * twilio - SMS
 * PyAudio - recording sound (had to build from scratch)
 * PyYAML - read yaml config files
+* phao-mqtt - python bindings for MQTT
 
 ## Sound Server
 
@@ -62,6 +64,36 @@ You can create ascii art from jpegs or text with the programs:
 
     jp2a --background=light -i --output='art.txt' <some_file.jpg>
     figlet 'hello world'
+
+## Message Flow
+
+Parts:
+
+* RobotCmdServer - controls motors, leds, servos, etc
+* RobotSensorServer - publishes processed/conditioned sensors readings
+* RobotSoundServer - handles voice commands and sounds
+
+```
+    js(twist/cmd) ----> RobotCmdServer <--(twist/cmd)-- ai
+                                    ^                  | ^  
+    RobotSoundServer(twist/cmd) ----+                  | |
+                ^                                      | |
+                +-------------------------(sound)------+ |
+                     RobotSensorServer(sensor/image) ----+ 
+```
+
+Here is simple layout of message formate to support the flow shown above.
+
+| Header | Format                                 |
+|--------|----------------------------------------|
+|header  | {time_stamp}                           |
+|vec     | {x,y,z}                                |
+|twist   | {linear[vec], angular[vec]}            |
+|cmd     | {motors:[1,2,3,4]}                     |
+|sound   | {sound: snd}                           |
+|imu     | {accel[vec],gyro[vec],comp[vec],temp}  |
+|sensor  | {header,[imu]}                         |
+|image   | {header,image}                         |
 
 ## To Do's
 
