@@ -25,6 +25,17 @@ Sensor Proc <--+
 
 **Note:** This re-write is still very early and not fully running yet, just parts. 
 
+## Libraries Used
+
+You need the following key python libraries installed:
+
+* python-forecastio - weather
+* PyWit - text-to-speech
+* PySDL2 - simulation and joystick
+* twilio - SMS
+* PyAudio - recording sound (had to build from scratch)
+* PyYAML - read yaml config files
+
 ## Sound Server
 
 The robot uses [wit.ai](http://wit.ai) to understand the spoken word, turning speech in to text (stt). There are a bunch of plugins which act upon the text to perform different things:

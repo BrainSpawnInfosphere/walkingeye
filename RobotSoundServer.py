@@ -6,7 +6,7 @@ import wit
 import pyaudio
 import time
 import logging
-import GoogleTTS
+import GoogleTTS as gtts
 from multiprocessing.connection import Listener as Publisher
 import multiprocessing as mp
 import socket
@@ -192,7 +192,7 @@ class RobotSoundServer(mp.Process):
 		self.port = port
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger('robot')
-		self.tts = GoogleTTS()
+		self.tts = gtts.GoogleTTS()
 		
 		#self.getKeys()
 		self.info = self.readYaml('/Users/kevin/Dropbox/accounts.yaml')
@@ -207,7 +207,7 @@ class RobotSoundServer(mp.Process):
 			self.logger.info('Wit.ai API token %s'%(wit_token))
 		
 		# get microphone	
-		use_mic = False
+		use_mic = True
 		self.mic = Microphone(wit_token,use_mic,stdin)
 		
 		# Grab plugins
@@ -248,7 +248,7 @@ class RobotSoundServer(mp.Process):
 	"""
 	def playTxt(self,txt):
 		if True:
-			fname = tts.tts(txt,None)
+			fname = self.tts.tts(txt)
 			os.system('afplay %s'%(fname))
 		else:
 			os.system('say -v vicki ' + txt)
