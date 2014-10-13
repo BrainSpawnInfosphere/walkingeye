@@ -25,23 +25,31 @@ class Plugin(Module):
 	"""
 	"""
 	def process(self, entity):
+		#print '>> process',entity
 		try:
-			if 'message_body' not in entity or 'contact' not in entity:
-				print 'Error:',entity
-				return
+			if ('message_body' not in entity) or ('contact' not in entity):
+				self.logger.error( '[-] Error:'+ str(entity) )
+				return 'error'
+			
+			# need better solution
 			who = entity['contact']['value']
+			if who == 'kevin': who = 'Kevin'
+			if who == 'nina': who = 'Nina'
 			msg = entity['message_body']['value']
+			
+			#print 'who',who,'msg',msg,'from phone',self.from_phone,'to phone',self.info['Twilio']['phone']
+			
 			message = self.client.messages.create(body=msg,
 				to=self.info['Twilio']['phone'][who],
 				from_=self.from_phone ) 
-			self.logger.debug( 'Good SMS: %s'%(message.sid) )
+			self.logger.debug( '[+] Good SMS: %s'%(message.sid) )
 		
 		except TwilioRestException as e:
 			self.logger.error( e )
 			return 'error'
 			
 		except:
-			print entity
+			self.logger.error( '[-] Error:'+ str(entity) )
 			return 'error'
 			
 		return 'empty'

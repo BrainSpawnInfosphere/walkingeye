@@ -6,28 +6,15 @@ import wit
 import pyaudio
 import time
 import logging
-#import handle_voice as hv
 import GoogleTTS
 from multiprocessing.connection import Listener as Publisher
 import multiprocessing as mp
 import socket
-#import random
 import yaml
 import glob
 import wave  
 import misc
-#import json
-#import forecastio
-
-#CHUNK = 1024
-#FORMAT = pyaudio.paInt16
-#CHANNELS = 1
-#RATE = 44100
-#RECORD_SECONDS = 3
-# Change this based on your OSes settings. This should work for OSX, though.
-#ENDIAN = 'little' 
-# see https://wit.ai/docs/api PSOT/speech for more options: wav,mp3,ulaw
-#CONTENT_TYPE = 'raw;encoding=signed-integer;bits=16;rate={0};endian={1}'.format(RATE, ENDIAN)
+import pprint
 
 
 ###################################################################################
@@ -37,13 +24,13 @@ class Microphone:
 	FORMAT = pyaudio.paInt16
 	CHANNELS = 1
 	RATE = 44100
-	#RECORD_SECONDS = 3
 	ENDIAN = 'little' 
 	# see https://wit.ai/docs/api PSOT/speech for more options: wav,mp3,ulaw
 	CONTENT_TYPE = 'raw;encoding=signed-integer;bits=16;rate={0};endian={1}'.format(RATE, ENDIAN)
 
-	def __init__(self,wit_token,real=True):
+	def __init__(self,wit_token,real,stdin):
 		self.real = real
+		self.stdin = stdin
 		
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger('robot')
@@ -82,9 +69,10 @@ class Microphone:
 				ret = True
 				
 		else:
-			input = raw_input("YOU: ")
+			print "you:",
+			input = self.stdin.readline()
 			txt = self.wit.get_message(input)
-			print txt
+			pprint.pprint( txt )
 			ret = True
 			
 		return txt, ret
@@ -198,12 +186,13 @@ class Microphone:
 # 
 ####################################################################
 class RobotSoundServer(mp.Process):
-	def __init__(self,host="localhost",port=9200):
+	def __init__(self,stdin,host="localhost",port=9200):
 		mp.Process.__init__(self)
 		self.host = host
 		self.port = port
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger('robot')
+		self.tts = GoogleTTS()
 		
 		#self.getKeys()
 		self.info = self.readYaml('/Users/kevin/Dropbox/accounts.yaml')
@@ -219,7 +208,7 @@ class RobotSoundServer(mp.Process):
 		
 		# get microphone	
 		use_mic = False
-		self.mic = Microphone(wit_token,use_mic)
+		self.mic = Microphone(wit_token,use_mic,stdin)
 		
 		# Grab plugins
 		path = "plugins/"
@@ -259,8 +248,8 @@ class RobotSoundServer(mp.Process):
 	"""
 	def playTxt(self,txt):
 		if True:
-			GoogleTTS.tts(txt,None)
-			os.system('afplay output.mp3')
+			fname = tts.tts(txt,None)
+			os.system('afplay %s'%(fname))
 		else:
 			os.system('say -v vicki ' + txt)
 	

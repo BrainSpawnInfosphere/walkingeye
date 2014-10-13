@@ -55,7 +55,10 @@ class Robot:
 		self.cmds = RobotCmdServer( 
 				ip, 
 				conf['servers']['cmd']['port'])
+				
+		newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
 		self.sounds = RobotSoundServer(
+				newstdin,
 				ip, 
 				conf['servers']['sound']['port'])
 	
