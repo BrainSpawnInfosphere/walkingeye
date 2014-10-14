@@ -61,23 +61,17 @@ class RobotSensorServer(mp.Process):
 		
 	def run(self):
 		self.logger.info(str(self.name)+'['+str(self.pid)+'] started on'+ str(self.host) + ':' + str(self.port) +', Daemon: '+str(self.daemon))
-		#p = Publisher((self.host,self.port))
-		#self.pub = p.accept()
-		#self.logger.info('Accepted connection: ')
 		
 		#self.camera = cv2.VideoCapture(self.camera_num)
-		self.logger.info('Openned camera: '+str(self.camera_num))
+		#self.logger.info('Openned camera: '+str(self.camera_num))
 		
 		
-		self.pub = mq.PubJSON('sensors')
+		self.pub = mq.PubSubJSON([],[])
 		self.pub.start()
 		
 		while True:
 			# send info
-			#self.pub.send( self.pkgImage() )
-			#self.pub.send( self.pkgSensors() )
-			
-			self.pub.publish( self.pkgSensors() )
+			self.pub.publish( 'sensors', self.pkgSensors() )
 			time.sleep(0.05) # 0.5 => 20Hz
 		
 

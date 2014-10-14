@@ -62,7 +62,7 @@ class RobotCmdServer(mp.Process):
 		#self.logger.info('Accepted connection: ')
 		
 		
-		self.sub = mq.SubJSON('cmds',self.on_message)
+		self.sub = mq.PubSubJSON([('cmds',0)],[self.on_message])
 		self.sub.start()
 		
 		while True:

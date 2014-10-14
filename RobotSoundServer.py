@@ -37,9 +37,6 @@ class Microphone:
 		self.logger = logging.getLogger('robot')
 		
 		self.wit = wit.Wit(wit_token)
-		
-		self.pub = mq.PubJSON('sound')
-		self.pub.start()
 
 		# get microphone	
 		if real: 
@@ -190,13 +187,17 @@ class Microphone:
 # 
 ####################################################################
 class RobotSoundServer(mp.Process):
-	def __init__(self,stdin,host="localhost",port=9200):
+	def __init__(self,stdin=os.fdopen(os.dup(sys.stdin.fileno())),host="localhost",port=9200):
 		mp.Process.__init__(self)
 		self.host = host
 		self.port = port
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger('robot')
 		self.tts = gtts.GoogleTTS()
+		
+		# publisher
+		self.pub = mq.PubSubJSON([],[])
+		self.pub.start()
 		
 		#self.getKeys()
 		self.info = self.readYaml('/Users/kevin/Dropbox/accounts.yaml')
@@ -211,7 +212,7 @@ class RobotSoundServer(mp.Process):
 			self.logger.info('Wit.ai API token %s'%(wit_token))
 		
 		# get microphone	
-		use_mic = True
+		use_mic = False
 		self.mic = Microphone(wit_token,use_mic,stdin)
 		
 		# Grab plugins
@@ -333,6 +334,9 @@ class RobotSoundServer(mp.Process):
 			for m in self.modules:
 				if m.handleIntent( key ):
 					resp = m.process( msg['outcome']['entities'] )
+		
+		# probably publish stuff
+		#self.pub.publish(something)
 		
 		# shouldn't have to do this
 		if not resp:
