@@ -7,6 +7,8 @@ servers:
         camera: 0
     cmd:
         port: 9100
+    sound:
+        port: 9200
 logfile: test.log
 sounds: 
     folder: sounds

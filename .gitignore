@@ -4,7 +4,6 @@ old
 *.log
 .AppleDouble
 .DS_Store
-.aux
-.log
-.out
-.gz
+*.aux
+*.out
+*.gz

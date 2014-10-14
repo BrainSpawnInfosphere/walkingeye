@@ -6,29 +6,17 @@ import wit
 import pyaudio
 import time
 import logging
-#import handle_voice as hv
-import GoogleTTS
+import GoogleTTS as gtts
 from multiprocessing.connection import Listener as Publisher
 import multiprocessing as mp
 import socket
-#import random
 import yaml
 import glob
 import wave  
 import misc
-#import json
-#import forecastio
+import pprint
 
-CHUNK = 1024
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 44100
-RECORD_SECONDS = 3
-# Change this based on your OSes settings. This should work for OSX, though.
-ENDIAN = 'little' 
-# see https://wit.ai/docs/api PSOT/speech for more options: wav,mp3,ulaw
-CONTENT_TYPE = 'raw;encoding=signed-integer;bits=16;rate={0};endian={1}'.format(RATE, ENDIAN)
-
+import mqttclass as mq
 
 ###################################################################################
 
@@ -37,13 +25,16 @@ class Microphone:
 	FORMAT = pyaudio.paInt16
 	CHANNELS = 1
 	RATE = 44100
-	RECORD_SECONDS = 3
+	ENDIAN = 'little' 
+	# see https://wit.ai/docs/api PSOT/speech for more options: wav,mp3,ulaw
+	CONTENT_TYPE = 'raw;encoding=signed-integer;bits=16;rate={0};endian={1}'.format(RATE, ENDIAN)
 
-	def __init__(self,wit_token,real=True):
+	def __init__(self,wit_token,real,stdin):
 		self.real = real
+		self.stdin = stdin
 		
 		logging.basicConfig(level=logging.INFO)
-		self.logger = logging.getLogger(__name__)
+		self.logger = logging.getLogger('robot')
 		
 		self.wit = wit.Wit(wit_token)
 
@@ -64,7 +55,7 @@ class Microphone:
 		ret = False
 
 		if self.real:
-			result = self.wit.post_speech(self.grabAudio( self.mic, 2 ), content_type=CONTENT_TYPE)
+			result = self.wit.post_speech(self.grabAudio( self.mic, 2 ), content_type=self.CONTENT_TYPE)
 			ans = self.getKey(result)
 		
 			# this doesn't work so good :(
@@ -72,15 +63,17 @@ class Microphone:
 				self.logger.info('[*] Listening')
 				misc.playWave('sounds/misc/beep_hi.wav')
 			
-				txt = self.wit.post_speech(self.grabAudio( self.mic, 3 ), content_type=CONTENT_TYPE)
-			
+				txt = self.wit.post_speech(self.grabAudio( self.mic, 3 ), content_type=self.CONTENT_TYPE)
+				
 				misc.playWave('sounds/misc/beep_lo.wav')
 				self.logger.info('[*] Done listening')
 				ret = True
 				
 		else:
-			input = raw_input("YOU: ")
+			print "you:",
+			input = self.stdin.readline()
 			txt = self.wit.get_message(input)
+			pprint.pprint( txt )
 			ret = True
 			
 		return txt, ret
@@ -193,13 +186,18 @@ class Microphone:
 # 
 # 
 ####################################################################
-class SoundServer(mp.Process):
-	def __init__(self,host="localhost",port=9200):
+class RobotSoundServer(mp.Process):
+	def __init__(self,stdin=os.fdopen(os.dup(sys.stdin.fileno())),host="localhost",port=9200):
 		mp.Process.__init__(self)
 		self.host = host
 		self.port = port
 		logging.basicConfig(level=logging.INFO)
-		self.logger = logging.getLogger(__name__)
+		self.logger = logging.getLogger('robot')
+		self.tts = gtts.GoogleTTS()
+		
+		# publisher
+		self.pub = mq.PubSubJSON([],[])
+		self.pub.start()
 		
 		#self.getKeys()
 		self.info = self.readYaml('/Users/kevin/Dropbox/accounts.yaml')
@@ -214,7 +212,8 @@ class SoundServer(mp.Process):
 			self.logger.info('Wit.ai API token %s'%(wit_token))
 		
 		# get microphone	
-		self.mic = Microphone(wit_token,False)
+		use_mic = False
+		self.mic = Microphone(wit_token,use_mic,stdin)
 		
 		# Grab plugins
 		path = "plugins/"
@@ -254,8 +253,8 @@ class SoundServer(mp.Process):
 	"""
 	def playTxt(self,txt):
 		if True:
-			GoogleTTS.tts(txt,None)
-			os.system('afplay output.mp3')
+			fname = self.tts.tts(txt)
+			os.system('afplay %s'%(fname))
 		else:
 			os.system('say -v vicki ' + txt)
 	
@@ -266,14 +265,20 @@ class SoundServer(mp.Process):
 	"""
 	def run(self):
 		# main loop
+		self.logger.info(str(self.name)+'['+str(self.pid)+'] started on'+ 
+			str(self.host) + ':' + str(self.port) +', Daemon: '+str(self.daemon))
 		run = True
-		while run:			
+		while run:		
+			print 'loop'	
+			# get wit.ai json 
 			result,ret = self.mic.stt()
 			if ret:
  				txt = self.handleVoice(result)
 				
 				if txt == 'exit_loop':
 					run = False
+				elif txt == 'empty':
+					pass
 				elif txt != '':
 					self.playTxt(txt)
 		
@@ -304,7 +309,7 @@ class SoundServer(mp.Process):
 			key = 'error'
 		elif msg['outcome']['confidence'] < 0.5:
 			key = 'error'
-			print 'confidence',msg['outcome']['confidence']
+			print '[-] Error confidence:',msg['outcome']['confidence']
 		else:
 			key = msg['outcome']['intent']
 	
@@ -312,25 +317,30 @@ class SoundServer(mp.Process):
 
 	"""
 	Handles intent from wit.ai
-	in: processed voice from wit.ai and a list of standard answers
-	out: text for speech
+	in: processed voice from wit.ai
+	out: text for speech or empty
 	todo: make this more dynamic and pluggin
 	"""
 	def handleVoice(self,msg):
 		# get key and handle errors -----------------
 		key = self.getKey(msg)
 		resp = ''
-	
+		
 		# handle nothing said (empty) ---------------
 		if key == 'empty':
-			resp = ''
-	
-		# handle dynamic responses ------------------
-		for m in self.modules:
-			if m.handleIntent( key ):
-				resp = m.process( msg['outcome']['entities'] )
-	
-		#print 'response',resp
+			resp = 'empty'
+		else:
+			# handle dynamic responses ------------------
+			for m in self.modules:
+				if m.handleIntent( key ):
+					resp = m.process( msg['outcome']['entities'] )
+		
+		# probably publish stuff
+		#self.pub.publish(something)
+		
+		# shouldn't have to do this
+		if not resp:
+			resp = 'empty'	
 		self.logger.debug('response'+resp)
 		
 		return resp
@@ -339,7 +349,7 @@ class SoundServer(mp.Process):
 
 if __name__ == '__main__':
 	#output_file = StringIO()
-	ss = SoundServer()
-	ss.run()
+	s = RobotSoundServer()
+	s.run()
 	print 'bye ...'
 	
