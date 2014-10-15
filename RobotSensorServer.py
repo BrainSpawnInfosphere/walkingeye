@@ -32,6 +32,8 @@ class RobotSensorServer(mp.Process):
 		self.camera_num = camera_num
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger('robot')
+		
+		self.epoch = dt.datetime.now()
 	
 	def getTime(self):
 		ts = dt.datetime.now() - self.epoch
@@ -54,7 +56,7 @@ class RobotSensorServer(mp.Process):
 		imu = {'ax': 1.0, 'ay': 1.0, 'az': 1.0}
 		
 		msg = {
-			'sensors': 1, #self.getTime(), #FIXME 
+			'sensors': (dt.datetime.now() - self.epoch).total_seconds(), #self.getTime(), #FIXME 
 			'imu': imu
 		}
 		return msg
