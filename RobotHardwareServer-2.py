@@ -7,23 +7,24 @@
 #
 
 import time
-import json
-import cv2
-import base64
+#import json
+#import cv2
+#import base64
 import datetime as dt
-from multiprocessing.connection import Listener as Publisher
+#from multiprocessing.connection import Listener as Publisher
 import multiprocessing as mp
 import logging
 import yaml
-import socket
+#import socket
 
-import mqttclass as mq
+#import mqttclass as mq
+from zmqclass import *
 
 ####################################################################
 # RobotCmdServer handles incoming commands streamed from somewhere else.
 # All information is in coming.
 ####################################################################
-class RobotCmdServer(mp.Process):
+class RobotHardwareServer(mp.Process):
 	def __init__(self,host="localhost",port=9000):
 		mp.Process.__init__(self)
 		self.host = host
@@ -62,8 +63,7 @@ class RobotCmdServer(mp.Process):
 		#self.logger.info('Accepted connection: ')
 		
 		
-		self.sub = mq.PubSubJSON([('cmds',0)],[self.on_message])
-		self.sub.start()
+		self.sub = Sub(['cmds'])
 		
 		while True:
 			time.sleep(0.05) # 0.5 => 20Hz
@@ -76,5 +76,5 @@ class RobotCmdServer(mp.Process):
 
 
 if __name__ == '__main__':
-	c = RobotCmdServer()
+	c = RobotHardwareServer()
 	c.run()
