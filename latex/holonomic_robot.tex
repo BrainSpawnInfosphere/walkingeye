@@ -76,7 +76,7 @@ title=\lstname,                 % show the filename of files included with \lsti
 
 \flushbottom
 
-\title{\textsf{Holonomic Soccer Robot}}
+\title{\textsf{Holonomic Turtle Robot}}
 
 \author{
 %\hline 
@@ -160,8 +160,8 @@ Omni wheels operate like standard wheels in that the force is produced normal to
  	\hfill
  	\begin{minipage}[htb]{2.5in}
 		\centering
- 		\includegraphics[height =2.5in]{pics/omni_wheel.png} 
-		\caption{\label{wheel}Omni directional wheel used on the soccer robot which allows movement in any direction.} 
+ 		\includegraphics[height =2.5in]{pics/omni_wheel.jpg} 
+		\caption{\label{wheel}Omni directional wheel allows movement in any direction.} 
  	\end{minipage} 
 \end{figure*}  
 
@@ -170,7 +170,7 @@ Omni wheels operate like standard wheels in that the force is produced normal to
 	%\begin{minipage}[htb]{2.5in}
 		\centering
  		\includegraphics[height=3.5in]{pics/robot_cs.png} 
-		\caption{\label{coordinate}Coordinate system tied to the body of the robot with the origin located at the center of mass. Note that the x-axis points straight up and the y-axis points to the right. Also, the motor angle $\phi$ is defined as the angle measured from the y-axis. The forces (F) are the results of the motors spinning in the positive direction according to the right hand rule. Note also that no force is produced parallel to the motor's axis of rotation.}  
+		\caption{\label{coordinate}Coordinate system tied to the body of the robot with the origin located at the center of mass. Note that the x-axis points straight up and the y-axis points to the right. Also, the motor angle $\phi$ is defined as the angle measured from the y-axis. The forces ($F$) are the results of the motors spinning in the positive direction according to the right hand rule. Note also that no force is produced parallel to the motor's axis of rotation.}  
  	%\end{minipage}
  	%\hfill
  	%\begin{minipage}[htb]{2.5in}
@@ -512,59 +512,54 @@ hi how are you
 	\begin{minipage}[htb]{3in}
 		\centering
  		\includegraphics[height=2in]{pics/imu.png} 
-		\caption{\label{fig:imu}IMU.}  
+		\caption{\label{fig:imu} Pololu MiniIMU which provides 3 DoF for acceleration, rotation rate, and magnetic field.}  
  	\end{minipage}
  	\hfill
  	\begin{minipage}[htb]{3in}
-		%\centering
- 		\includegraphics[height =2in]{pics/motor_driver.jpg} 
-		%\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
- 	\end{minipage} 
-\end{figure*}
-
-The robot is teleoperated from a laptop via a bluetooth link to an Arduino microcontroller which runs the motor drivers and sensors.
-
-\subsubsection{MiniIMU}
-
-\subsubsection{Camera}
-
-
-\begin{figure*}[tb]
-	%\begin{minipage}[htb]{3in}
 		\centering
- 		%\includegraphics[height=2.5in]{pics/holonomic_robot.png} 
-		\caption{\label{fig:ros}The software architecture composed of ROS nodes.}  
- 	%\end{minipage}
- 	%\hfill
- 	%\begin{minipage}[htb]{3in}
-		%\centering
- 		%\includegraphics[height =2.5in]{pics/equiv_motors.png} 
-		%\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
- 	%\end{minipage} 
+ 		\includegraphics[height =2in]{pics/motor_driver.jpg} 
+		\caption{\label{fig:motor_driver} Two Polou dual TNG6612 motor driver boards control four motors with omni wheels.} 
+ 	\end{minipage} 
 \end{figure*}
 
 
 \begin{figure*}[tb]
 	\begin{minipage}[htb]{3in}
 		\centering
- 		\includegraphics[height=2in]{pics/bluetooth_back.jpg} 
-		\caption{\label{fig:imu}IMU.}  
+ 		\includegraphics[height=2in]{pics/led_matrix.jpg} 
+		\caption{\label{fig:imu} Adafruit LED matrix array.}  
  	\end{minipage}
  	\hfill
  	\begin{minipage}[htb]{3in}
-		%\centering
- 		\includegraphics[height =2in]{pics/motor_driver.jpg} 
-		%\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
+		\centering
+ 		\includegraphics[height =2in]{pics/camera.jpeg} 
+		\caption{\label{fig:motor_driver} Logitech c270 USB camera with microphone.} 
  	\end{minipage} 
 \end{figure*}
 
 
 
+
+\subsubsection{MiniIMU}
+
+The mini inertial measurement unit (IMU) from \url{http://www.pololu.com} provides acceleration, rotation rates, and magnetic field sensing along all 3 axes. The performance specs are shown below:
+
+table
+
 \section{Robot Software}
+
+The robot software is primarily written in Python and located at \url{https://github.com/walchko}. The architecture is shown in \cite{arch}, where multiple distributed processes communicate using a publish subscribe architecture leveraging software from \url{http://zeromq.org}. 
+
+\begin{figure*}[tb]
+	\centering
+ 	\includegraphics[height=5in]{pics/Robot_Processes.png} 
+	\caption{\label{fig:arch}The software architecture composed of publish/subscribe nodes allow all of the software to run either locally on the robot or distributed across different machines on the network.}  
+\end{figure*}
+
 
 \subsubsection{OpenCV}
 
-The vision system uses the Open Computer Vision (OpenCV \cite{opencv}) is used to track the ball and guide the robot to the ball (visual servoing).
+The vision system uses the Open Computer Vision (OpenCV \cite{opencv}).
 
 \begin{figure*}[tb]
 	\begin{minipage}[htb]{3in}
