@@ -50,7 +50,7 @@ class RobotCameraServer(mp.Process):
 def sub():
 	sub_topics = ['image']
 	
-	p = SubBase64(sub_topics)
+	p = SubBase64(sub_topics,'tcp://192.168.1.22:9000')
 	
 	try:
 		while True:

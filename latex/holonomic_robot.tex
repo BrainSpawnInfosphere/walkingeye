@@ -88,7 +88,7 @@ title=\lstname,                 % show the filename of files included with \lsti
 \begin{minipage}[b]{3in}	
 	Kevin J. Walchko, PhD \\ \\ \\
 	%US Air Force \\
-	Code: https://github.com/walchko/soccer \\
+	Code: https://github.com/walchko/soccer2\\
 	Email: \texttt{kevin.walchko@outlook.com} 
 \end{minipage}
 \\
@@ -121,14 +121,17 @@ This paper describes the development of a holonomic robot using omni directional
 		%$e$ & V & motor voltage \\
 		M & kg & mass of robot \\
 		I & $kg \cdot m^2$ & inertia of robot \\
-		$I_w$ & kg$\cdot$m$^2$ & inertia of wheel \\
-		$a_i$ & m/$sec^2$ & acceleration in the $i^{th}$ direction \\
-		$v_i$ & m/sec & velocity in the $i^{th}$ direction \\
-		$\omega_i$ & rad/sec & $i^{th}$ wheel speed \\
+		$J_w$ & kg$\cdot$m$^2$ & inertia of wheel \\
+		%$a_i$ & m/$sec^2$ & acceleration in the $i^{th}$ direction \\
+		$v_i$ & m/sec & velocity in the $i^{th}$ direction in either frame {$W$} or ${B}$\\
+		$\dot \theta_i$ & rad/sec & $i^{th}$ wheel speed \\
 		$r_w$ &  m & wheel radius \\
+		$r_m$ & m & offset distance between frames {$B'$} and ${B}$\\
 		$\tau_i$ & N$\cdot$m & wheel torque \\
 		$F_i$ & N & traction force (vector) \\
 		$f_i$ & N &  magnitude of traction force ($\|F_i\|$) \\
+		$\phi_i$ & rads & wheel location relative to ${B}$\\
+		$\psi$ & rads & angle of ${B}$ with respect to ${W}$\\
 		\hline
 		\end{tabular}
 	\end{center}
@@ -141,10 +144,10 @@ This paper describes the development of a holonomic robot using omni directional
 Robots come in a variety of types and configurations: wheeled, tracked, legs, flying, etc. Common wheeled robots typically have two wheels (directly driven) with a caster wheel to make the robot stable. There are some without the caster wheel and employ a control system to keep them upright (inverted pendulum problem) and resemble a Segway scooter. All of these two wheeled robot are non-holonomic systems. 
 
 \begin{definition}
-A non-holonomic system in physics and mathematics is a system whose state depends on the path taken to achieve it. An automobile is an example of a non-holonomic vehicle. The vehicle has three degrees of freedom—its position in two axes, and its orientation relative to a fixed heading. Yet it has only two controllable degrees of freedom—acceleration/braking and the angle of the steering wheel—with which to control its position and orientation. \cite{wiki_non_holonomic}
+A non-holonomic system in physics and mathematics is a system whose state depends on the path taken to achieve it. An automobile is an example of a non-holonomic vehicle. The vehicle has three degrees of freedom: its position in two axes, and its orientation relative to a fixed heading. Yet it has only two controllable degrees of freedom: acceleration/braking and the angle of the steering wheel—with which to control its position and orientation. \cite{wiki_non_holonomic}
 \end{definition}
 
-Due to these constraints, a holonomic robot (\figref{robot}) which could travel in any direction and immediately change its position and orientation is much more desirable. There are a variety of different wheels which make this type of robot possible such as mecanum or omni wheels (\figref{wheel}).
+Due to these constraints, a holonomic robot (\figref{soccer_robot}) which could travel in any direction and immediately change its position and orientation is much more desirable. There are a variety of different wheels which make this type of robot possible such as mecanum or omni wheels (\figref{wheel}).
 
 Omni wheels operate like standard wheels in that the force is produced normal to the motor's axis of rotation and as a result of friction. However, there are a series of smaller wheels which ring the main wheel and allow the wheel to slip in the direction of the motor rotational axis. Note that no force is produced parallel to the motor axis, just slippage.
 
@@ -155,7 +158,7 @@ Omni wheels operate like standard wheels in that the force is produced normal to
 	\begin{minipage}[htb]{2.5in}
 		\centering
  		\includegraphics[height=2.5in]{pics/holonomic_robot.png} 
-		\caption{\label{robot}Holonomic soccer robot using 4 omni directional wheels and a kicking motor used to hit the red ball into a goal. \cite{Radu1}.}  
+		\caption{\label{soccer_robot}Holonomic soccer robot using 4 omni directional wheels and a kicking motor used to hit the red ball into a goal. \cite{Radu1}.}  
  	\end{minipage}
  	\hfill
  	\begin{minipage}[htb]{2.5in}
@@ -181,12 +184,12 @@ Omni wheels operate like standard wheels in that the force is produced normal to
 \end{figure*}  
 
 
-The dynamics for a holonomic robot, such as \figref{robot}, with 4 omni directional wheels (see \figref{wheel}, can be derived using Euler-Largrange ($\mathcal{L}$) which defines a system's kinectic ($T$) and potential ($V$) energies in relation to a set of generalized coordinates ($q$) and generalized forces ($Q$):
+The dynamics for a holonomic robot, such as \figref{coordinate}, with 4 omni directional wheels (can be derived using Euler-Largrange ($\mathcal{L}$) which defines a system's kinectic ($T$) and potential ($V$) energies in relation to a set of generalized coordinates ($q$) and generalized forces ($Q$):
 
 \begin{eqnarray}
 	\mathcal{L}=T-V \\
 	\frac{d}{dt} \left\{ \dpar{ \mathcal{L} }{\dot q} \right\} - \dpar{ \mathcal{L} }{q} = Q \\
-	T = \frac{1}{2}M(\dot x^2 + \dot y^2)+ \frac{1}{2}J \dot \psi^2 + \frac{1}{2} J_w (\dot \theta_1^2 + \dot \theta_2^2 + \dot \theta_3^2 + \dot \theta_4^2) \\
+	T = \frac{1}{2}M v_w^2+ \frac{1}{2}J \dot \psi^2 + \frac{1}{2} J_w (\dot \theta_1^2 + \dot \theta_2^2 + \dot \theta_3^2 + \dot \theta_4^2) \\
 	V = 0
 \end{eqnarray}
 
@@ -194,17 +197,23 @@ However, the dynamics must be calculated from an inertial reference frame (${W}$
 
 \begin{eqnarray}
 	v_w = v_{B'} + \dot \psi \times r_m \\
-	v_w = v_{B'} +
-	\begin{bmatrix}
-		x & y & 0
-	\end{bmatrix}^T
-	\times
+	v_w = v_{B'} +	
 	\begin{bmatrix}
 		0 & 0 & \dot \psi
 	\end{bmatrix}^T
-	= v_{B'} + \dot \psi
+	\times
 	\begin{bmatrix}
-		y_m & x_m & 0
+		x_m & y_m & 0
+	\end{bmatrix}^T
+	= 
+	\begin{bmatrix}
+		\dot x & \dot y & 0
+	\end{bmatrix}^T +
+	\begin{bmatrix}
+		-y_m \dot \psi & x_m \dot \psi & 0
+	\end{bmatrix}^T \\
+	v_{B'} = \begin{bmatrix}
+		\dot x & \dot y & 0
 	\end{bmatrix}^T
 \end{eqnarray}
 
@@ -213,7 +222,7 @@ where $v_{B`}$ is the speed of the body frame. Now substituting that into the ab
 
 \begin{eqnarray}
 	T = \frac{1}{2}M( ( \dot x - \dot \psi y )^2 + (\dot y + \dot \psi x)^2)+ \dots \\
-	T = \frac{1}{2}M( \dot x^2 - 2 \dot \psi y \dot x +\dot \psi^2 y^2 + \dot y^2 + 2 \dot \psi x \dot y + \dot \psi^2 x^2)++ \frac{1}{2}J \dot \psi^2 + \frac{1}{2} J_w (\dot \theta_1^2 + \dot \theta_2^2 + \dot \theta_3^2 + \dot \theta_4^2)  \\
+	T = \frac{1}{2}M( \dot x^2 - 2 \dot \psi y_m \dot x +\dot \psi^2 y_m^2 + \dot y^2 + 2 \dot \psi x_m \dot y + \dot \psi^2 x_m^2)+ \frac{1}{2}J \dot \psi^2 + \frac{1}{2} J_w (\dot \theta_1^2 + \dot \theta_2^2 + \dot \theta_3^2 + \dot \theta_4^2)  \\
 	\frac{d}{dt} \left\{ \dpar{ \mathcal{L} }{\dot x} \right\} = M ( \ddot x - \ddot \psi y - \dot \psi \dot y ) \hspace{1cm} \dpar{ \mathcal{L} }{x} = M(\dot \psi \dot y + \dot \psi^2 x) \\
 	\frac{d}{dt} \left\{ \dpar{ \mathcal{L} }{\dot y} \right\} = M (\ddot y + \ddot \psi x + \dot \psi \dot x) \hspace{1cm} \dpar{ \mathcal{L} }{y} = M( -\dot \psi \dot x + \dot \psi^2 y) \\
 	\frac{d}{dt} \left\{ \dpar{ \mathcal{L} }{\dot \psi} \right\} = J \ddot \psi \hspace{1cm} \dpar{ \mathcal{L} }{\phi} = 0 \\
@@ -259,7 +268,7 @@ Now we make the following assumptions: ${B`}$ is coincident with ${B}$, $x_m = 0
 	\dot y \\
 	\dot \psi
 \end{bmatrix}
-= \mathcal{M} \ddot X + \mathcal{O} \dot X
+= \mathcal{M} \ddot X + \mathcal{O} \dot X = Q
 \end{eqnarray}
 %\begin{eqnarray}
 %	a=\sum \limits_{i=1}^4 \frac{F_i}{M_i}=\frac{1}{M}(F_1+F_2+F_3+F_4) \label{one} \\
@@ -389,6 +398,21 @@ Now looking at this equation, we notice that $\phi$ can not be equal to 0, 90, 1
 
 \section{Holonomic Robot Kinematics}
 
+
+\begin{figure*}[tb]
+	\begin{minipage}[htb]{3in}
+		\centering
+ 		\includegraphics[height=2.8in]{pics/force_cs.png} 
+		\caption{\label{robot}Configuration of three groups of motors where $\phi$ is 30, 45, and 60 degrees.}  
+ 	\end{minipage}
+ 	\hfill
+ 	\begin{minipage}[htb]{3in}
+		\centering
+ 		\includegraphics[height =2.8in]{pics/equiv_motors.png} 
+		\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
+ 	\end{minipage} 
+\end{figure*}  
+
 Now performing a similar exercise for what was done with the dynamics, looking at \figref{coordinate}, the velocity of motor 1is given by $v_1 = -\sin(\phi) v_x + \cos(\phi) v_y + R \omega$. Performing this for each wheel gives:
 
 \begin{equation}
@@ -428,20 +452,6 @@ Now performing a similar exercise for what was done with the dynamics, looking a
 \end{equation}
 
 Now setting $\omega$ to zero and calculating only linear movement, we can determine the number of equivalent motors as shown in \figref{fig:equivalent_motors}. For example, setting $\phi$ to 30$^\circ$ (the red line in \figref{fig:equivalent_motors}) and traveling in the x direction only ($ \begin{bmatrix} v_x & v_y & \omega \end{bmatrix}^T = \begin{bmatrix}1& 0 & 0 \end{bmatrix}^T$), the above equation simplifies to $4 \sin(30)$ or 2 equivalent motors. Repeating for the y direction results in $4 \cos(30)$ or 3.46 equivalent motors.
-
-\begin{figure*}[tb]
-	\begin{minipage}[htb]{3in}
-		\centering
- 		\includegraphics[height=2.8in]{pics/force_cs.png} 
-		\caption{\label{robot}Configuration of three groups of motors where $\phi$ is 30, 45, and 60 degrees.}  
- 	\end{minipage}
- 	\hfill
- 	\begin{minipage}[htb]{3in}
-		\centering
- 		\includegraphics[height =2.8in]{pics/equiv_motors.png} 
-		\caption{\label{fig:equivalent_motors} Number of equivalent motors for any direction under linear movement only, no rotational movement allowed.} 
- 	\end{minipage} 
-\end{figure*}  
 
 Now it is interesting to note that when $\phi$ is set to 30$^\circ$, the robot has more equivalent motors when going forward or backwards, while a $\phi$ of 60$^\circ$ provides more equivalent motors moving left or right. When the motors are are angled at 45$^\circ$, movement is clearly equally optimized for both forward/backwards and left/right ($2 \sin(45)$ is 2.83 motors) movement.
 
