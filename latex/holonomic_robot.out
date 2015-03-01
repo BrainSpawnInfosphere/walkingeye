@@ -12,6 +12,5 @@
 \BOOKMARK [2][-]{subsection.A.1}{EOM}{appendix.A}% 12
 \BOOKMARK [1][-]{appendix.B}{Robot Hardware}{}% 13
 \BOOKMARK [2][-]{subsubsection.B.0.1}{MiniIMU}{appendix.B}% 14
-\BOOKMARK [3][-]{subsubsection.B.0.2}{Camera}{subsubsection.B.0.1}% 15
-\BOOKMARK [1][-]{appendix.C}{Robot Software}{}% 16
-\BOOKMARK [2][-]{subsubsection.C.0.3}{OpenCV}{appendix.C}% 17
+\BOOKMARK [1][-]{appendix.C}{Robot Software}{}% 15
+\BOOKMARK [2][-]{subsubsection.C.0.2}{OpenCV}{appendix.C}% 16

@@ -7,7 +7,7 @@ import pyaudio
 import time
 import logging
 import GoogleTTS as gtts
-from multiprocessing.connection import Listener as Publisher
+#from multiprocessing.connection import Listener as Publisher
 import multiprocessing as mp
 import socket
 import yaml
@@ -16,7 +16,8 @@ import wave
 import misc
 import pprint
 
-import mqttclass as mq
+#import mqttclass as mq
+from zmqclass import *
 
 ###################################################################################
 
@@ -196,8 +197,7 @@ class RobotSoundServer(mp.Process):
 		self.tts = gtts.GoogleTTS()
 		
 		# publisher
-		self.pub = mq.PubSubJSON([],[])
-		self.pub.start()
+		self.pub = Pub()
 		
 		#self.getKeys()
 		self.info = self.readYaml('/Users/kevin/Dropbox/accounts.yaml')
