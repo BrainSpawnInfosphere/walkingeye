@@ -14,7 +14,7 @@ import logging
 import yaml
 #import socket
 
-from RobotCmdServer import *
+from RobotHardwareServer import *
 from RobotSensorServer import *
 from RobotSoundServer import *
 
@@ -52,25 +52,26 @@ class Robot:
 				ip, 
 				conf['servers']['sensor']['port'],
 				conf['servers']['sensor']['camera'] )
-		self.cmds = RobotCmdServer( 
+				
+		self.cmds = RobotHardwareServer( 
 				ip, 
 				conf['servers']['cmd']['port'])
 				
-		newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
-		self.sounds = RobotSoundServer(
-				newstdin,
-				ip, 
-				conf['servers']['sound']['port'])
+# 		newstdin = os.fdopen(os.dup(sys.stdin.fileno()))
+# 		self.sounds = RobotSoundServer(
+# 				newstdin,
+# 				ip, 
+# 				conf['servers']['sound']['port'])
 	
 	def run(self):
 		try:
 			self.sensors.start()
 			self.cmds.start()
-			self.sounds.start()
+# 			self.sounds.start()
 			
 			self.sensors.join()
 			self.cmds.join()
-			self.sounds.join()
+# 			self.sounds.join()
 		
 		except Exception, e:
 			logger.error('Error: ', exc_info=True) # exc_info should dump traceback info log

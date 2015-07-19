@@ -105,8 +105,8 @@ class OpticalFlow:
 def main():
 	
 	# Source: 0 - built in camera  1 - USB attached camera
-	cap = cv2.VideoCapture('output.mp4v')
-	#cap = cv2.VideoCapture(1)
+	#cap = cv2.VideoCapture('output.mp4v')
+	cap = cv2.VideoCapture(0)
 	
 	save = False
 	loop_video = True

@@ -4,7 +4,7 @@ This is the second version of my soccer robot.
 
 * Doesn't use [ROS](http://ros.org), ROS is a pain to install and maintain on OSX and various linux systems
 	* Uses some of the same ideas, but not RPC-XML
-* Uses [Mosquito](http://mosquitto.org) instead of `roscore` 
+* Uses [Zero MQ](http://http://zeromq.org/) instead of `roscore` 
 * Uses my PS4 controller with PySDL2
 * Uses [wit.ai](http://wit.ai) for speech-to-text
 * Uses Google-translate to for text-to-speech
@@ -17,10 +17,10 @@ This is still in development, but various parts are working.
 ## Basic Diagram
                 
 ```                
-AI ---+---> robot.py <--- sensors
-      |        | |
-PS4 --+        | +---> actuators
-Sensor Proc <--+
+	AI ---+---> robot.py <--- sensors
+		  |        | |
+	PS4 --+        | +---> actuators
+	Sensor Proc <--+
 ```
 (I need a better diagram)
 
@@ -30,33 +30,9 @@ Sensor Proc <--+
 
 You need the following key python libraries installed:
 
-* python-forecastio - weather
-* PyWit - text-to-speech
 * PySDL2 - simulation and joystick
-* twilio - SMS
-* PyAudio - recording sound (had to build from scratch)
 * PyYAML - read yaml config files
-* phao-mqtt - python bindings for MQTT
-
-## Sound Server
-
-The robot uses [wit.ai](https://wit.ai) to understand the spoken word, turning speech in to text (stt). There are a bunch of plugins which act upon the text to perform different things:
-
- * Say current time
- * Say current date
- * Send a text message using [Twilio](https://www.twilio.com)
- * Tell a joke (most of the jokes are not funny)
- * Say a greeting
- * Tell you to stop being mean or cursing
- * Play random sound bites from movie and tv shows:
- 	* Venture Brothers
- 	* Blues Brothers
- 	* Star Wars
- * Tell current or future weather forecast using [Forcast.io](http://forecast.io)
- * Grab news headlines
- * General help info
- 
-Additionally, the text-to-speech part uses [Google Translate](https://translate.google.com) (which sounds the best) or uses `say`.
+* pyzmq - interprocess communication library
 
 ## SSH Login Art
 
@@ -65,13 +41,16 @@ You can create ascii art from jpegs or text with the programs:
     jp2a --background=light -i --output='art.txt' <some_file.jpg>
     figlet 'hello world'
 
+Use `brew` to install::
+	
+	brew install jp2a
+
 ## Message Flow
 
 Parts:
 
-* RobotCmdServer - controls motors, leds, servos, etc
-* RobotSensorServer - publishes processed/conditioned sensors readings
-* RobotSoundServer - handles voice commands and sounds
+* RobotHardwareServer - controls motors, leds, servos, etc
+* RobotCameraServer - publishes images from USB camera, streams base64 encoded images
 
 Message Flow:
 
