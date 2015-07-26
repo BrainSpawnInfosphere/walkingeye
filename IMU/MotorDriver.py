@@ -27,6 +27,9 @@ class MotorDriver:
 		self.pwm2 = GPIO.PWM(pwm2, 100)
 		self.pwm3 = GPIO.PWM(pwm3, 100)
 
+		m = {'dir': 0, 'duty': 0}
+		self.setMotors(m,m,m,m)
+
 	"""
 	"""
 	def setMotors(m0,m1,m2,m3):
