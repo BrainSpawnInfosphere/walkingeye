@@ -19,6 +19,10 @@ from zmqclass import *
 ####################################################################
 # RobotHardwareServer handles incoming commands streamed from somewhere else.
 # All information is in coming.
+#
+# todo:
+# - need to breakout into holonomic and nonholonomic 
+#
 ####################################################################
 class RobotHardwareServer(mp.Process):
 	def __init__(self,host="localhost",port=9000):
@@ -27,18 +31,13 @@ class RobotHardwareServer(mp.Process):
 		self.port = port
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger('robot')
-		self.md = md.MotorDriver(11,12,15,16)
+# 		self.md = md.MotorDriver(11,12,15,16)
 
 	def createMotorCmd(dir,duty):
 		return {'dir': dir, 'duty': duty}
 
-	def motorCmd(self,cmd):
-		print cmd
-
-		self.md.setMotors()
-
 	def soundCmd(self,cmd):
-		print cmd
+		self.logger.info( cmd )
 
 	def parseMsg(self, msg):
 		if 'quit' in msg:
@@ -74,9 +73,21 @@ class RobotHardwareServer(mp.Process):
 			#if msg:
 			#	self.parseMsg( msg )
 
+class NonHolonomic(RobotHardwareServer):
+	def __init__(self,host="localhost",port=9000):
+		RobotHardwareServer.__init(self,host,port)
+		self.md = md.MotorDriver(11,12,15,16)
 
+	def motorCmd(self,cmd):
+		self.logger.info(cmd)
+		self.md.setMotors(cmd)
+
+class Holonomic(RobotHardwareServer):
+	def __init__(self):
+		RobotHardwareServer.__init(self)
+# 		self.md = md.MotorDriver(11,12)
 
 
 if __name__ == '__main__':
-	c = RobotHardwareServer()
+	c = NonHolonomic()
 	c.run()

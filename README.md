@@ -16,13 +16,7 @@ This is still in development, but various parts are working.
 
 ## Basic Diagram
                 
-```                
-	AI ---+---> robot.py <--- sensors
-		  |        | |
-	PS4 --+        | +---> actuators
-	Sensor Proc <--+
-```
-(I need a better diagram)
+![Data Flow(./pics/Robot.png)
 
 **Note:** This re-write is still very early and not fully running yet, just parts. 
 
@@ -33,6 +27,12 @@ You need the following key python libraries installed:
 * PySDL2 - simulation and joystick
 * PyYAML - read yaml config files
 * pyzmq - interprocess communication library
+* smbus-cffi - [I2C](https://pypi.python.org/pypi/smbus-cffi) support
+
+## Install
+
+	sudo apt-get install build-essential libi2c-dev i2c-tools python-dev libffi-dev
+	pip install cffi smbus-cffi
 
 ## SSH Login Art
 
@@ -51,17 +51,6 @@ Parts:
 
 * RobotHardwareServer - controls motors, leds, servos, etc
 * RobotCameraServer - publishes images from USB camera, streams base64 encoded images
-
-Message Flow:
-
-```
-    js(twist/cmd) ----> RobotCmdServer <--(twist/cmd)-- ai
-                                    ^                  | ^  
-    RobotSoundServer(twist/cmd) ----+                  | |
-                ^                                      | |
-                +-------------------------(sound)------+ |
-                     RobotSensorServer(sensor/image) ----+ 
-```
 
 Here is simple layout of message formate to support the flow shown above.
 
@@ -84,3 +73,4 @@ Messages:
 ## To Do's
 
 * put it all together :)
+* might break this up into sound, camera, hw gits
