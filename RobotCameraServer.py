@@ -140,12 +140,12 @@ class CameraDisplayClient(object):
 
 # set up and handle command line args
 def handleArgs():
-	parser = argparse.ArgumentParser(description='A simple zero MQ pub/sub for a camera Example: RobotCameraServer pub -a 192.168.10.22 -p 8080')
-	parser.add_argument('type', help='pub or sub')
-	parser.add_argument('-a', '--address', help='host address', default='localhost')
-	parser.add_argument('-p', '--port', help='port', default='9100')
+	parser = argparse.ArgumentParser(description='A simple zero MQ pub/sub for a camera Example: RobotCameraServer pub 192.168.10.22 8080')
+	parser.add_argument('info', nargs=3, help='pub or sub, hostname, port; example: pub 10.1.1.1 9333')
+	# parser.add_argument('-a', '--address', help='host address', default='localhost')
+	# parser.add_argument('-p', '--port', help='port', default='9100')
 	parser.add_argument('-f', '--file', help='file name to save video to')
-	# parser.add_argument('-s', '--save', type=int, nargs=2, help='size of pattern, for example, -s 6 7', required=True)
+	# parser.add_argument('-g', '--host', nargs=2, help='size of pattern, for example, -s 6 7', required=True)
 	# parser.add_argument('-p', '--path', help='location of images to use', required=True)
 	# parser.add_argument('-d', '--display', help='display images', default=True)
 
@@ -154,16 +154,23 @@ def handleArgs():
 
 def main():
 	args = handleArgs()
-	func = args['type']
+	func = args['info'][0]
+	addr = args['info'][1]
+	port = args['info'][2]
+
+	print args
+	exit()
+
 	if func == 'sub':
 		sub = 0
 		if args['file']: sub = CameraSaveClient(args['file'])
-		else: sub = CameraDisplayClient('192.168.1.3','9100')
+		else: sub = CameraDisplayClient(addr,port)
 		sub.run()
 
 	elif func == 'pub':
-		pub = RobotCameraServer('192.168.1.3','9100')
+		pub = RobotCameraServer(addr,port)
 		pub.run()
+
 	else:
 		print 'Error'
 
