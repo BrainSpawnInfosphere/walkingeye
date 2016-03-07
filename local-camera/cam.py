@@ -16,10 +16,10 @@ class SaveVideo:
 		mpg4 = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
 		self.out = cv2.VideoWriter()
 		self.out.open(fn,mpg4,fps, image_size)
-		
+
 	def write(self,image):
 		self.out.write(image)
-	
+
 	def release(self):
 		self.out.release()
 
@@ -46,15 +46,15 @@ class OpticalFlow:
 		self.detect_interval = 5
 		self.tracks = []
 		self.frame_idx = 0
-		
+
 	"""
 	in: gray image
 	out: none
 	"""
 	def initOldFrame(self,frame):
 		self.prev_gray = frame
-		
-	
+
+
 	"""
 	p0 - points from last picture that we are tracking
 	p1 - points found in new image we are tracking
@@ -63,7 +63,7 @@ class OpticalFlow:
 	"""
 	def calc(self,frame_gray):
 		vis = frame_gray.copy()
-		
+
 		if len(self.tracks) > 0:
 			img0, img1 = self.prev_gray, frame_gray
 			p0 = np.float32([tr[-1] for tr in self.tracks]).reshape(-1, 1, 2)
@@ -98,56 +98,56 @@ class OpticalFlow:
 
 		self.frame_idx += 1
 		self.prev_gray = frame_gray
-		
+
 		return vis
-		
+
 
 def main():
-	
+
 	# Source: 0 - built in camera  1 - USB attached camera
 	#cap = cv2.VideoCapture('output.mp4v')
-	cap = cv2.VideoCapture(0)
-	
+	cap = cv2.VideoCapture(1)
+
 	save = False
 	loop_video = True
-	
+
 	ret, frame = cap.read()
 	h,w,d = frame.shape
-	
+
 	of = OpticalFlow()
-	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) 
+	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	of.initOldFrame(gray)
-	
+
 	while(True):
-		# Capture frame-by-frame 
+		# Capture frame-by-frame
 		ret, frame = cap.read()
-		
+
 		if ret == True:
-			gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) 
-			
+			gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
 			flow = of.calc(gray.copy())
-			
+
 			# Display the resulting frame
 			cv2.imshow('frame2',flow)
-			
-		elif (ret == False) and (loop_video): 
+
+		elif (ret == False) and (loop_video):
 			print 'loop reset'
 			cap.set(1,0) # CV_CAP_PROP_POS_FRAMES
 			pass
-		
+
 		elif ret == False:
 			print 'could not read video'
 			break
-		
+
 		key = cv2.waitKey(10)
 		if key == ord('q'):
 			break
 		elif (key & 0xFF) == 27: #Esc
 			break
-		
+
 	# When everything done, release the capture
 	cap.release()
-	cv2.destroyAllWindows() 
+	cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':

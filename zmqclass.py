@@ -118,6 +118,9 @@ import datetime as dt
 import base64
 
 class PubBase64(Pub):
+	"""
+	Publishes info in base64, used for images
+	"""
 	def __init__(self,bind_to='tcp://127.0.0.1:9000'):
 		Pub.__init__(self,bind_to)
 
@@ -148,6 +151,9 @@ class PubBase64(Pub):
 
 
 class SubBase64(Sub):
+	"""
+	Subscribes to topics that are encoded in base64, usually images
+	"""
 	def __init__(self,topics='',connect_to='tcp://localhost:9000',poll_time=0.01):
 		Sub.__init__(self,topics,connect_to,poll_time)
 
