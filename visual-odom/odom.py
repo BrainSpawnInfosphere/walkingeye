@@ -43,7 +43,7 @@ def checkRange(x,max,min):
     else: return False
 
 
-def featureTrack(new_gray,old_gray,keypoints):
+def featureTrack(new_gray,old_gray,p0):
     # Parameters for lucas kanade optical flow
     lk_params = dict( winSize  = (21,21),
                   maxLevel = 2,
@@ -51,27 +51,43 @@ def featureTrack(new_gray,old_gray,keypoints):
 
     # cd=np.array([k.pt for k in keypoints])
     # cd=np.array([[k.pt for k in keypoints]])
-    cd = keypoints
+    if p0.shape[0] > 50: cd = p0
+    else:
+        print 'reset'
+        p0 = featureDetection(old_gray)
+        cd = p0
 
     # print cd
     p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, new_gray, cd, None, **lk_params)
 
-    # print p1
+    # print 'st',st.shape
+    # print 'st',st
+    print 'p0',p0.shape
+    print 'p1',p1.shape
+    # exit()
     # good_new = np.zeros(shape=(1,1,2))
     # good_old = np.zeros(shape=(1,1,2))
     new = []
     old = []
 
     # need ot keep the same number of points
-    for i in p0:
-        # print i
-        x=i[0][0]
-        y=i[0][1]
-        if checkRange(x,639,200) and checkRange(y,479,0): old.append([x,y])
-    for i in p1:
-        x=i[0][0]
-        y=i[0][1]
-        if checkRange(x,639,200) and checkRange(y,479,0): new.append([x,y])
+    # for i in p0:
+    #     # print i
+    #     x=i[0][0]
+    #     y=i[0][1]
+    #     if checkRange(x,639,200) and checkRange(y,479,0): old.append([x,y])
+    # for i in p1:
+    #     x=i[0][0]
+    #     y=i[0][1]
+    #     if checkRange(x,639,200) and checkRange(y,479,0): new.append([x,y])
+
+    for i in range(0,p1.shape[0]):
+        # print 'st',st[i]
+        # print 'p1',p1[i]
+        if st[i][0] == 1 and p1[i][0][0] >= 0 and p1[i][0][1] >= 0:
+            new.append(p1[i][0])
+            old.append(p0[i][0])
+
     # Select good points - not doing this right
     # good_new = p1[st==1]
     # good_old = cd[st==1]
@@ -81,8 +97,8 @@ def featureTrack(new_gray,old_gray,keypoints):
     good_new = np.array([[k] for k in new],dtype=np.float32)
     good_old = np.array([[k] for k in old],dtype=np.float32)
 
-    print 'p0',p0.shape
-    print 'p1',p1.shape
+    # print 'p0',p0.shape
+    # print 'p1',p1.shape
     print 'good_new',good_new.shape
     print 'good_old',good_old.shape
 
