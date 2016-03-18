@@ -31,6 +31,7 @@ class Camera(object):
 		"""
 		"""
 		self.cap = cv2.VideoCapture(input)
+		self.useROI = False
 
 	def size(self,width,height):
 		self.width = width
@@ -59,8 +60,16 @@ class Camera(object):
 	def isOpened(self):
 		return self.cap.isOpened()
 
+	def setROI(self,roi):
+		self.roi = roi
+		self.useROI = True
+
 	def read(self, isBnW=False):
 		ret, image = self.cap.read()
+
+		if self.useROI and ret:
+			roi = self.roi
+			image = image[roi[0]:roi[1],roi[2]:roi[3]]
 
 		if isBnW and ret:
 			image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
