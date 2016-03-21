@@ -4,7 +4,7 @@ This is the second version of my soccer robot.
 
 * Doesn't use [ROS](http://ros.org), ROS is a pain to install and maintain on OSX and various linux systems
 	* Uses some of the same ideas, but not RPC-XML
-* Uses [Zero MQ](http://http://zeromq.org/) instead of `roscore` 
+* Uses [Zero MQ](http://http://zeromq.org/) instead of `roscore`
 * Uses my PS4 controller with PySDL2
 * Uses [wit.ai](http://wit.ai) for speech-to-text
 * Uses Google-translate to for text-to-speech
@@ -15,10 +15,10 @@ This is the second version of my soccer robot.
 This is still in development, but various parts are working.
 
 ## Basic Diagram
-                
+
 ![Data Flow(./pics/Robot.png)
 
-**Note:** This re-write is still very early and not fully running yet, just parts. 
+**Note:** This re-write is still very early and not fully running yet, just parts.
 
 ## Libraries Used
 
@@ -31,8 +31,16 @@ You need the following key python libraries installed:
 
 ## Install
 
+### RPi
+
 	sudo apt-get install build-essential libi2c-dev i2c-tools python-dev libffi-dev
+	sudo apt-get install libsdl2-dev
+	sudo apt-get install libzmq3-dev
+	sudo apt-get install i2c-tools
 	pip install cffi smbus-cffi
+	pip install pysdl2
+	pip install pyzmq
+
 
 ## SSH Login Art
 
@@ -42,7 +50,7 @@ You can create ascii art from jpegs or text with the programs:
     figlet 'hello world'
 
 Use `brew` to install::
-	
+
 	brew install jp2a
 
 ## Message Flow
