@@ -36,7 +36,6 @@ You need the following key python libraries installed:
 	sudo apt-get install build-essential libi2c-dev i2c-tools python-dev libffi-dev
 	sudo apt-get install libsdl2-dev
 	sudo apt-get install libzmq3-dev
-	sudo apt-get install i2c-tools
 	pip install cffi smbus-cffi
 	pip install pysdl2
 	pip install pyzmq
