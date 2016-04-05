@@ -7,7 +7,7 @@ This is the second version of my soccer robot.
 * Uses [Zero MQ](http://http://zeromq.org/) instead of `roscore`
 * Uses my PS4 controller with PySDL2
 * Uses [wit.ai](http://wit.ai) for speech-to-text
-* Uses OpenCV to compress and send video stream off-board
+* Uses OpenCV to process on-board or stream video off-board to remote
 * All of this runs on [Raspberry Pi B+](http://www.raspberrypi.org)
 
 This is still in development, but various parts are working.
@@ -67,6 +67,14 @@ Have a look at the LEDBackpack 8x8_pixel example
 	pip install pysdl2
 	pip install pyzmq
 
+#### I2C
+
+The following is on the I2C bus:
+
+* MCP23008 8b I/O Expander: 0x20
+* MCP23017 16b I/O Expander: 0x21 (A0 -> 1)
+* Adafruit BNO055 AHRS: 0x28
+* Adafruit 8x8 LED Matrix: 0x70 
 
 ## SSH Login Art
 
