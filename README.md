@@ -14,7 +14,7 @@ This is still in development, but various parts are working.
 
 ## Basic Diagram
 
-![Data Flow(./pics/Robot.png)
+![Data Flow](./pics/Robot.png)
 
 **Note:** This re-write is still very early and not fully running yet, just parts.
 
