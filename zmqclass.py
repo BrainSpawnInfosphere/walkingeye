@@ -7,6 +7,7 @@
 import zmq
 import json
 import numpy
+# import jpeg # compress video sent
 
 """
 Base class for other derived pub/sub classes

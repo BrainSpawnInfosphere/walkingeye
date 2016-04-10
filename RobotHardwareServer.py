@@ -13,15 +13,34 @@ import logging
 import yaml
 #import socket
 import IMU.MotorDriver as md
+import RPi.GPIO as GPIO # IR
 
 from zmqclass import *
+
+class DigitalIR(object):
+	"""
+	Read IR sensors on digital inputs
+
+	Pololu sds01a 0-5 cm pwr 3V output max 3V
+	Sharp xxx 0-15 cm pwr 5V output max 3V - digital gives 3 inch range
+	"""
+	def __init__(self, pins):
+		GPIO.setwarnings(False)
+		GPIO.setmode(GPIO.BCM)
+		for p in pins: GPIO.setup(p, GPIO.IN)
+		self.pins = pins
+
+	def read(self):
+		ir = []
+		for p in pins: ir.append( GPIO.input(p) )
+		return ir
 
 ####################################################################
 # RobotHardwareServer handles incoming commands streamed from somewhere else.
 # All information is in coming.
 #
 # todo:
-# - need to breakout into holonomic and nonholonomic 
+# - need to breakout into holonomic and nonholonomic
 #
 ####################################################################
 class RobotHardwareServer(mp.Process):
@@ -75,19 +94,23 @@ class RobotHardwareServer(mp.Process):
 
 class NonHolonomic(RobotHardwareServer):
 	def __init__(self,host="localhost",port=9000):
-		RobotHardwareServer.__init(self,host,port)
-		self.md = md.MotorDriver(11,12,15,16)
+		RobotHardwareServer.__init(self,host,port)__
+		self.md = md.MotorDriver(11,12)
 
 	def motorCmd(self,cmd):
 		self.logger.info(cmd)
 		self.md.setMotors(cmd)
 
 class Holonomic(RobotHardwareServer):
-	def __init__(self):
-		RobotHardwareServer.__init(self)
-# 		self.md = md.MotorDriver(11,12)
+	def __init__(self,pinA=11,pinB=12,pinC=15,pinD=16):
+		RobotHardwareServer.__init(self)__
+		self.md = md.MotorDriver(pinA,pinB,pinC,pinD)
+
+	def motorCmd(self,cmd):
+		self.logger.info(cmd)
+		self.md.setMotors(cmd)
 
 
 if __name__ == '__main__':
-	c = NonHolonomic()
+	c = Holonomic()
 	c.run()
