@@ -10,12 +10,30 @@ import time
 import datetime as dt
 import multiprocessing as mp
 import logging
-import yaml
+# import yaml
 #import socket
 import IMU.MotorDriver as md
 import RPi.GPIO as GPIO # IR
 
 from zmqclass import *
+
+# def test():
+# 	import time
+# 	mmd = md.MotorDriver(17,18,22,23)
+# 	
+# 	go  = {'dir': MotorDriver.FORWARD, 'duty': 50}
+# 	rev = {'dir': MotorDriver.REVERSE, 'duty': 100}
+# 	stp = {'dir': MotorDriver.REVERSE, 'duty': 0}
+# 	
+# 	mmd.setMotors(go,go,go,go)
+# 	time.sleep(10)
+# 	mmd.setMotors(rev,rev,rev,rev)
+# 	time.sleep(10)
+# 	mmd.setMotors(go,stp,go,stp)
+# 	time.sleep(10)
+# 	mmd.setMotors(stp,rev,stp,rev)
+# 	time.sleep(10)
+# 	mmd.allStop()
 
 class DigitalIR(object):
 	"""
@@ -51,6 +69,7 @@ class RobotHardwareServer(mp.Process):
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger('robot')
 # 		self.md = md.MotorDriver(11,12,15,16)
+		self.md = None
 
 	def createMotorCmd(dir,duty):
 		return {'dir': dir, 'duty': duty}
@@ -67,14 +86,33 @@ class RobotHardwareServer(mp.Process):
 				self.motorCmd( cmd )
 			elif 's' in cmd:
 				self.soundCmd( cmd )
-
+	def __del__(self):
+		self.md.allStop()
+		
 	def on_message(self,client, userdata, msg):
 		print(msg.topic+' '+str(msg.payload))
 
 	def shutdown(self):
-		self.pub.close()
-		exit()
+# 		self.pub.close()
+# 		exit()
+		0
 
+	def test(self):
+		dt = 5
+		go  = {'dir': md.MotorDriver.FORWARD, 'duty': 25}
+		rev = {'dir': md.MotorDriver.REVERSE, 'duty': 10}
+		stp = {'dir': md.MotorDriver.REVERSE, 'duty': 0}
+	
+		self.md.setMotors(go,go,go,go)
+		time.sleep(dt)
+		self.md.setMotors(rev,rev,rev,rev)
+		time.sleep(dt)
+		self.md.setMotors(go,stp,go,stp)
+		time.sleep(dt)
+		self.md.setMotors(stp,rev,stp,rev)
+		time.sleep(dt)
+		self.md.allStop()
+		
 	def run(self):
 		self.logger.info(str(self.name)+'['+str(self.pid)+'] started on'+
 			str(self.host) + ':' + str(self.port) +', Daemon: '+str(self.daemon))
@@ -88,13 +126,17 @@ class RobotHardwareServer(mp.Process):
 		while True:
 			time.sleep(0.05) # 0.5 => 20Hz
 			# get info
-			#msg = self.pub.recv()
-			#if msg:
-			#	self.parseMsg( msg )
+			msg = self.sub.recv()
+# 			if msg:
+# 				self.parseMsg( msg )
+				
+			self.test()
+			
+			
 
 class NonHolonomic(RobotHardwareServer):
 	def __init__(self,host="localhost",port=9000):
-		RobotHardwareServer.__init(self,host,port)__
+		RobotHardwareServer.__init__(self,host,port)
 		self.md = md.MotorDriver(11,12)
 
 	def motorCmd(self,cmd):
@@ -103,12 +145,14 @@ class NonHolonomic(RobotHardwareServer):
 
 class Holonomic(RobotHardwareServer):
 	def __init__(self,pinA=11,pinB=12,pinC=15,pinD=16):
-		RobotHardwareServer.__init(self)__
+		RobotHardwareServer.__init__(self)
 		self.md = md.MotorDriver(pinA,pinB,pinC,pinD)
 
 	def motorCmd(self,cmd):
 		self.logger.info(cmd)
 		self.md.setMotors(cmd)
+		
+
 
 
 if __name__ == '__main__':
