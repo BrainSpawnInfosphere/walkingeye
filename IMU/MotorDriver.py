@@ -19,9 +19,12 @@ class MotorDriver(object):
 	def __init__(self,pwm0,pwm1,pwm2,pwm3):
 		"""
 		"""
-		self.mux = Ada.Adafruit_MCP230XX(0x20,8,1)
+		self.mux = Ada.Adafruit_MCP230XX(0x20,16,1)
+		
+		print 'RPi detected:',GPIO.RPI_INFO['P1_REVISION']
+		print 'GPIO Version:',GPIO.VERSION
 
-		for pin in range(0,8):
+		for pin in range(0,15):
 			self.mux.config(pin,Ada.MCP230XX_GPIO.OUT)
 		
 		# don't need these anymore
@@ -30,13 +33,17 @@ class MotorDriver(object):
 # 		self.pin2 = pwm2
 # 		self.pin3 = pwm3
 		
+		# this can be: 
+		# BOARD -> Board numbering scheme. The pin numbers follow the pin numbers on header P1.
+		# BCM -> Broadcom chip-specific pin numbers. 
 		GPIO.setmode(GPIO.BOARD)
-		GPIO.setup(pwm0, GPIO.OUT)
-		GPIO.setup(pwm1, GPIO.OUT)
-		GPIO.setup(pwm2, GPIO.OUT)
-		GPIO.setup(pwm3, GPIO.OUT)
+# 		GPIO.setup(pwm0, GPIO.OUT)
+# 		GPIO.setup(pwm1, GPIO.OUT)
+# 		GPIO.setup(pwm2, GPIO.OUT)
+# 		GPIO.setup(pwm3, GPIO.OUT)
+		GPIO.setup([pwm0,pwm1,pwm2,pwm3], GPIO.OUT)
 		
-		freq = 0.001
+		freq = 500.0 # Hz
 		self.motor0 = GPIO.PWM(pwm0,freq)
 		self.motor1 = GPIO.PWM(pwm1,freq)
 		self.motor2 = GPIO.PWM(pwm2,freq)
@@ -61,6 +68,7 @@ class MotorDriver(object):
 
 	def __del__(self):
 		print 'motor drive ... bye'
+		self.allStop()
 		self.motor0.stop()
 		self.motor1.stop()
 		self.motor2.stop()
@@ -101,18 +109,22 @@ class MotorDriver(object):
 
 		#set pwm
 		pwm = self.clamp(m0['duty'])
+		print pwm
 # 		self.motor0.set_servo(self.pin0,pwm)
 		self.motor0.ChangeDutyCycle(pwm)
 		
 		pwm = self.clamp(m1['duty'])
+		print pwm
 # 		self.motor1.set_servo(self.pin1,pwm)
 		self.motor1.ChangeDutyCycle(pwm)
 		
 		pwm = self.clamp(m2['duty'])
+		print pwm
 # 		self.motor2.set_servo(self.pin2,pwm)
 		self.motor2.ChangeDutyCycle(pwm)
 		
 		pwm = self.clamp(m3['duty'])
+		print pwm
 # 		self.motor3.set_servo(self.pin3,pwm)
 		self.motor3.ChangeDutyCycle(pwm)
 
@@ -128,6 +140,7 @@ def test():
 	import time
 	md = MotorDriver(17,18,22,23)
 	
+	# duty cycle 0.0 - 100.0
 	go  = {'dir': MotorDriver.FORWARD, 'duty': 10}
 	rev = {'dir': MotorDriver.REVERSE, 'duty': 25}
 	stp = {'dir': MotorDriver.REVERSE, 'duty': 0}

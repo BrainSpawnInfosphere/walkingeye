@@ -99,19 +99,19 @@ class RobotHardwareServer(mp.Process):
 
 	def test(self):
 		dt = 5
-		go  = {'dir': md.MotorDriver.FORWARD, 'duty': 25}
+		go  = {'dir': md.MotorDriver.FORWARD, 'duty': 10}
 		rev = {'dir': md.MotorDriver.REVERSE, 'duty': 10}
-		stp = {'dir': md.MotorDriver.REVERSE, 'duty': 0}
+		stp = {'dir': md.MotorDriver.REVERSE, 'duty': 10}
 	
 		self.md.setMotors(go,go,go,go)
 		time.sleep(dt)
-		self.md.setMotors(rev,rev,rev,rev)
-		time.sleep(dt)
-		self.md.setMotors(go,stp,go,stp)
-		time.sleep(dt)
-		self.md.setMotors(stp,rev,stp,rev)
-		time.sleep(dt)
-		self.md.allStop()
+# 		self.md.setMotors(rev,rev,rev,rev)
+# 		time.sleep(dt)
+# 		self.md.setMotors(go,stp,go,stp)
+# 		time.sleep(dt)
+# 		self.md.setMotors(stp,rev,stp,rev)
+# 		time.sleep(dt)
+# 		self.md.allStop()
 		
 	def run(self):
 		self.logger.info(str(self.name)+'['+str(self.pid)+'] started on'+
