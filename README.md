@@ -10,12 +10,6 @@ This is the second version of my soccer robot.
 * Uses OpenCV to process on-board or stream video off-board to remote
 * All of this runs on [Raspberry Pi B+](http://www.raspberrypi.org)
 
-This is still in development, but various parts are working.
-
-## Basic Diagram
-
-![Data Flow](./pics/Robot.png)
-
 **Note:** This re-write is still very early and not fully running yet, just parts.
 
 ## Libraries Used
@@ -27,6 +21,10 @@ You need the following key python libraries installed:
 * pyzmq - interprocess communication library
 * smbus-cffi - [I2C](https://pypi.python.org/pypi/smbus-cffi) support
 * Adafruit - various libraries
+
+## Wiki
+
+Documentation is on the [wiki](https://github.com/walchko/soccer2/wiki)
 
 ## Install
 
@@ -67,52 +65,3 @@ Have a look at the LEDBackpack 8x8_pixel example
 	pip install pysdl2
 	pip install pyzmq
 
-#### I2C
-
-The following is on the I2C bus:
-
-* MCP23008 8b I/O Expander: 0x20
-* MCP23017 16b I/O Expander: 0x21 (A0 -> 1)
-* Adafruit BNO055 AHRS: 0x28
-* Adafruit 8x8 LED Matrix: 0x70 
-
-## SSH Login Art
-
-You can create ascii art from jpegs or text with the programs:
-
-    jp2a --background=light -i --output='art.txt' <some_file.jpg>
-    figlet 'hello world'
-
-Use `brew` to install::
-
-	brew install jp2a
-
-## Message Flow
-
-Parts:
-
-* RobotHardwareServer - controls motors, leds, servos, etc
-* RobotCameraServer - publishes images from USB camera, streams base64 encoded images
-
-Here is simple layout of message formate to support the flow shown above.
-
-Messages:
-
-| Header | Format                                 |
-|--------|----------------------------------------|
-|header  | {time_stamp}                           |
-|vec     | {x,y,z}                                |
-|twist   | {linear[vec],angular[vec]}             |
-|wrench  | {force[vec],torque[vec]}               |
-|cmd     | {motors:[1,2,3,4],servo[1,2], ...}     |
-|sound   | {sound}                                |
-|imu     | {accel[vec],gyro[vec],comp[vec],temp}  |
-|sensor  | {header,[imu], ...}                    |
-|image   | {header,image}                         |
-|pose    | {x,y,heading}                          |
-
-
-## To Do's
-
-* put it all together :)
-* might break this up into sound, camera, hw gits
