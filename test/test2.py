@@ -25,21 +25,25 @@ class Bob(dict):
         # self.update(y=2)
         # self.update(z=3)
 
-class Tom(object):
+class Tom(dict):
     def __init__(self):
-        self.x = 1
-        self.lin = Bob(x=500.0, z=-234.1)
-        self.ang = Bob()
+        # self.x = 1
+        # self.lin = Bob(x=500.0, z=-234.1)
+        # self.ang = Bob()
+        self.update(x=1)
+        self.update(lin=Bob(x=500.0, z=-234.1))
+        self.update(ang=Bob())
 
 t = Tom()
 
-d = vars(t)
+# d = vars(t)
+print t['x']
 
-pp.pprint(d)
-print 'x',d['lin']['x']
+# pp.pprint(d)
+print 'lin.x',t['lin']['x']
 
-d['lin']['x']=5
-print 'new x',d['lin']['x']
+t['lin']['x']=5
+print 'new lin.x',t['lin']['x']
 
 # print 'serialize',t.serialize()
 pp.pprint( json.dumps(t, default=lambda o: vars(o)) )
