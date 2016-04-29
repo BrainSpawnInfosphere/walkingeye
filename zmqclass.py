@@ -6,7 +6,7 @@
 
 import zmq
 import json
-#import numpy
+import numpy
 # import jpeg # compress video sent
 
 """
