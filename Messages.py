@@ -5,9 +5,15 @@ import json
 import math
 
 def serialize(c):
+    """
+    Takes a dictionary and turns it into a json string.
+    """
     return json.dumps(c, default=lambda o: vars(o))
 
 def deserialize(s):
+    """
+    Takes a json string and turns it into a dictionary.
+    """
     return json.loads(s)
 
 # class Header(dict):
@@ -70,11 +76,72 @@ class Pose(dict):
         self.update(orientation = Quaternion())
 
 class PoseStamped(dict):
+    """
+    This is primarily used in path planning. The planner returns a position/orientation at a given time.
+    """
     def __init__(self):
         dict.__init__(self)
         self.update(stamp = time.time())
         self.update(position = Vector())
         self.update(orientation = Quaternion())
+
+
+class Range(dict):
+    """
+    Holds the ranges of the Sharp IR sensors. Note, currently, these are just digital and only return True (1) or False (0) and have a real distance of around 7 inches. This is because the analog signal is tied to a digital pin.
+    """
+    def __init__(self):
+        dict.__init__(self)
+        self.update(stamp = time.time())
+        self.update(fov = 20.0) # need to fix this
+        self.update(limits = (0.01,0.08))
+        self.update(range = [0,0,0,0,0,0,0,0]) # this is for all 8 IR's 
+
+
+class IMU(dict):
+    def __init__(self, ranges):
+        dict.__init__(self)
+        self.update(stamp = time.time())
+        self.update(linear_acceleration = Vector())
+        self.update(angular_velocity = Vector())
+        self.update(orientation = Quaternion())
+
+class Odom(dict):
+    def __init__(self):
+        dict.__init__(self)
+        self.update(stamp = time.time())
+        self.update(position = Pose())
+        self.update(velocity = Twist())
+
+class Path(dict):
+    """
+    The returned path from a path planner which is an array of position/orientation at various times. These poses take the robot from the start to the stop position of the getPlan message.
+    """
+    def __init__(self):
+        dict.__init__(self)
+        self.update(stamp = time.time())
+        self.update(poses = [])
+
+class GetPlan(dict):
+    """
+    Define the start and stop position/orientation/time for a path planner 
+    """
+    def __init__(self):
+        dict.__init__(self)
+        self.update(start = PoseStamped())
+        self.update(stop = PoseStamped())
+
+class Text(dict):
+    """
+    Simple text message
+    """
+    def __init__(self):
+        dict.__init__(self)
+        self.update(stamp = time.time())
+        self.update(message = '')
+
+
+#########################################################################################################
 
 # def test_point():
 #     p = Point(x=1.23,y=-1.23,z=32.1)
