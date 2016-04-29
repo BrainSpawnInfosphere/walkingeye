@@ -6,7 +6,7 @@
 
 import zmq
 import json
-import numpy
+#import numpy
 # import jpeg # compress video sent
 
 """
@@ -190,6 +190,9 @@ class SubBase64(Sub):
 
 
 class ServiceProvider(Base):
+	"""
+	Provides a service
+	"""
 	def __init__(self,bind_to,reply_to):
 		self.socket = self.ctx.socket(zmq.REP)
 		self.bind(bind_to)
@@ -199,15 +202,34 @@ class ServiceProvider(Base):
 		self._stop('Srvc:'+ self.bind_to)
 	
 	def listen(self, callback):
+		while True:
+			jmsg = self.socket.recv()
+			msg = json.loads(jmsg)
+			
+			ans = callback(msg)
+			
+			jmsg = json.dumps(ans)
+			self.socket.send(jmsg)
 	
-	def recv(self):
+class ServiceClient(Base):
+	"""
+	Client socket to get a response back from a service provider
+	"""
+	def __init__(self,bind_to,reply_to):
+		self.socket = self.ctx.socket(zmq.REQ)
+		self.bind(bind_to)
+		
+	def __del__(self):
+		self.socket.close()
+		self._stop('Srvc:'+ self.bind_to)
+	
+	def get(self, msg):
+		jmsg = json.dumps(msg)
+		self.socket.send(jmsg)
 		jmsg = self.socket.recv()
 		msg = json.loads(jmsg)
 		return msg
-
-	def send(self,msg):
-		jmsg = json.dumps(msg)
-		self.socket.send()
+			
 
 # class Service(Base):
 # 	def __init__(self,bind_to,reply_to):
@@ -251,6 +273,63 @@ class ServiceProvider(Base):
 # 		jmsg = msg
 # 		jmsg.payload = json.loads(msg.payload)
 # 		f(client, userdata, jmsg)
+
+
+
+#############################################################################################
+
+def test_pub_sub():
+	pub = Pub('tcp://127.0.0.1:9000')
+	sub = Sub('test','tcp://127.0.0.1:9000')
+	tmsg = {'a':1,'b':2}
+	while True:
+		pub.send('test',tmsg)
+		topic, msg = sub.recv()
+		
+		if msg:
+			assert msg == tmsg
+			break
+		
+# not sure this will work with nose????
+def test_serivce():
+	import threading
+	
+	quest = 'info'
+	ans = {'a':1,'b':2}
+	
+	def callback(msg):
+		if msg == quest:
+			return ans
+		else:
+			return {}
+	
+	def server():
+		serv = ServiceProvider('tcp://127.0.0.1:9000')
+		serv.listen(callback)
+		return
+	
+	def client():
+		client = ServiceClient('test','tcp://127.0.0.1:9000')
+		msg = client.get(quest)
+		assert msg == ans
+		return
+	
+	threads = []
+	s = threading.Thread(name='server',target=server) 
+	c =  threading.Thread(name='client',target=client) 
+	
+	s.start()
+	c.start()
+	
+	s.join()
+	c.join()
+		
+
+
+
+
+
+
 
 if __name__ == "__main__":
 	pass
