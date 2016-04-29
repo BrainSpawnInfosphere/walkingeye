@@ -189,32 +189,50 @@ class SubBase64(Sub):
 
 
 
-
-
-class Service(Base):
+class ServiceProvider(Base):
 	def __init__(self,bind_to,reply_to):
-		Base.__init__(self)
-		self.socket = self.ctx.socket(zmb.PUB)
-		self.socket.sndhwm = 110000 # set high water mark
-		self.socket.bind(bind_to)
-		self.bind_to = bind_to
-
-		# setup receive signals
-		self.sync = self.ctx.socket(zmq.REP)
-		self.sync.bind(reply_to)
-
+		self.socket = self.ctx.socket(zmq.REP)
+		self.bind(bind_to)
+		
 	def __del__(self):
 		self.socket.close()
 		self._stop('Srvc:'+ self.bind_to)
-
+	
+	def listen(self, callback):
+	
 	def recv(self):
-		jmsg = self.sync.recv()
+		jmsg = self.socket.recv()
 		msg = json.loads(jmsg)
 		return msg
 
 	def send(self,msg):
 		jmsg = json.dumps(msg)
-		self.sync.send()
+		self.socket.send()
+
+# class Service(Base):
+# 	def __init__(self,bind_to,reply_to):
+# 		Base.__init__(self)
+# 		self.socket = self.ctx.socket(zmb.PUB)
+# 		self.socket.sndhwm = 110000 # set high water mark
+# 		self.socket.bind(bind_to)
+# 		self.bind_to = bind_to
+
+# 		# setup receive signals
+# 		self.sync = self.ctx.socket(zmq.REP)
+# 		self.sync.bind(reply_to)
+
+# 	def __del__(self):
+# 		self.socket.close()
+# 		self._stop('Srvc:'+ self.bind_to)
+
+# 	def recv(self):
+# 		jmsg = self.sync.recv()
+# 		msg = json.loads(jmsg)
+# 		return msg
+
+# 	def send(self,msg):
+# 		jmsg = json.dumps(msg)
+# 		self.sync.send()
 
 # """
 # """
