@@ -193,87 +193,45 @@ class ServiceProvider(Base):
 	"""
 	Provides a service
 	"""
-	def __init__(self,bind_to,reply_to):
+	def __init__(self,bind_to):
+		Base.__init__(self)
 		self.socket = self.ctx.socket(zmq.REP)
-		self.bind(bind_to)
-		
+		self.socket.bind(bind_to)
+
 	def __del__(self):
 		self.socket.close()
-		self._stop('Srvc:'+ self.bind_to)
-	
+		# self._stop('Srvc:'+ self.bind_to)
+
 	def listen(self, callback):
+		# print 'listen'
 		while True:
 			jmsg = self.socket.recv()
 			msg = json.loads(jmsg)
-			
+
 			ans = callback(msg)
-			
+
 			jmsg = json.dumps(ans)
 			self.socket.send(jmsg)
-	
+
 class ServiceClient(Base):
 	"""
 	Client socket to get a response back from a service provider
 	"""
-	def __init__(self,bind_to,reply_to):
+	def __init__(self,bind_to):
+		Base.__init__(self)
 		self.socket = self.ctx.socket(zmq.REQ)
-		self.bind(bind_to)
-		
+		self.socket.connect(bind_to)
+
 	def __del__(self):
 		self.socket.close()
-		self._stop('Srvc:'+ self.bind_to)
-	
+		# self._stop('Srvc:'+ self.bind_to)
+
 	def get(self, msg):
 		jmsg = json.dumps(msg)
 		self.socket.send(jmsg)
 		jmsg = self.socket.recv()
 		msg = json.loads(jmsg)
 		return msg
-			
-
-# class Service(Base):
-# 	def __init__(self,bind_to,reply_to):
-# 		Base.__init__(self)
-# 		self.socket = self.ctx.socket(zmb.PUB)
-# 		self.socket.sndhwm = 110000 # set high water mark
-# 		self.socket.bind(bind_to)
-# 		self.bind_to = bind_to
-
-# 		# setup receive signals
-# 		self.sync = self.ctx.socket(zmq.REP)
-# 		self.sync.bind(reply_to)
-
-# 	def __del__(self):
-# 		self.socket.close()
-# 		self._stop('Srvc:'+ self.bind_to)
-
-# 	def recv(self):
-# 		jmsg = self.sync.recv()
-# 		msg = json.loads(jmsg)
-# 		return msg
-
-# 	def send(self,msg):
-# 		jmsg = json.dumps(msg)
-# 		self.sync.send()
-
-# """
-# """
-# class PubSubBase64(PubSub):
-# 	def __init__(self,topic,callback,host='localhost',port=9000):
-# 		PubSub.__init__(self,topic,callback,host,port)
-# 		self.mqttc.on_message = self.on_message
-#
-# 	def publish(self,topic,msg):
-# 		jmsg = json.dumps(msg)
-# 		self.mqttc.publish(topic,jmsg)
-#
-# 	def on_message(self,client, userdata, msg):
-# 		#print msg.topic, msg.payload
-# 		f=self.cb[msg.topic]
-# 		jmsg = msg
-# 		jmsg.payload = json.loads(msg.payload)
-# 		f(client, userdata, jmsg)
-
 
 
 #############################################################################################
@@ -283,47 +241,40 @@ def test_pub_sub():
 	sub = Sub('test','tcp://127.0.0.1:9000')
 	tmsg = {'a':1,'b':2}
 	while True:
-		pub.send('test',tmsg)
+		pub.pub('test',tmsg)
 		topic, msg = sub.recv()
-		
+
 		if msg:
 			assert msg == tmsg
 			break
-		
-# not sure this will work with nose????
+
 def test_serivce():
-	import threading
-	
-	quest = 'info'
+	import multiprocessing as mp
+	import time
+
 	ans = {'a':1,'b':2}
-	
-	def callback(msg):
-		if msg == quest:
-			return ans
-		else:
-			return {}
-	
-	def server():
-		serv = ServiceProvider('tcp://127.0.0.1:9000')
-		serv.listen(callback)
-		return
-	
-	def client():
-		client = ServiceClient('test','tcp://127.0.0.1:9000')
-		msg = client.get(quest)
-		assert msg == ans
-		return
-	
-	threads = []
-	s = threading.Thread(name='server',target=server) 
-	c =  threading.Thread(name='client',target=client) 
-	
+
+	class server(mp.Process):
+		def __init__(self):
+			mp.Process.__init__(self)
+		def run(self):
+			serv = ServiceProvider('tcp://127.0.0.1:9000')
+			serv.listen(self.callback)
+			return 0
+		def callback(self,msg):
+			return msg
+
+	s = server()
 	s.start()
-	c.start()
-	
+
+	client = ServiceClient('tcp://127.0.0.1:9000')
+	msg = client.get(ans)
+	assert msg == ans
+
+	s.terminate()
 	s.join()
-	c.join()
-		
+
+
 
 
 
