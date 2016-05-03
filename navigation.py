@@ -12,6 +12,25 @@ import logging
 import datetime as dt
 import cv2
 import argparse
+import numpy as np
+
+
+def fillMatrix(a,b,m,n,i=0,j=0):
+	"""
+	Set a(i:m,j:n) = b
+	Why numpy doesn't support something this useful already I don't know ... idiots!
+	"""
+	for y in range(j,j+n):
+		for x in range(i,i+m):
+			a[x,y] = b[x-i,y-j]
+	
+
+wie = 5
+oe_ie = np.array([(0,-wie,0),(wie,0,0),(0,0,0)])
+A = np.arange(9*9).reshape(9,9)
+fillMatrix(A,oe_ie,3,3)
+fillMatrix(A,-oe_ie*oe_ie,3,3,3,0)
+fillMatrix(A,np.eye(3,3),3,3,?,?)
 
 class Navigation(mp.Process):
 	def __init__(self,host="localhost",port='9110'):
