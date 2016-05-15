@@ -23,13 +23,13 @@ class Kludge(mp.Process):
 		mp.Process.__init__(self)
 		self.host = host
 		self.port = port
-		
+
 	def __del__(self):
 		print 'Kludge says goodbye'
 
 	def run(self):
 		self.sub = Sub(['voice'])
-		
+
 		while True:
 			time.sleep(3)
 			msg = self.sub.recv()
@@ -43,10 +43,6 @@ PORT=8800
 # https://github.com/liris/websocket-client
 
 class GetHandler(BaseHTTPRequestHandler):
-
-	def error(self):
-		return "<html><head><title>404</title></head><body><h1>404 File not Found</h1><br/>The file you requested was not found on the server</br></body></html>"
-
 	def page(self):
 		fd = open('node/head/face.htm','r')
 		results = fd.read()
@@ -58,26 +54,29 @@ class GetHandler(BaseHTTPRequestHandler):
 		if self.path == '/':
 			response = self.page()
 			self.send_response(200)
+			self.send_header('Content-type','text/html')
 			self.end_headers()
 			self.wfile.write(response)
 		else:
 			print "GetHandler doesn't support %s" % self.path
-			response = self.error()
 			self.send_response(404)
+			self.send_header('Content-type','text/html')
 			self.end_headers()
-			self.wfile.write(response)
-			
+			self.wfile.write('<html><head></head><body>')
+			self.wfile.write('<h1>File not found</h1>')
+			self.wfile.write('</body></html>')
+
 
 
 if __name__ == '__main__':
 
 	ipaddr = gethostbyname(gethostname())
-	
+
 	k = Kludge()
 	k.start()
 
 	print 'Starting server on '+str(ipaddr)+':'+str(PORT)+', use <Ctrl-C> to stop'
 	server = HTTPServer(('0.0.0.0', PORT), GetHandler)
 	server.serve_forever()
-	
+
 	k.join()
