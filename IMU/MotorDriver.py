@@ -36,14 +36,15 @@ class MotorDriver(object):
 		# this can be: 
 		# BOARD -> Board numbering scheme. The pin numbers follow the pin numbers on header P1.
 		# BCM -> Broadcom chip-specific pin numbers. 
-		GPIO.setmode(GPIO.BOARD)
+# 		GPIO.setmode(GPIO.BOARD)
+		GPIO.setmode(GPIO.BCM) # Pi cover uses BCM pin numbers
 # 		GPIO.setup(pwm0, GPIO.OUT)
 # 		GPIO.setup(pwm1, GPIO.OUT)
 # 		GPIO.setup(pwm2, GPIO.OUT)
 # 		GPIO.setup(pwm3, GPIO.OUT)
 		GPIO.setup([pwm0,pwm1,pwm2,pwm3], GPIO.OUT)
 		
-		freq = 500.0 # Hz
+		freq = 100.0 # Hz
 		self.motor0 = GPIO.PWM(pwm0,freq)
 		self.motor1 = GPIO.PWM(pwm1,freq)
 		self.motor2 = GPIO.PWM(pwm2,freq)
@@ -138,7 +139,7 @@ class MotorDriver(object):
 
 def test():
 	import time
-	md = MotorDriver(17,18,22,23)
+	md = MotorDriver(4,15,14,18)
 	
 	# duty cycle 0.0 - 100.0
 	go  = {'dir': MotorDriver.FORWARD, 'duty': 10}
