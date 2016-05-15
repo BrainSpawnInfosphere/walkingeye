@@ -10,109 +10,11 @@ This is the second version of my soccer robot.
 * Uses OpenCV to process on-board or stream video off-board to remote
 * All of this runs on [Raspberry Pi B+](http://www.raspberrypi.org)
 
-This is still in development, but various parts are working.
-
-## Basic Diagram
-
-![Data Flow](./pics/Robot.png)
-
 **Note:** This re-write is still very early and not fully running yet, just parts.
 
-## Libraries Used
+## Wiki Documentation
 
-You need the following key python libraries installed:
-
-* PySDL2 - simulation and joystick
-* PyYAML - read yaml config files
-* pyzmq - interprocess communication library
-* smbus-cffi - [I2C](https://pypi.python.org/pypi/smbus-cffi) support
-* Adafruit - various libraries
-
-## Install
-
-### Adafruit
-
-**TODO** Sort out this adafruit library mess ... there are so many and they are duplicates!
-
-You will need the following libraries from Adafruit for:
-
-####[GPIO](https://github.com/adafruit/Adafruit_Python_GPIO)
-
-	sudo apt-get update
-	sudo apt-get install build-essential python-pip python-dev python-smbus git
-	git clone https://github.com/adafruit/Adafruit_Python_GPIO.git
-	cd Adafruit_Python_GPIO
-	python setup.py install
-
-####[LED Matrix](https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code):
-
-	git clone https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
-
-Have a look at the LEDBackpack 8x8_pixel example
-	
-####[IMU](https://github.com/adafruit/Adafruit_Python_BNO055):
-
-	git clone git@github.com:adafruit/Adafruit_Python_BNO055.git
-	cd Adafruit_Python_BNO055
-	python setup.py install
+Documentation is on the [wiki](https://github.com/walchko/soccer2/wiki)
 
 
-### RPi
 
-	sudo apt-get install build-essential libi2c-dev i2c-tools python-dev libffi-dev
-	sudo apt-get install libsdl2-dev
-	sudo apt-get install libzmq3-dev
-	sudo apt-get install gnustep-gui-runtime
-	pip install cffi smbus-cffi
-	pip install pysdl2
-	pip install pyzmq
-
-#### I2C
-
-The following is on the I2C bus:
-
-* MCP23008 8b I/O Expander: 0x20
-* MCP23017 16b I/O Expander: 0x21 (A0 -> 1)
-* Adafruit BNO055 AHRS: 0x28
-* Adafruit 8x8 LED Matrix: 0x70 
-
-## SSH Login Art
-
-You can create ascii art from jpegs or text with the programs:
-
-    jp2a --background=light -i --output='art.txt' <some_file.jpg>
-    figlet 'hello world'
-
-Use `brew` to install::
-
-	brew install jp2a
-
-## Message Flow
-
-Parts:
-
-* RobotHardwareServer - controls motors, leds, servos, etc
-* RobotCameraServer - publishes images from USB camera, streams base64 encoded images
-
-Here is simple layout of message formate to support the flow shown above.
-
-Messages:
-
-| Header | Format                                 |
-|--------|----------------------------------------|
-|header  | {time_stamp}                           |
-|vec     | {x,y,z}                                |
-|twist   | {linear[vec],angular[vec]}             |
-|wrench  | {force[vec],torque[vec]}               |
-|cmd     | {motors:[1,2,3,4],servo[1,2], ...}     |
-|sound   | {sound}                                |
-|imu     | {accel[vec],gyro[vec],comp[vec],temp}  |
-|sensor  | {header,[imu], ...}                    |
-|image   | {header,image}                         |
-|pose    | {x,y,heading}                          |
-
-
-## To Do's
-
-* put it all together :)
-* might break this up into sound, camera, hw gits

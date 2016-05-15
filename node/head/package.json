@@ -1,0 +1,27 @@
+{
+  "name": "head",
+  "version": "0.0.1",
+  "description": "A simple animated robot that serves as a human to machine interface.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "debug": "DEBUG=* node server.js",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "robot"
+  ],
+  "author": "Kevin J. Walchko",
+  "license": "MIT",
+  "dependencies": {
+		"http": "0.0.0",
+		"fs": "*",
+		"zmq": "*",
+		"socket.io": "*",
+		"commander": "*",
+		"chalk": "*",
+		"jsonfile": "*",
+		"os-monitor": "*",
+		"debug":"*"
+  }
+}

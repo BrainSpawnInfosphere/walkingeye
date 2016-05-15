@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<!--
+This works
+var u = new SpeechSynthesisUtterance();
+function speak(txt){
+		// var u = new SpeechSynthesisUtterance();
+		u.text = txt;
+		// u.lang = 'en-UK';
+		u.rate = 1.2;
+		u.volume = 1.5; // between 0-10
+		// u.onend = function(event) { alert('Finished in ' + event.elapsedTime + ' seconds.'); }
+		speechSynthesis.speak(u);
+		//window.speechSynthesis(u);
+}
+
+speak('start');
+
+// no sound
+var two = new Two({
+    type: Two.Types.canvas,
+    fullscreen: true,
+    autostart: true
+}).appendTo(document.body);
+
+var moon = two.makeCircle(100,100,50);
+moon.noStroke().fill = 'green';
+//moon.translate.set(250,100);
+
+// sound
+var svg = new Two({
+    fullscreen: true,
+    autostart: true
+}).appendTo(document.body);
+
+var center = svg.makeCircle(window.width / 2, window.height / 2, 100);
+center.noStroke().fill = 'blue';
+center.translation.set(250, 250);
+
+// this has sound ... can't use with bind(), it fucks things up for some reason!!!
+svg.update();
+
+
+center._renderer.elem.addEventListener('click', function() {
+    changeColor('boing');
+}, false);
+
+function changeColor(txt) {
+    speak(txt);
+    return;
+}
+
+// this is animation .. no sound
+two.bind('update', function(frameCount) {
+	center.translation.set(250, 250);
+  moon.translation.set(250,100+frameCount%60);
+});
+-->
+
+
+<html>
+<header>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/two.js/0.6.0/two.min.js"></script>
+	<!-- <script src="https://raw.githubusercontent.com/jonobr1/two.js/gh-pages/third-party/url.js"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
+
+	<style>
+		body {background-color: rgb(0, 200, 255);}
+	</style>
+
+</header>
+<body>
+
+	<div id="debug">none</div>
+
+<div id="draw-shapes"></div>
+
+
+	<button id="demo">Speak</button>
+
+<script type="text/javascript">
+	var description = {'faceSize': 50, 'one': {'x':-20,'y':20}, 'two': {'x':20,'y':20}, 'three': {'x':0,'y':0}};
+
+	var u = new SpeechSynthesisUtterance();
+	// var voices = window.speechSynthesis.getVoices();
+	// console.log('get voices:');
+	// console.log(voices);
+	// // u.voice = voices.filter(function(voice) { return voice.name == 'Alex'; })[0];
+	// // u.voice = speechSynthesis.getVoices().filter(function(voice) { return voice.name == "Kathy"; })[0];
+	//
+	// console.log('voice: '+u.voice);
+	// console.log('lang: '+u.lang);
+
+	// var debug = document.getElementById('debug');
+	// debug.innerHTML = voices;
+
+	function speak(txt){
+		// var u = new SpeechSynthesisUtterance();
+		u.text = txt;
+		// u.lang = 'en-UK';
+		u.rate = 1.2;
+		u.volume = 5; // between 0-10
+		// u.onend = function(event) { alert('Finished in ' + event.elapsedTime + ' seconds.'); }
+		speechSynthesis.speak(u);
+		// window.speechSynthesis(u);
+	}
+
+	speak('fuck you!');
+
+	document.getElementById("demo").addEventListener("click", test);
+
+	function test() {
+		speak('button press');
+		console.log('log: button press');
+	}
+
+	function move(x,y,grp){
+		grp.translation.set(x,y);
+	}
+
+	function rotate(theta,grp){
+		grp.rotation = theta;
+	}
+
+	function makeRoundEye(x,y){
+		var eye = two.makeCircle(x,y,5);
+		eye.fill = 'rgb(0, 0, 0)';
+		// eye.stroke
+		return eye;
+	}
+
+
+	function makeDeadEye(x,y){
+		// var eye = two.makeCircle(x,y,5);
+		// eye.fill = 'rgb(0, 0, 0)';
+		// eye.stroke
+		var size = 8;
+		var thick = 3;
+		var left = new Two.Line(x-size,y+size,x+size,y-size);
+		var right = new Two.Line(x-size,y-size,x+size,y+size);
+		left.stroke = 'black';
+		left.linewidth = thick;
+		right.linewidth = thick;
+		right.stroke = 'black';
+		var eye = two.makeGroup(left,right);
+		return eye;
+	}
+
+	function makeFace(d){
+		console.log(d);
+		return 'hi';
+	}
+
+	// Make an instance of two and place it on the page.
+	// var elem = document.getElementById('draw-shapes');
+	// document.getElementById("draw-shapes").style.background = 'red';
+	// autostart: true, fullscreen: true
+	var params = { width: 285, height: 200, autostart: true, fullscreen: true };
+	var two = new Two(params).appendTo(document.body);//.appendTo(elem);
+
+	// two has convenience methods to create shapes. circle(x,y,r)
+	var face = two.makeCircle(0, 0, 50);
+	var eye1 = makeDeadEye(-20,20); //two.makeCircle(-20,20,5);
+	var eye2 = makeDeadEye(20,20); //two.makeCircle(20,20,5);
+	var eye3 = makeDeadEye(0,0); //two.makeCircle(0,0,5);
+
+	var group = two.makeGroup(face,eye1,eye2,eye3);
+
+	// face.on('click',test);
+
+	// The object returned has many stylable properties:
+	face.fill = 'white'; //'#FF8000';
+	face.stroke = 'black'; //'#1C75BC'; //'orangered'; // Accepts all valid css color
+	face.linewidth = 5;
+
+	//rotation
+	group.translation.set(100,100);
+	group.rotation = 3.14/2.0;
+	move(100,100,group);
+	rotate(Math.PI / 3.0, group);
+
+	// Don't forget to tell two to render everything
+	// to the screen
+	// two.update();
+
+	two.bind("update", function(frameCount){
+		var rot = false;
+		var cent = true;
+
+		if(rot){
+			rotate(Math.PI*frameCount/60.0, group);
+		}
+
+		if(cent) {
+			move(window.innerWidth/2,window.innerHeight/2,group);
+		}
+
+		if(frameCount%(5*60)==0){
+			console.log('speak');
+			// speak('hi');
+		}
+
+
+	});
+
+	// $(face._renderer.elem).click(function(e) {
+    // //   rect.fill = getRandomColor();
+	// 	console.log('face');
+    // });
+
+	two.play();
+
+
+</script>
+
+</body>
+</html>
