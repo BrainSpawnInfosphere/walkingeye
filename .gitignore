@@ -11,3 +11,4 @@ Arduino
 *.mp4
 *.m4v
 website
+node_modules
