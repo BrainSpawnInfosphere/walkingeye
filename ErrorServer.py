@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 #
-# by Kevin J. Walchko 26 Aug 2014
-#
-# Log:
-# 12 Oct 14 Broke out into its own file
-#
+# not done
 
 import time
 import datetime as dt

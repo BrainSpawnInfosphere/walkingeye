@@ -2,22 +2,20 @@
 #
 # Kevin J. Walchko 13 Oct 2014
 #
-# see http://zeromq.org.or for more info
+# see http://zeromq.org for more info
 
 import zmq
 import json
 import numpy
-# import jpeg # compress video sent
 
-"""
-Base class for other derived pub/sub classes
 
-todo:
-- add logging
-- add service (ask,replay)
-"""
 class Base:
 	"""
+	Base class for other derived pub/sub classes
+
+	todo:
+	- add logging
+	- add service (ask,replay)
 	"""
 	def __init__(self):
 		# functions
@@ -25,17 +23,19 @@ class Base:
 
 		#self.poller = zmq.Poller()
 
-	"""
-	Internal function, don't call
-	"""
+
 	def _stop(self,msg='some pub/sub/srvc'):
+		"""
+		Internal function, don't call
+		"""
 		self.ctx.term()
 		print '[<] shutting down',msg
 
-"""
-Simple publisher
-"""
+
 class Pub(Base):
+	"""
+	Simple publisher
+	"""
 	def __init__(self,bind_to='tcp://127.0.0.1:9000'):
 		Base.__init__(self)
 		self.bind_to = bind_to
@@ -55,19 +55,22 @@ class Pub(Base):
 		self.socket.close()
 		self._stop('PUB:'+ self.bind_to)
 
-	"""
-	It appears the send_json() doesn't work for pub/sub.
-	in: topic, message
-	out: none
-	"""
+
 	def pub(self,topic,msg):
+		"""
+		It appears the send_json() doesn't work for pub/sub.
+		in: topic, message
+		out: none
+		"""
 		jmsg = json.dumps(msg)
 		self.socket.send_multipart([topic,jmsg])
 		#self.socket.send_json(msg)
 
-"""
-"""
+
 class Sub(Base):
+	"""
+	Simple subscriber
+	"""
 	def __init__(self,topics='',connect_to='tcp://localhost:9100',poll_time=0.01):
 		Base.__init__(self)
 		self.connect_to = connect_to
@@ -120,7 +123,9 @@ import base64
 
 class PubBase64(Pub):
 	"""
-	Publishes info in base64, used for images
+	Publishes info in base64, used for images. The expectation is the user
+	compresses the image with jpeg, png, or whatever prior to sending the
+	image with this.
 	"""
 	def __init__(self,bind_to='tcp://127.0.0.1:9000'):
 		Pub.__init__(self,bind_to)
@@ -235,6 +240,8 @@ class ServiceClient(Base):
 
 
 #############################################################################################
+# Tests
+# nosetests -v zmqclass.py
 
 def test_pub_sub():
 	pub = Pub('tcp://127.0.0.1:9000')
@@ -275,12 +282,6 @@ def test_serivce():
 	s.join()
 
 
-
-
-
-
-
-
-
 if __name__ == "__main__":
+	print 'hello cowboy!'
 	pass

@@ -13,9 +13,10 @@ class Plugin(Module):
 		Module.__init__(self,'time')
 		self.intent = 'time'
 		
-	"""
-	"""	
 	def process(self, entity):
+		"""
+		Grabs the local time
+		"""	
 		t = time.localtime()
 		hrs = t[3]
 		if hrs > 12:

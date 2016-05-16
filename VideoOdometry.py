@@ -7,14 +7,17 @@ import video
 import time
 import math
 
-import Messages as messages
+import Messages as msgs
 
 from zmqclass import *
 import multiprocessing as mp
 
 class VideoOdom(object):
+	"""
+	why not just fold this into the vo class instead of stand alone???
+	"""
 	def __init__(self):
-		a=0
+		self.cam = None
 
 	def init(self,params):
 		"""
@@ -114,7 +117,11 @@ class VideoOdom(object):
 		return p0, p1
 
 
-	def grab(self, params):
+	def grab(self):
+
+		if not self.cam:
+			print 'Error: camera not setup, run init() first'
+			return new msgs.Odom()
 
 		try:
 			ret, im = cam.read(True)
@@ -185,7 +192,7 @@ class VideoOdom(object):
 			# save_pts.append(t_f[:2])
 
 			# create message
-			odom = new message.Odom()
+			odom = new msgs.Odom()
 			odom['position']['position']['x'] = 0.0
 			odom['position']['position']['y'] = 0.0
 			odom['position']['position']['z'] = 0.0
@@ -227,17 +234,16 @@ class Server(mp.Process):
 
 		pub = Pub('tcp://'+self.host+':'+self.port)
 
-		# camera = cv2.VideoCapture(self.camera_num)
-		# self.logger.info('Openned camera: '+str(self.camera_num))
+		params = {
+			'pp': (200,200),
+			'focallength': 200
+		}
 
 		vo = VideoOdom()
+		vo.init(params)
 
 		try:
 			while True:
-				# ret, frame = camera.read()
-				# jpeg = cv2.imencode('.jpg',frame)[1]
-				# pub.pub('image',jpeg)
-				#print '[*] frame: %d k   jpeg: %d k'%(frame.size/1000,len(jpeg)/1000)
-				#time.sleep(0.1)
 				odom = vo.loop()
 				pub.pub('vo', odom)
+				time.sleep(0.1)

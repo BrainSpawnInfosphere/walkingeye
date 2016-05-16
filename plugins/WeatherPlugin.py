@@ -24,16 +24,16 @@ class Plugin(Module):
 		long = self.info['Geolocation']['LONGITUDE']  
 	
 		self.forecast = forecastio.load_forecast(api_key, lat, long)
-		self.weather_time = time.gmtime()
+		self.weather_time = time.localtime()
 		
 		#self.intent = 'weather'
 	
-	"""
-	Grab a forcast
-	in: day of week (0-6) to grab weather forecast and json info
-	out: forecast txt
-	"""
 	def grabWeatherDay(self,day):
+		"""
+		Grab a forcast
+		in: day of week (0-6) to grab weather forecast and json info
+		out: forecast txt
+		"""
 		j = self.forecast.json
 		
 		high = int(round(j['daily']['data'][day]['apparentTemperatureMax'],0))
@@ -51,40 +51,44 @@ class Plugin(Module):
 	
 		return resp
 
-	"""
-	Handles the weather request. If the last one isn't too old, it just uses that one.
-	in: what day (now, tomorrow, today, etc)
-	out: txt response
-	todo: 
-	"""
+
 	def process(self, entity):	
+		"""
+		Handles the weather request. If the last one isn't too old, it just uses that one.
+		in: entity {"datetime": [{
+				"grain": "day",
+				"type": "value",
+				"value": "2015-03-04T00:00:00.000-08:00"
+			  }]}
+		out: txt response
+		"""
+		
 		resp = ''
-		w_time = 'today'
 		
-		if 'datetime' in entity: 
-			w_time = entity['datetime']['body']
-	
-		# convert time to seconds from epoch and div by 60 for minutes
+		# last time forecast.io was called
 		now = time.localtime()
-		diff = (time.mktime(self.weather_time) - time.mktime(now))/60
+		diff = (time.mktime(now) - time.mktime(self.weather_time))/60
+		print 'diff', diff
 		
+		# grab the json info
 		j = self.forecast.json
 		
-		# update if it has been too long
+		# update if it has been too long ... 5 mins
 		if diff > 5:
 			self.forecast.update()
 			j = self.forecast.json
 			self.weather_time = now
-	
-		if w_time == 'tomorrow':
-			resp = self.grabWeatherDay(1)
+			print 'update'
 		
-		elif w_time == 'today':
-			resp = self.grabWeatherDay(0)
-		
-		elif w_time == 'this week':
-			resp =  j['daily']['summary']
-		
+		# get weather asked for: today, tomorrow, monday, sunday, etc
+		if 'datetime' in entity: 
+			t = entity['datetime'][0]['value']
+			asked = time.strptime(t.split('.')[0],'%Y-%m-%dT%H:%M:%S')
+			
+			# get how many days in future
+			w_time = asked.tm_mday - now.tm_mday
+			if w_time >= 0 or w_time < 7: resp = self.grabWeatherDay( int( w_time ) )
+			
 		else:
 			temp = j['currently']['apparentTemperature']
 			rain = j['currently']['precipProbability']*100.0	
