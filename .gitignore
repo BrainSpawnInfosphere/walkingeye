@@ -10,5 +10,6 @@ old
 Arduino
 *.mp4
 *.m4v
+*.wav
 website
 node_modules

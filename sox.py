@@ -47,6 +47,19 @@ class Microphone(object):
 		return s
 
 	def getAudio(self):
+		"""
+		from: https://wit.ai/docs/http/20160330#get-intent-via-text-link
+		sox -d -b 16 -c 1 -r 16k sample.wav
+
+		$ file sample.wav
+			sample.wav: RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 16000 Hz
+
+		$ curl -XPOST 'https://api.wit.ai/speech?v=20141022' \
+			-i -L \
+			-H "Authorization: Bearer $TOKEN" \
+			-H "Content-Type: audio/wav" \
+			--data-binary "@sample.wav"
+		"""
 		# print 'Ready'
 		self.logger.debug('Ready')
 
