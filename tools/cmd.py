@@ -7,22 +7,22 @@
 # Just a dummy test script
 
 import time
-import json
-from multiprocessing.connection import Client as Subscriber
-
+#from multiprocessing.connection import Client as Subscriber
+import '../zmqclass' as zmq
+import '../Message' as msg
 
 if __name__ == '__main__':
-	s = Subscriber(("192.168.1.12",9000))
-	
+	# this points to the computer running the subscriber
+	p = zmq.Pub(("192.168.1.12",9000))
+
 	while True:
 		try:
 			time.sleep(3)
-			cmd = {'cmd': {'m': {'x': 2.3, 'y': 5.33}, 'speed': 50} }
-			s.send(cmd)
+			#cmd = {'cmd': {'m': {'x': 2.3, 'y': 5.33}, 'speed': 50} }
+			cmd = new Twist()
+			p.pub('motor',cmd)
 		except (IOError, EOFError):
 			print '[-] Connection gone .... bye'
 			break
-		
+
 	s.close()
-	
-    
