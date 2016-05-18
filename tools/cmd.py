@@ -8,8 +8,13 @@
 
 import time
 #from multiprocessing.connection import Client as Subscriber
-import '../zmqclass' as zmq
-import '../Message' as msg
+
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+
+import zmqclass as zmq
+import Message as msg
 
 if __name__ == '__main__':
 	# this points to the computer running the subscriber

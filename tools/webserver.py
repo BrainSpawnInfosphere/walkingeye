@@ -13,6 +13,11 @@ import time
 
 # for the server/client interface
 import multiprocessing as mp
+
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+
 from zmqclass import *
 
 class Kludge(mp.Process):
