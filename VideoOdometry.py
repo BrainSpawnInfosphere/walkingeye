@@ -6,40 +6,45 @@ import argparse
 import video
 import time
 import math
-
-import Messages as msgs
-
-from zmqclass import *
 import multiprocessing as mp
+import lib.Messages as msgs
+import lib.zmqclass as zmq
+import iib.Camera as camera
+
+
+class VOError(Exception):
+	pass
+
 
 class VideoOdom(object):
 	"""
 	why not just fold this into the vo class instead of stand alone???
+	- I am thinking I should be able to easily swap out different vo algorithms
 	"""
 	def __init__(self):
 		self.cam = None
 
-	def init(self,params):
+	def init(self, params):
 		"""
 		params = {pp:(tuple), focallength: #}
 		"""
-		self.cam = ???
+		self.cam = camera.Camera()
+		self.cam.init((640, 480))  # set window size
 		# cam = video.Camera('floor.mp4')
 		# cam.setROI((0,479,210,639))
 		# cam.load('camera_params.npz')
 		# cameraMat = cam.data['camera_matrix']
-
 
 		# pp = (240,220)
 		# focal = 200.0
 		self.pp = params['pp']
 		self.focal = params['focallength']
 
-		R_f = np.eye(3,3,dtype=np.float)
-		t_f = np.array([0,0,0],dtype=np.float)
+		R_f = np.eye(3, 3, dtype=np.float)
+		t_f = np.array([0, 0, 0], dtype=np.float)
 		# R = np.zeros((3,3),dtype=np.float)
 		R = R_f.copy()
-		t = np.array([0,0,0],dtype=np.float)
+		t = np.array([0, 0, 0], dtype=np.float)
 		t_prev = t.copy()
 		dist = 0.0
 
@@ -71,16 +76,16 @@ class VideoOdom(object):
 		# print 'orb shape',keypoints.shape
 
 		# params for ShiTomasi corner detection
-		feature_params = dict( maxCorners = 500,
-			qualityLevel = 0.3,
-			minDistance = 7,
-			blockSize = 7 )
-		keypoints = cv2.goodFeaturesToTrack(im, mask = None, **feature_params)
-		print 'goodFeaturesToTrack shape',keypoints.shape
+		feature_params = dict(maxCorners=500,
+			qualityLevel=0.3,
+			minDistance=7,
+			blockSize=7)
+		keypoints = cv2.goodFeaturesToTrack(im, mask=None, **feature_params)
+		print 'goodFeaturesToTrack shape', keypoints.shape
 
 		return keypoints
 
-	def cullBadPts(p0,p1,st,err):
+	def cullBadPts(p0, p1, st, err):
 		new = []
 		old = []
 
@@ -91,37 +96,35 @@ class VideoOdom(object):
 		# exit()
 
 		# Select good points
-		for i in range(0,p1.shape[0]):
+		for i in range(0, p1.shape[0]):
 			# print 'st',st[i]
 			# print 'p1',p1[i]
 			if st[i][0] == 1 and p1[i][0][0] >= 0 and p1[i][0][1] >= 0:
 				new.append(p1[i][0])
 				old.append(p0[i][0])
 
-		good_new = np.array([[k] for k in new],dtype=np.float32)
-		good_old = np.array([[k] for k in old],dtype=np.float32)
+		good_new = np.array([[k] for k in new], dtype=np.float32)
+		good_old = np.array([[k] for k in old], dtype=np.float32)
 
 		return good_old, good_new
 
-
-	def featureTrack(new_gray,old_gray,p0):
+	def featureTrack(new_gray, old_gray, p0):
 		# Parameters for lucas kanade optical flow
-		lk_params = dict( winSize  = (10,10),
-					  maxLevel = 3,
-					  criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+		lk_params = dict(winSize=(10, 10),
+						maxLevel=3,
+						criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
 
 		p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, new_gray, p0, None, **lk_params)
 
-		p0,p1 = cullBadPts(p0,p1,st,err)
+		p0, p1 = cullBadPts(p0, p1, st, err)
 
 		return p0, p1
-
 
 	def grab(self):
 
 		if not self.cam:
 			print 'Error: camera not setup, run init() first'
-			return new msgs.Odom()
+			return msgs.Odom()
 
 		try:
 			ret, im = cam.read(True)
@@ -142,21 +145,21 @@ class VideoOdom(object):
 
 			# p0 - old pts
 			# p1 - new pts
-			p0, p1 = featureTrack(im,old_im,p0)
+			p0, p1 = featureTrack(im, old_im, p0)
 
 			# not enough new points p1
 			if p1.shape[0] < 50:
 				print '------- reset p1 --------'
 				continue
 
-			drawKeyPoints(im,p1)
+			drawKeyPoints(im, p1)
 
 			# since these are rectified images, fundatmental (F) = essential (E)
 			# E, mask = cv2.findEssentialMat(p0,p1,focal,pp,cv2.FM_RANSAC)
 			# retval, R, t, mask = cv2.recoverPose(E,p0,p1,R_f,t_f,focal,pp,mask)
 
-			E, mask = cv2.findEssentialMat(p0,p1,focal,pp,cv2.FM_RANSAC, 0.999, 1.0)
-			retval, R, t, mask = cv2.recoverPose(E,p0,p1,R,t,focal,pp,mask)
+			E, mask = cv2.findEssentialMat(p0, p1, focal, pp, cv2.FM_RANSAC, 0.999, 1.0)
+			retval, R, t, mask = cv2.recoverPose(E, p0, p1, R, t, focal, pp, mask)
 			# print retval,R
 
 			# Now update the previous frame and previous points
@@ -174,7 +177,7 @@ class VideoOdom(object):
 
 			R_f = R.dot(R_f)
 			# t_f = t
-			t_f = t_f + scale*R_f.dot(t)
+			t_f = t_f + scale * R_f.dot(t)
 
 			# t_prev = t
 			# t_f = t_f/t_f[2]
@@ -192,7 +195,7 @@ class VideoOdom(object):
 			# save_pts.append(t_f[:2])
 
 			# create message
-			odom = new msgs.Odom()
+			odom = msgs.Odom()
 			odom['position']['position']['x'] = 0.0
 			odom['position']['position']['y'] = 0.0
 			odom['position']['position']['z'] = 0.0
@@ -212,15 +215,15 @@ class VideoOdom(object):
 
 			return odom
 
-			except KeyboardInterrupt:
-				print 'captured interrupt'
-				break
+		except KeyboardInterrupt:
+			print 'captured interrupt'
+			break
 
 		# cam.release()
 
 
 class Server(mp.Process):
-	def __init__(self,host="localhost",port='9100'):
+	def __init__(self, host="localhost", port='9100'):
 		mp.Process.__init__(self)
 		self.epoch = dt.datetime.now()
 		self.host = host
@@ -230,12 +233,12 @@ class Server(mp.Process):
 		self.logger = logging.getLogger('robot')
 
 	def run(self):
-		self.logger.info(str(self.name)+'['+str(self.pid)+'] started on'+ str(self.host) + ':' + str(self.port) +', Daemon: '+str(self.daemon))
+		self.logger.info(str(self.name) + '[' + str(self.pid) + '] started on' + str(self.host) + ':' + str(self.port) + ', Daemon: ' + str(self.daemon))
 
-		pub = Pub('tcp://'+self.host+':'+self.port)
+		pub = Pub('tcp://' + self.host + ':' + self.port)
 
 		params = {
-			'pp': (200,200),
+			'pp': (200, 200),
 			'focallength': 200
 		}
 
@@ -247,3 +250,11 @@ class Server(mp.Process):
 				odom = vo.loop()
 				pub.pub('vo', odom)
 				time.sleep(0.1)
+
+
+def main():
+	srv = Server()
+
+
+if __name__ == "__main__":
+	main()
