@@ -1,0 +1,8 @@
+{
+	"name": "robot",
+	"accounts": "/Users/kevin/Dropbox/accounts.yaml",
+	"servers": {
+		"vision": ["localost", 9000],
+		"hardware": ["localost", 9000]
+	}
+}

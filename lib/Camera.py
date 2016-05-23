@@ -3,14 +3,30 @@
 
 import cv2             # OpenCV camera
 import time            # sleep
-import logging         # logging
+# import logging         # logging
 import platform        # determine linux or darwin (OSX)
-import argparse        # command line args
+# import argparse        # command line args
 
 
 if platform.system().lower() == 'linux':
-	import picamera       # on linux, PiCamera
-	import picamera.array # on linux, turn PiCamera images into numpy arrays
+	import picamera        # on linux, PiCamera
+	import picamera.array  # on linux, turn PiCamera images into numpy arrays
+
+
+class SaveVideo(object):
+	"""
+	Simple class to save frames to video (mp4v)
+	"""
+	def __init__(self, filename, image_size, fps=20):
+		mpg4 = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+		self.out = cv2.VideoWriter()
+		self.out.open(filename, mpg4, fps, image_size)
+
+	def write(self, image):
+		self.out.write(image)
+
+	def release(self):
+		self.out.release()
 
 
 class Camera(object):
@@ -24,7 +40,7 @@ class Camera(object):
 		passed in, then it determines the operating system and picks which
 		camera to use.
 		default:
-		    linux: PiCamera
+			linux: PiCamera
 			OSX: OpenCV
 		in: type: cv or pi and if OpenCV, what camera number
 		out: None
@@ -32,20 +48,22 @@ class Camera(object):
 		self.cal = None
 
 		if not cam:
-			os = platform.system().lower() # grab OS name and make lower case
-			if os == 'linux': cam = 'pi'
-			else: cam = 'cv'
+			os = platform.system().lower()  # grab OS name and make lower case
+			if os == 'linux':
+				cam = 'pi'
+			else:
+				cam = 'cv'
 
 		if cam == 'pi':
-			self.cameraType = 'pi' # picamera
+			self.cameraType = 'pi'  # picamera
 			self.camera = picamera.PiCamera()
 		else:
-			self.cameraType = 'cv' # opencv
+			self.cameraType = 'cv'  # opencv
 			self.cameraNumber = num
 			self.camera = cv2.VideoCapture()
 			# need to do vertical flip?
 
-		time.sleep(1) # let camera warm-up
+		time.sleep(1)  # let camera warm-up
 
 	def __del__(self):
 		"""
@@ -58,23 +76,23 @@ class Camera(object):
 
 		print 'exiting camera ... bye!'
 
-	def init(self,win=(640,480)):
+	def init(self, win=(640, 480)):
 		"""
 		Initialize the camera and set the image size
 		in: image size (tuple (width,height))
 		out: None
 		"""
 		if self.cameraType == 'pi':
-			self.camera.vflip = True # camera is mounted upside down
+			self.camera.vflip = True  # camera is mounted upside down
 			self.camera.resolution = win
-			self.bgr = picamera.array.PiRGBArray(self.camera,size=win)
+			self.bgr = picamera.array.PiRGBArray(self.camera, size=win)
 		else:
 			self.camera.open(self.cameraNumber)
-			self.camera.set(3, win[0]);
-			self.camera.set(4, win[1]);
+			self.camera.set(3, win[0])
+			self.camera.set(4, win[1])
 		# self.capture.set(cv2.cv.CV_CAP_PROP_SATURATION,0.2);
 
-	def setCalibration(self,n):
+	def setCalibration(self, n):
 		"""
 		Set the calibration data for the camera
 		in: numpy array of calibration data
@@ -93,18 +111,18 @@ class Camera(object):
 		if self.cameraType == 'pi':
 			self.camera.capture(self.bgr, format='bgr', use_video_port=True)
 			gray = cv2.cvtColor(self.bgr.array, cv2.COLOR_BGR2GRAY)
-			self.bgr.truncate(0) # clear stream
+			self.bgr.truncate(0)  # clear stream
 			# print 'got image'
 			# return True, gray
 		else:
-			ret,img = self.camera.read()
+			ret, img = self.camera.read()
 			if not ret:
 				return False
 			# imgRGB=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 			gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 			# return True, gray
 
-		if self.cal: # FIXME 2016-05-15
+		if self.cal:  # FIXME 2016-05-15
 			print 'do calibration correction ... not done yet'
 
 		return True, gray
@@ -115,8 +133,7 @@ class Camera(object):
 		in: None
 		out: True/False
 		"""
-		return True # FIXME 2016-05-15
-
+		return True  # FIXME 2016-05-15
 
 
 def main():
