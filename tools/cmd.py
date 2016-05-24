@@ -13,8 +13,8 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
-import zmqclass as zmq
-import Message as msg
+import lib.zmqclass as zmq
+import lib.Message as msg
 
 if __name__ == '__main__':
 	# this points to the computer running the subscriber
