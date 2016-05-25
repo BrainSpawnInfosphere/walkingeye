@@ -14,6 +14,11 @@
 # A good resource:
 # http://docs.opencv.org/3.1.0/dc/dbb/tutorial_py_calibration.html
 
+# storing numpy arrays
+# http://robotfantastic.org/serializing-python-data-to-json-some-edge-cases.html
+# >>> a = np.array_equal(data, json.loads(json.dumps(data.tolist())))
+# >>> np.array(a)
+
 import numpy as np
 import cv2
 import glob
