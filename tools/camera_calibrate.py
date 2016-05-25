@@ -11,10 +11,14 @@
 # - remove getOptimalNewCameraMatrix()? not sure of its value
 # --------------------------------------------------------------------
 
+# A good resource:
+# http://docs.opencv.org/3.1.0/dc/dbb/tutorial_py_calibration.html
+
 import numpy as np
 import cv2
 import glob
-# import yaml
+import yaml
+import json
 import argparse
 # import os
 # import sys
@@ -36,15 +40,20 @@ class CameraCalibration(object):
 		self.marker_checkerboard = True
 
 	# # write camera calibration file out
-	# def save(self):
-	# 	fd = open(self.save_file, "w")
-	# 	yaml.dump(self.data, fd)
-	# 	fd.close()
-	#
-	# # read camera calibration file in
-	# def read(self, matrix_name):
-	# 	fd = open(matrix_name, "r")
-	# 	data = yaml.load(fd)
+	def save(self):
+		fd = open(self.save_file, "w")
+		yaml.dump(self.data, fd)
+		fd.close()
+		# with open(self.save_file, 'w') as f:
+		# 	json.dump(self.data, f)
+
+	# read camera calibration file in
+	def read(self, matrix_name):
+		fd = open(matrix_name, "r")
+		self.data = yaml.load(fd)
+		fd.close()
+		# with open(matrix_name, 'r') as f:
+		# 	self.data = json.load(f)
 
 	# print the estimated camera parameters
 	def printMat(self):
@@ -64,14 +73,17 @@ class CameraCalibration(object):
 		# objp = np.zeros((self.marker_size[0]*self.marker_size[1],3), np.float32)
 		# objp[:,:2] = np.mgrid[0:self.marker_size[0],0:self.marker_size[1]].T.reshape(-1,2)
 		objp = np.zeros((np.prod(self.marker_size), 3), np.float32)
-		objp[:, :2] = np.indices(self.marker_size).T.reshape(-1, 2)
+		objp[:, :2] = np.indices(self.marker_size).T.reshape(-1, 2) # make a grid of points
 
-		# Find the chess board corners
+		# Find the chess board corners or circle centers
 		if self.marker_checkerboard is True:
 			ret, corners = cv2.findChessboardCorners(gray, self.marker_size)
 			if ret: print '[+] chess - found corners: ', corners.size / 2
 		else:
-			ret, corners = cv2.findCirclesGrid(gray, self.marker_size, None, cv2.CALIB_CB_ASYMMETRIC_GRID)
+			ret, corners = cv2.findCirclesGrid(gray, self.marker_size, flags=cv2.CALIB_CB_ASYMMETRIC_GRID)
+			# ret, corners = cv2.findCirclesGrid(gray, self.marker_size, flags=cv2.CALIB_CB_CLUSTERING)
+			# print '[+] circles - found corners: ', corners.size / 2, 'ret:', ret
+			# print 'corners:', corners
 			if ret: print '[+] circles - found corners: ', corners.size / 2
 
 		# If found, add object points, image points (after refining them)
@@ -80,19 +92,18 @@ class CameraCalibration(object):
 			cv2.cornerSubPix(gray, corners, (5, 5), (-1, -1), term)
 			imgpoints.append(corners.reshape(-1, 2))
 			objpoints.append(objp)
-
-			# Draw the corners
-			self.draw(gray, corners)
-
 		else:
 			print '[-] Couldn\'t find markers'
+
+		# Draw the corners
+		self.draw(gray, corners)
 
 		return ret, objpoints, imgpoints
 
 	# draw the detected corners on the image for display
 	def draw(self, image, corners):
 		# Draw and display the corners
-		cv2.drawChessboardCorners(image, self.marker_size, corners, True)
+		if corners is not None: cv2.drawChessboardCorners(image, self.marker_size, corners, True)
 		cv2.imshow('camera', image)
 		cv2.waitKey(500)
 		return image
@@ -114,12 +125,16 @@ class CameraCalibration(object):
 			gray = cv2.imread(fname, 0)
 			ret, objpoints, imgpoints = self.findMarkers(gray, objpoints, imgpoints)
 			h, w = gray.shape[:2]
+			# print(fname,h,w)
 
 		# print len(objpoints),len(imgpoints),w,h
 
-		rms, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, (w, h))
+		rms, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, (w, h), None, None)
 
-		# not sure of the value of this
+		# Adjust the calibrations matrix
+		# alpha=0: returns undistored image with minimum unwanted pixels (image pixels at corners/edges could be missing)
+		# alpha=1: retains all image pixels but there will be black to make up for warped image correction
+		# returns new cal matrix and an ROI to crop out the black edges
 		alpha = 0.5
 		newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), alpha)
 		self.data = {'camera_matrix': mtx, 'dist_coeff': dist, 'newcameramtx': newcameramtx, 'rms': rms, 'rvecs': rvecs, 'tvecs': tvecs}
@@ -139,17 +154,25 @@ def handleArgs():
 
 
 # main function
-def test():
+def main():
 	args = handleArgs()
 	imgs_folder = args['path']
 
-	calibration_images = '%s/*.png' % (imgs_folder)
+	print('Searching %s for images' % imgs_folder)
+
+	# calibration_images = '%s/left*.jpg' % (imgs_folder)
+	calibration_images = '%s/shot_*.png' % (imgs_folder)
 	images = []
 	images = glob.glob(calibration_images)
+
+	print('Number images found: %d' % len(images))
+	# print(images)
 
 	cal = CameraCalibration()
 	cal.save_file = args['matrix']
 	cal.marker_size = (args['target_size'][0], args['target_size'][1])
+
+	print 'Marker size:', cal.marker_size
 
 	if args['target'] == 'chessboard': cal.marker_checkerboard = True
 	else: cal.marker_checkerboard = False
@@ -175,9 +198,14 @@ def test():
 	dst = cal.undistort(image)
 	cv2.imshow('calibrated image', dst)
 	# cv2.imshow('original image', image)
-	cv2.waitKey(2000)
+	cv2.waitKey(0)
 
 	cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-	test()
+	# print('Here we go!')
+	# print('OpenCV', cv2.__version__)
+	# while True:
+	# 	a=1
+	# exit()
+	main()
