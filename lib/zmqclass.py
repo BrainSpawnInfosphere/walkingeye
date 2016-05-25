@@ -15,13 +15,9 @@ class ZMQError(Exception):
 	pass
 
 
-class Base:
+class Base:  # FIXME: 20160525 move printing statements to logging instead?
 	"""
-	Base class for other derived pub/sub classes
-
-	todo:
-	- add logging
-	- add service (ask,replay)
+	Base class for other derived pub/sub/service classes
 	"""
 	def __init__(self):
 		# functions
@@ -29,6 +25,11 @@ class Base:
 
 		# self.poller = zmq.Poller()
 
+	def zmq_version(self):
+		"""
+		What version of the zmq (C++) library is python tied to?
+		"""
+		print('Using ZeroMQ version: %s' % (zmq.version_info()))
 
 	def _stop(self, msg='some pub/sub/srvc'):
 		"""
@@ -58,10 +59,9 @@ class Pub(Base):
 		# self.poller.register(self.socket, zmq.POLLOUT)
 
 	def __del__(self):
-		#self.poller.register(self.socket)
+		# self.poller.register(self.socket)
 		self.socket.close()
 		self._stop('PUB:' + self.bind_to)
-
 
 	def pub(self, topic, msg):
 		"""
@@ -96,31 +96,30 @@ class Sub(Base):
 				for t in topics:
 					self.socket.setsockopt(zmq.SUBSCRIBE, t)
 
- 		except Exception, e:
+		except Exception, e:
 			error = '[-] Sub Error, %s to %s' % (str(e), connect_to)
 			# print error
 			raise ZMQError(error)
 
-
 	def __del__(self):
 		self.socket.close()
-		self._stop('SUB:'+ self.connect_to)
+		self._stop('SUB:' + self.connect_to)
 
 	def recv(self):
 		# check to see if there is read, write, or erros
-		r,w,e = zmq.select([self.socket],[],[],self.poll_time)
+		r, w, e = zmq.select([self.socket], [], [], self.poll_time)
 
-		topic=''
-		msg={}
+		topic = ''
+		msg = {}
 
 		# should this be a for loop? I don't think so???
 		if len(r) > 0:
 			topic, jmsg = r[0].recv_multipart()
 			msg = json.loads(jmsg)
 
- 		#topic, jmsg = self.socket.recv_multipart()
- 		#msg = json.loads(jmsg)
-		return topic,msg
+		# topic, jmsg = self.socket.recv_multipart()
+		# msg = json.loads(jmsg)
+		return topic, msg
 
 
 class PubBase64(Pub):
@@ -257,25 +256,40 @@ def test_pub_sub():
 			break
 
 
+# for some reason, windows barfs on this inside of the test_service() and I have
+# to put it out here!!!!!
+import multiprocessing as mp
+class tServer(mp.Process):
+	def __init__(self):
+		mp.Process.__init__(self)
+
+	def run(self):
+		serv = ServiceProvider('tcp://127.0.0.1:9000')
+		serv.listen(self.callback)
+		return 0
+
+	def callback(self, msg):
+		return msg
+
 def test_serivce():
 	import multiprocessing as mp
 	# import time
 
 	ans = {'a': 1, 'b': 2}
 
-	class server(mp.Process):
-		def __init__(self):
-			mp.Process.__init__(self)
+	# class tServer(mp.Process):
+	# 	def __init__(self):
+	# 		mp.Process.__init__(self)
+	#
+	# 	def run(self):
+	# 		serv = ServiceProvider('tcp://127.0.0.1:9000')
+	# 		serv.listen(self.callback)
+	# 		return 0
+	#
+	# 	def callback(self, msg):
+	# 		return msg
 
-		def run(self):
-			serv = ServiceProvider('tcp://127.0.0.1:9000')
-			serv.listen(self.callback)
-			return 0
-
-		def callback(self, msg):
-			return msg
-
-	s = server()
+	s = tServer()
 	s.start()
 
 	client = ServiceClient('tcp://127.0.0.1:9000')

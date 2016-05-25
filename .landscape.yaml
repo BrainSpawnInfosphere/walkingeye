@@ -1,0 +1,17 @@
+doc-warnings: yes
+test-warnings: no
+strictness: medium
+autodetect: yes
+# requirements:
+#     - deps/core.txt
+#     - deps/test.txt
+ignore-paths:
+    - docs
+    - pics
+    - sim
+    - sounds
+    - tmp
+ignore-patterns:
+    - ^/Adafruit_.*\.py$
+python-targets:
+    - 2

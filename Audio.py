@@ -12,9 +12,9 @@ import multiprocessing as mp		# multiprocess
 # import glob
 # import json
 import lib.zmqclass as zmq
-import lib.sox as sox
+# import lib.sox as sox
 import lib.FileStorage as fs
-import lib.wit as wit				# wit.ai
+# import lib.wit as wit				# wit.ai
 import lib.WitInput as wi
 
 """
