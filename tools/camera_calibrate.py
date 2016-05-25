@@ -14,14 +14,15 @@
 import numpy as np
 import cv2
 import glob
-import yaml
+# import yaml
 import argparse
-import os
+# import os
+# import sys
 
-sys.path.insert(0, os.path.abspath('..'))
-import lib.zmqclass as zmq
-import lib.Message as msg
-import lib.Camera as Camera
+# sys.path.insert(0, os.path.abspath('..'))
+# import lib.zmqclass as zmq
+# import lib.Message as msg
+# import lib.Camera as Camera
 
 
 class CameraCalibration(object):
@@ -31,46 +32,46 @@ class CameraCalibration(object):
 	def __init__(self):
 		self.save_file = 'calibration.npy'
 		self.calibration_images = '.'
-		self.marker_size = (0,0)
+		self.marker_size = (0, 0)
 		self.marker_checkerboard = True
 
-	# write camera calibration file out
-	def save(self):
-		fd = open(self.save_file,"w")
-		yaml.dump(self.data,fd)
-		fd.close()
-
-	# read camera calibration file in
-	def read(self, matrix_name):
-		fd = open(matrix_name,"r")
-		data = yaml.load(fd)
+	# # write camera calibration file out
+	# def save(self):
+	# 	fd = open(self.save_file, "w")
+	# 	yaml.dump(self.data, fd)
+	# 	fd.close()
+	#
+	# # read camera calibration file in
+	# def read(self, matrix_name):
+	# 	fd = open(matrix_name, "r")
+	# 	data = yaml.load(fd)
 
 	# print the estimated camera parameters
 	def printMat(self):
-		#self.data = {'camera_matrix': mtx, 'dist_coeff': dist, 'newcameramtx': newcameramtx}
-		#print 'mtx:',self.data['camera_matrix']
-		#print 'dist:',self.data['dist_coeff']
-		#print 'newcameramtx:',self.data['newcameramtx']
+		# self.data = {'camera_matrix': mtx, 'dist_coeff': dist, 'newcameramtx': newcameramtx}
+		# print 'mtx:',self.data['camera_matrix']
+		# print 'dist:',self.data['dist_coeff']
+		# print 'newcameramtx:',self.data['newcameramtx']
 		m = self.data['camera_matrix']
 		k = self.data['dist_coeff']
-		print 'focal length %3.1f %3.1f'%(m[0][0],m[1][1])
-		print 'image center %3.1f %3.1f'%(m[0][2],m[1][2])
-		print 'radial distortion %3.3f %3.3f'%(k[0][0],k[0][1])
-		print 'tangental distortion %3.3f %3.3f'%(k[0][2],k[0][3])
+		print 'focal length %3.1f %3.1f' % (m[0][0], m[1][1])
+		print 'image center %3.1f %3.1f' % (m[0][2], m[1][2])
+		print 'radial distortion %3.3f %3.3f' % (k[0][0], k[0][1])
+		print 'tangental distortion %3.3f %3.3f' % (k[0][2], k[0][3])
 
 	# Pass a gray scale image and find the markers (i.e., checkerboard, circles)
 	def findMarkers(self, gray, objpoints, imgpoints):
-		#objp = np.zeros((self.marker_size[0]*self.marker_size[1],3), np.float32)
-		#objp[:,:2] = np.mgrid[0:self.marker_size[0],0:self.marker_size[1]].T.reshape(-1,2)
-		objp = np.zeros( (np.prod(self.marker_size), 3), np.float32 )
-		objp[:,:2] = np.indices(self.marker_size).T.reshape(-1, 2)
+		# objp = np.zeros((self.marker_size[0]*self.marker_size[1],3), np.float32)
+		# objp[:,:2] = np.mgrid[0:self.marker_size[0],0:self.marker_size[1]].T.reshape(-1,2)
+		objp = np.zeros((np.prod(self.marker_size), 3), np.float32)
+		objp[:, :2] = np.indices(self.marker_size).T.reshape(-1, 2)
 
 		# Find the chess board corners
-		if self.marker_checkerboard == True:
+		if self.marker_checkerboard is True:
 			ret, corners = cv2.findChessboardCorners(gray, self.marker_size)
-			if ret: print '[+] chess - found corners: ', corners.size/2
+			if ret: print '[+] chess - found corners: ', corners.size / 2
 		else:
-			ret, corners = cv2.findCirclesGrid(gray, self.marker_size, None,cv2.CALIB_CB_ASYMMETRIC_GRID)
+			ret, corners = cv2.findCirclesGrid(gray, self.marker_size, None, cv2.CALIB_CB_ASYMMETRIC_GRID)
 			if ret: print '[+] circles - found corners: ', corners.size / 2
 
 		# If found, add object points, image points (after refining them)
@@ -85,7 +86,6 @@ class CameraCalibration(object):
 
 		else:
 			print '[-] Couldn\'t find markers'
-
 
 		return ret, objpoints, imgpoints
 
@@ -174,7 +174,7 @@ def test():
 	image = cv2.imread(images[0], 0)
 	dst = cal.undistort(image)
 	cv2.imshow('calibrated image', dst)
-	#cv2.imshow('original image', image)
+	# cv2.imshow('original image', image)
 	cv2.waitKey(2000)
 
 	cv2.destroyAllWindows()
