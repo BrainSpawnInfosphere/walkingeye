@@ -3,6 +3,9 @@ sudo: false
 python:
   - "2.7"
 # command to install dependencies
-# install: python -v
+before_install:
+  - apt-get update
+  - apt-get install libzmq5-dev
+install: pip install --user -r requirements.txt
 # command to run tests
 script: nosetests -v -w test/
