@@ -1,5 +1,8 @@
 # Python Robot Controller
 
+[![Travis](https://img.shields.io/travis/walchko/soccer2.svg)](https://travis-ci.org/walchko/soccer2)
+[![Code Health](https://landscape.io/github/walchko/soccer2/master/landscape.svg?style=flat)](https://landscape.io/github/walchko/soccer2/master)
+
 This is the second version of my soccer robot.
 
 * Doesn't use [ROS](http://ros.org), ROS is a pain to install and maintain on OSX and various linux systems
@@ -15,6 +18,3 @@ This is the second version of my soccer robot.
 ## Wiki Documentation
 
 Documentation is on the [wiki](https://github.com/walchko/soccer2/wiki)
-
-
-
