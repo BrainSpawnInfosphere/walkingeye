@@ -3,6 +3,6 @@ sudo: false
 python:
   - "2.7"
 # command to install dependencies
-# install: python setup.py install
+install: python -v
 # command to run tests
-# script: nosetests -v test.py
+script: nosetests -v -w test/

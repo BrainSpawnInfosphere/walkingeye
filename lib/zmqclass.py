@@ -243,61 +243,61 @@ class ServiceClient(Base):
 # Tests
 # nosetests -v zmqclass.py
 
-def test_pub_sub():
-	pub = Pub('tcp://127.0.0.1:9000')
-	sub = Sub('test', 'tcp://127.0.0.1:9000')
-	tmsg = {'a': 1, 'b': 2}
-	while True:
-		pub.pub('test', tmsg)
-		topic, msg = sub.recv()
-
-		if msg:
-			assert msg == tmsg
-			break
-
-
-# for some reason, windows barfs on this inside of the test_service() and I have
-# to put it out here!!!!!
-import multiprocessing as mp
-class tServer(mp.Process):
-	def __init__(self):
-		mp.Process.__init__(self)
-
-	def run(self):
-		serv = ServiceProvider('tcp://127.0.0.1:9000')
-		serv.listen(self.callback)
-		return 0
-
-	def callback(self, msg):
-		return msg
-
-def test_serivce():
-	import multiprocessing as mp
-	# import time
-
-	ans = {'a': 1, 'b': 2}
-
-	# class tServer(mp.Process):
-	# 	def __init__(self):
-	# 		mp.Process.__init__(self)
-	#
-	# 	def run(self):
-	# 		serv = ServiceProvider('tcp://127.0.0.1:9000')
-	# 		serv.listen(self.callback)
-	# 		return 0
-	#
-	# 	def callback(self, msg):
-	# 		return msg
-
-	s = tServer()
-	s.start()
-
-	client = ServiceClient('tcp://127.0.0.1:9000')
-	msg = client.get(ans)
-	assert msg == ans
-
-	s.terminate()
-	s.join()
+# def test_pub_sub():
+# 	pub = Pub('tcp://127.0.0.1:9000')
+# 	sub = Sub('test', 'tcp://127.0.0.1:9000')
+# 	tmsg = {'a': 1, 'b': 2}
+# 	while True:
+# 		pub.pub('test', tmsg)
+# 		topic, msg = sub.recv()
+#
+# 		if msg:
+# 			assert msg == tmsg
+# 			break
+#
+#
+# # for some reason, windows barfs on this inside of the test_service() and I have
+# # to put it out here!!!!!
+# import multiprocessing as mp
+# class tServer(mp.Process):
+# 	def __init__(self):
+# 		mp.Process.__init__(self)
+#
+# 	def run(self):
+# 		serv = ServiceProvider('tcp://127.0.0.1:9000')
+# 		serv.listen(self.callback)
+# 		return 0
+#
+# 	def callback(self, msg):
+# 		return msg
+#
+# def test_serivce():
+# 	import multiprocessing as mp
+# 	# import time
+#
+# 	ans = {'a': 1, 'b': 2}
+#
+# 	# class tServer(mp.Process):
+# 	# 	def __init__(self):
+# 	# 		mp.Process.__init__(self)
+# 	#
+# 	# 	def run(self):
+# 	# 		serv = ServiceProvider('tcp://127.0.0.1:9000')
+# 	# 		serv.listen(self.callback)
+# 	# 		return 0
+# 	#
+# 	# 	def callback(self, msg):
+# 	# 		return msg
+#
+# 	s = tServer()
+# 	s.start()
+#
+# 	client = ServiceClient('tcp://127.0.0.1:9000')
+# 	msg = client.get(ans)
+# 	assert msg == ans
+#
+# 	s.terminate()
+# 	s.join()
 
 
 if __name__ == "__main__":

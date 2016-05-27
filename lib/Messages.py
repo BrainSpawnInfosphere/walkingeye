@@ -95,7 +95,7 @@ class Range(dict):
         self.update(stamp = time.time())
         self.update(fov = 20.0) # need to fix this
         self.update(limits = (0.01,0.08))
-        self.update(range = [0,0,0,0,0,0,0,0]) # this is for all 8 IR's 
+        self.update(range = [0,0,0,0,0,0,0,0]) # this is for all 8 IR's
 
 
 class IMU(dict):
@@ -124,7 +124,7 @@ class Path(dict):
 
 class GetPlan(dict):
     """
-    Define the start and stop position/orientation/time for a path planner 
+    Define the start and stop position/orientation/time for a path planner
     """
     def __init__(self):
         dict.__init__(self)
@@ -137,8 +137,8 @@ class Text(dict):
     """
     def __init__(self):
         dict.__init__(self)
-        self.update(stamp = time.time())
-        self.update(message = '')
+        self.update(stamp=time.time())
+        self.update(message='')
 
 
 #########################################################################################################
@@ -146,38 +146,38 @@ class Text(dict):
 # def test_point():
 #     p = Point(x=1.23,y=-1.23,z=32.1)
 #     assert p == {'y': -1.23, 'x': 1.23, 'z': 32.1}
-
-def test_vector():
-    v = Vector(x=1.23,y=-1.23,z=32.1)
-    assert v == {'y': -1.23, 'x': 1.23, 'z': 32.1}
-
-def test_quaternion():
-    q = Quaternion(x=0.5,y=0.5,z=0.5,w=0.5)
-    assert q == {'w': 0.5, 'y': 0.5, 'x': 0.5, 'z': 0.5}
-
-def test_twist():
-    t = Twist()
-    t['linear']['x'] = 55.0
-    t['angular']['y'] = -56.7
-    assert t == {'linear': {'y': 0.0, 'x': 55.0, 'z': 0.0}, 'angular': {'y': -56.7, 'x': 0.0, 'z': 0.0}}
-
-def test_pose():
-    p = Pose()
-    assert p == {'position': {'y': 0.0, 'x': 0.0, 'z': 0.0}, 'orientation': {'y': 0.0, 'x': 0.0, 'z': 0.0, 'w': 1.0}}
-
-def test_posestamped():
-    ps = PoseStamped()
-    ps['stamp'] = 1234567.89
-    assert ps == {'stamp': 1234567.89, 'orientation': {'y': 0.0, 'x': 0.0, 'z': 0.0, 'w': 1.0}, 'position': {'y': 0.0, 'x': 0.0, 'z': 0.0}}
-
-def test_wrench():
-    w = Wrench()
-    assert w == {'torque': {'y': 0.0, 'x': 0.0, 'z': 0.0}, 'force': {'y': 0.0, 'x': 0.0, 'z': 0.0}}
-
-def test_serialize():
-    ps = PoseStamped()
-    ps['stamp'] = 1234567.89
-    assert deserialize(serialize(ps)) == ps
+#
+# def test_vector():
+#     v = Vector(x=1.23,y=-1.23,z=32.1)
+#     assert v == {'y': -1.23, 'x': 1.23, 'z': 32.1}
+#
+# def test_quaternion():
+#     q = Quaternion(x=0.5,y=0.5,z=0.5,w=0.5)
+#     assert q == {'w': 0.5, 'y': 0.5, 'x': 0.5, 'z': 0.5}
+#
+# def test_twist():
+#     t = Twist()
+#     t['linear']['x'] = 55.0
+#     t['angular']['y'] = -56.7
+#     assert t == {'linear': {'y': 0.0, 'x': 55.0, 'z': 0.0}, 'angular': {'y': -56.7, 'x': 0.0, 'z': 0.0}}
+#
+# def test_pose():
+#     p = Pose()
+#     assert p == {'position': {'y': 0.0, 'x': 0.0, 'z': 0.0}, 'orientation': {'y': 0.0, 'x': 0.0, 'z': 0.0, 'w': 1.0}}
+#
+# def test_posestamped():
+#     ps = PoseStamped()
+#     ps['stamp'] = 1234567.89
+#     assert ps == {'stamp': 1234567.89, 'orientation': {'y': 0.0, 'x': 0.0, 'z': 0.0, 'w': 1.0}, 'position': {'y': 0.0, 'x': 0.0, 'z': 0.0}}
+#
+# def test_wrench():
+#     w = Wrench()
+#     assert w == {'torque': {'y': 0.0, 'x': 0.0, 'z': 0.0}, 'force': {'y': 0.0, 'x': 0.0, 'z': 0.0}}
+#
+# def test_serialize():
+#     ps = PoseStamped()
+#     ps['stamp'] = 1234567.89
+#     assert deserialize(serialize(ps)) == ps
 
 
 if __name__ == '__main__':
