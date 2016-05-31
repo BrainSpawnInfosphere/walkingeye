@@ -1,24 +1,17 @@
 #!/usr/bin/env python
 
-from Module import *
+import Module as mod
 
 
-####################################################################
-# 
-# 
-####################################################################
-class Plugin(Module):
+class Plugin(mod.Module):
 	def __init__(self):
-		Module.__init__(self,'news')
+		mod.Module.__init__(self, 'news')
 		self.intent = 'news'
-			
+
 	def process(self, entity):
 		return 'News module is not  implemented yet'
-		
-
 
 
 if __name__ == '__main__':
-	n = Plugin()
+	n = mod.Plugin()
 	print n.process(0)
-	

@@ -9,6 +9,7 @@ import json
 import numpy
 import datetime as dt
 import base64
+import socket as Socket
 
 
 class ZMQError(Exception):
@@ -43,16 +44,18 @@ class Pub(Base):
 	"""
 	Simple publisher
 	"""
-	def __init__(self, bind_to='tcp://127.0.0.1:9000'):
+	def __init__(self, bind_to=('localhost', 9000)):
 		Base.__init__(self)
-		self.bind_to = bind_to
+		if bind_to[0] == 'localhost':  # do I need to do this?
+			bind_to = (Socket.gethostbyname(Socket.gethostname()), bind_to[1])
+		self.bind_to = 'tcp://' + bind_to[0] + ':' + str(bind_to[1])
 
 		try:
 			self.socket = self.ctx.socket(zmq.PUB)
-			self.socket.bind(bind_to)
+			self.socket.bind(self.bind_to)
 
 		except Exception, e:
-			error = '[-] Pub Error, %s to %s' % (str(e), bind_to)
+			error = '[-] Pub Error, %s' % (str(e))
 			# print error
 			raise ZMQError(error)
 
@@ -61,7 +64,7 @@ class Pub(Base):
 	def __del__(self):
 		# self.poller.register(self.socket)
 		self.socket.close()
-		self._stop('PUB:' + self.bind_to)
+		# self._stop('PUB:' + self.bind_to)
 
 	def pub(self, topic, msg):
 		"""
@@ -78,17 +81,17 @@ class Sub(Base):
 	"""
 	Simple subscriber
 	"""
-	def __init__(self, topics='', connect_to='tcp://localhost:9100', poll_time=0.01):
+	def __init__(self, topics=None, connect_to=('localhost', 9000), poll_time=0.01):
 		Base.__init__(self)
-		self.connect_to = connect_to
+		self.connect_to = 'tcp://' + connect_to[0] + ':' + str(connect_to[1])
 		self.poll_time = poll_time
 		try:
 			self.socket = self.ctx.socket(zmq.SUB)
-			self.socket.connect(connect_to)
+			self.socket.connect(self.connect_to)
 			self.socket.poll(self.poll_time, zmq.POLLIN)
 
 			# manage subscriptions
-			if not topics:
+			if topics is None:
 				print "Receiving messages on ALL topics..."
 				self.socket.setsockopt(zmq.SUBSCRIBE, '')
 			else:
@@ -97,13 +100,13 @@ class Sub(Base):
 					self.socket.setsockopt(zmq.SUBSCRIBE, t)
 
 		except Exception, e:
-			error = '[-] Sub Error, %s to %s' % (str(e), connect_to)
+			error = '[-] Sub Error, %s' % (str(e))
 			# print error
 			raise ZMQError(error)
 
 	def __del__(self):
 		self.socket.close()
-		self._stop('SUB:' + self.connect_to)
+		# self._stop('SUB:' + self.connect_to)
 
 	def recv(self):
 		# check to see if there is read, write, or erros
@@ -128,7 +131,7 @@ class PubBase64(Pub):
 	compresses the image with jpeg, png, or whatever prior to sending the
 	image with this.
 	"""
-	def __init__(self, bind_to='tcp://127.0.0.1:9000'):
+	def __init__(self, bind_to=('localhost', 9000)):
 		Pub.__init__(self, bind_to)
 
 	def __del__(self):
@@ -161,7 +164,7 @@ class SubBase64(Sub):
 	"""
 	Subscribes to topics that are encoded in base64, usually images
 	"""
-	def __init__(self, topics='', connect_to='tcp://localhost:9000', poll_time=0.01):
+	def __init__(self, topics='', connect_to=('localhost', 9000), poll_time=0.01):
 		Sub.__init__(self, topics, connect_to, poll_time)
 
 	def __del__(self):
@@ -200,7 +203,8 @@ class ServiceProvider(Base):
 	def __init__(self, bind_to):
 		Base.__init__(self)
 		self.socket = self.ctx.socket(zmq.REP)
-		self.socket.bind(bind_to)
+		tcp = 'tcp://' + bind_to[0] + ':' + str(bind_to[1])
+		self.socket.bind(tcp)
 
 	def __del__(self):
 		self.socket.close()
@@ -225,7 +229,8 @@ class ServiceClient(Base):
 	def __init__(self, bind_to):
 		Base.__init__(self)
 		self.socket = self.ctx.socket(zmq.REQ)
-		self.socket.connect(bind_to)
+		tcp = 'tcp://' + bind_to[0] + ':' + str(bind_to[1])
+		self.socket.connect(tcp)
 
 	def __del__(self):
 		self.socket.close()

@@ -2,11 +2,11 @@
 
 import numpy as np
 import cv2
-# import argparse
+import argparse
 # import video
-# import time
+import time
 import datetime as dtm
-# import math
+import math
 import logging
 import multiprocessing as mp
 import lib.Messages as Msg
@@ -20,6 +20,7 @@ save_pts = []
 class VOError(Exception):
 	pass
 
+# cv2.imshow('debug',)
 
 class VideoOdom(object):
 	"""
@@ -173,7 +174,6 @@ class VideoOdom(object):
 				# break
 				exit()
 
-			# only for development ... delete!
 			roi = (0,479,210,639)
 			im = raw[roi[0]:roi[1],roi[2]:roi[3]]
 
@@ -275,14 +275,13 @@ class VideoOdom(object):
 
 		except KeyboardInterrupt:
 			print 'captured interrupt'
-			exit()
 			# break
 
 		# cam.release()
 
 
 class Server(mp.Process):
-	def __init__(self, host="localhost", port='9000', camera=None):
+	def __init__(self, host="localhost", port='9100', camera=None):
 		mp.Process.__init__(self)
 		self.epoch = dtm.datetime.now()
 		self.host = host

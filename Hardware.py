@@ -7,15 +7,15 @@
 #
 
 import time
-import datetime as dt
+# import datetime as date
 import multiprocessing as mp
 import logging
-# import yaml
-#import socket
 import IMU.MotorDriver as md
-import RPi.GPIO as GPIO # IR
+import RPi.GPIO as GPIO  # IR
 
-from zmqclass import *
+import lib.zmqclass as zmq
+import lib.Messages as Msg
+import lib.FileStorage as Fs
 
 # def test():
 # 	import time
@@ -53,16 +53,14 @@ from zmqclass import *
 # 		for p in pins: ir.append( GPIO.input(p) )
 # 		return ir
 
-####################################################################
-# RobotHardwareServer handles incoming commands streamed from somewhere else.
-# All information is in coming.
-#
-# todo:
-# - need to breakout into holonomic and nonholonomic
-#
-####################################################################
+
 class RobotHardwareServer(mp.Process):
-	def __init__(self,host="localhost",port=9000):
+	"""
+	RobotHardwareServer handles incoming commands streamed from somewhere else.
+	in: commands/etc
+	out: sensor readings
+	"""
+	def __init__(self, host="localhost", port=9000):
 		mp.Process.__init__(self)
 		self.host = host
 		self.port = port
@@ -71,11 +69,11 @@ class RobotHardwareServer(mp.Process):
 # 		self.md = md.MotorDriver(11,12,15,16)
 		self.md = None
 
-	def createMotorCmd(dir,duty):
+	def createMotorCmd(dir, duty):
 		return {'dir': dir, 'duty': duty}
 
-	def soundCmd(self,cmd):
-		self.logger.info( cmd )
+	def soundCmd(self, cmd):
+		self.logger.info(cmd)
 
 	def parseMsg(self, msg):
 		if 'quit' in msg:
@@ -83,76 +81,75 @@ class RobotHardwareServer(mp.Process):
 		elif 'cmd' in msg:
 			cmd = msg['cmd']
 			if 'm' in cmd:
-				self.motorCmd( cmd )
+				self.motorCmd(cmd)
 			elif 's' in cmd:
-				self.soundCmd( cmd )
+				self.soundCmd(cmd)
+
 	def __del__(self):
 		self.md.allStop()
 
-	def on_message(self,client, userdata, msg):
-		print(msg.topic+' '+str(msg.payload))
+	def on_message(self, client, userdata, msg):
+		print(msg.topic + ' ' + str(msg.payload))
 
 	def shutdown(self):
-# 		self.pub.close()
-# 		exit()
+		"""
+		Needed?
+		"""
 		0
 
 	def test(self):
 		dt = 5
-		go  = {'dir': md.MotorDriver.FORWARD, 'duty': 10}
+		go = {'dir': md.MotorDriver.FORWARD, 'duty': 10}
 		rev = {'dir': md.MotorDriver.REVERSE, 'duty': 10}
 		stp = {'dir': md.MotorDriver.REVERSE, 'duty': 10}
 
-		self.md.setMotors(go,go,go,go)
+		self.md.setMotors(go, go, go, go)
 		time.sleep(dt)
-# 		self.md.setMotors(rev,rev,rev,rev)
-# 		time.sleep(dt)
-# 		self.md.setMotors(go,stp,go,stp)
-# 		time.sleep(dt)
-# 		self.md.setMotors(stp,rev,stp,rev)
-# 		time.sleep(dt)
-# 		self.md.allStop()
+		self.md.setMotors(rev, rev, rev, rev)
+		time.sleep(dt)
+		self.md.setMotors(go, stp, go, stp)
+		time.sleep(dt)
+		self.md.setMotors(stp, rev, stp, rev)
+		time.sleep(dt)
+		self.md.allStop()
 
 	def run(self):
-		self.logger.info(str(self.name)+'['+str(self.pid)+'] started on'+
-			str(self.host) + ':' + str(self.port) +', Daemon: '+str(self.daemon))
-		#p = Publisher((self.host,self.port))
-		#self.pub = p.accept()
-		#self.logger.info('Accepted connection: ')
+		self.logger.info(str(self.name) + '[' + str(self.pid) + '] started on' +
+			str(self.host) + ':' + str(self.port) + ', Daemon: ' + str(self.daemon))
+		# p = Publisher((self.host,self.port))
+		# self.pub = p.accept()
+		# self.logger.info('Accepted connection: ')
 
-
-		self.sub = Sub(['cmds'])
+		self.sub = zmq.Sub(['cmds'])
+		self.pub = zmq.Pub()
 
 		while True:
-			time.sleep(0.05) # 0.5 => 20Hz
+			time.sleep(0.05)  # 0.5 => 20Hz
 			# get info
 			msg = self.sub.recv()
 # 			if msg:
 # 				self.parseMsg( msg )
-
 			self.test()
 
 
-
 class NonHolonomic(RobotHardwareServer):
-	def __init__(self,host="localhost",port=9000):
-		RobotHardwareServer.__init__(self,host,port)
-		self.md = md.MotorDriver(11,12)
+	def __init__(self, host="localhost", port=9000):
+		RobotHardwareServer.__init__(self, host, port)
+		self.md = md.MotorDriver(11, 12)  # FIXME: 20160528 why these two pins?
 
-	def motorCmd(self,cmd):
+	def motorCmd(self, cmd):
 		self.logger.info(cmd)
 		self.md.setMotors(cmd)
+
 
 class Holonomic(RobotHardwareServer):
-	def __init__(self,pinA=11,pinB=12,pinC=15,pinD=16):
+	def __init__(self, pinA=11, pinB=12, pinC=15, pinD=16):
 		RobotHardwareServer.__init__(self)
-		self.md = md.MotorDriver(pinA,pinB,pinC,pinD)
+		self.md = md.MotorDriver(pinA, pinB, pinC, pinD)
 
-	def motorCmd(self,cmd):
+	def motorCmd(self, cmd):
 		self.logger.info(cmd)
 		self.md.setMotors(cmd)
-
-
 
 
 if __name__ == '__main__':

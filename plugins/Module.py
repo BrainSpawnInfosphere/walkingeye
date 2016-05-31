@@ -21,24 +21,24 @@ class Module(object):
 
 		# get parameters
 		# does this get called everytime? Can i share, like static in C++?
-		if not hasattr(self,'info'):
-			file = '/Users/kevin/Dropbox/accounts.yaml'
-			self.info = self.readYaml(file)
+		# if not hasattr(self,'info'):
+		# 	file = '/Users/kevin/Dropbox/accounts.yaml'
+		# 	self.info = self.readYaml(file)
 			#self.logger.info('[+] Loaded: %s'%(file))
 
-	def readYaml(self,fname):
-		"""
-		Read a yaml file and return the corresponding dictionary
-		in: file name
-		out: dict
-		"""
-		f = open( fname )
-		dict = yaml.safe_load(f)
-		f.close()
+	# def readYaml(self,fname):
+	# 	"""
+	# 	Read a yaml file and return the corresponding dictionary
+	# 	in: file name
+	# 	out: dict
+	# 	"""
+	# 	f = open( fname )
+	# 	dict = yaml.safe_load(f)
+	# 	f.close()
+	#
+	# 	return dict
 
-		return dict
-
-	def handleIntent(self,intent):
+	def handleIntent(self, intent):
 		"""
 		Returns True if the intent passed matches the intent of this module.
 		"""

@@ -2,7 +2,11 @@
 	"name": "robot",
 	"accounts": "/Users/kevin/Dropbox/accounts.yaml",
 	"servers": {
-		"vision": ["localost", 9000],
-		"hardware": ["localost", 9000]
+		"vision": ["localhost", 9000],
+		"hardware": ["localhost", 9010],
+		"audio": ["localhost", 9010],
+		"vo": ["localhost", 9010],
+		"hardware": ["localhost", 9010],
+		"hardware": ["localhost", 9010],
 	}
 }

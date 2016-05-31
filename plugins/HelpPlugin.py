@@ -1,23 +1,16 @@
 #!/usr/bin/env python
 
-from Module import *
+import Module as mod
 
-####################################################################
-# Help:
-# Lists available commands, or describes a command in detail
-# 
-####################################################################
-class Plugin(Module):
+
+class Plugin(mod.Module):
 	def __init__(self):
-		Module.__init__(self,'help')
-			
+		mod.Module.__init__(self, 'help')
+
 	def process(self, entity):
 		return 'Help module is not implemented yet'
 
 
-
-
 if __name__ == '__main__':
-	h = Plugin()
+	h = mod.Plugin()
 	print h.process(0)
-	

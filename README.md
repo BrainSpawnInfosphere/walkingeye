@@ -18,3 +18,31 @@ This is the second version of my soccer robot.
 ## Wiki Documentation
 
 Documentation is on the [wiki](https://github.com/walchko/soccer2/wiki)
+
+# Future
+
+If I think it is useful, I might break the infrastructure out into its own thing:
+
+MyRos (need a better name)
+
+* Core
+	* Pub/Sub/Service
+	* Messages
+	* BaseNodeClass
+* Video
+	* Camera Calibrate
+	* Image View
+	* Video
+	* Video Save
+* Motion
+	* Holonomic
+	* Non-Holonomic
+	* Quadraped
+* Tools
+	* Topic
+
+## Software Development
+
+* flake8 - check for errors according to PEP8
+* Landscape.io - check code for errors
+* travis.ci - run unit tests on commit to github

@@ -8,23 +8,22 @@
 from BaseHTTPServer import HTTPServer
 from BaseHTTPServer import BaseHTTPRequestHandler
 from socket import gethostname, gethostbyname
-import os
 import time
 
 # for the server/client interface
 import multiprocessing as mp
-
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
-from zmqclass import *
+import lib.zmqclass as zmq
+
 
 class Kludge(mp.Process):
 	"""
 	This listens to zmq and passes into between zmq and the client webpage
 	"""
-	def __init__(self, topics, host="localhost",port=9000):
+	def __init__(self, topics, host="localhost", port=9000):
 		mp.Process.__init__(self)
 		self.host = host
 		self.port = port
@@ -33,7 +32,7 @@ class Kludge(mp.Process):
 		print 'Kludge says goodbye'
 
 	def run(self):
-		self.sub = Sub(['voice'])
+		self.sub = zmq.Sub(['voice'])
 
 		while True:
 			time.sleep(3)
@@ -42,14 +41,15 @@ class Kludge(mp.Process):
 				print msg
 
 
-PORT=8800
+PORT = 8800
 
 # take a look at websockets:
 # https://github.com/liris/websocket-client
 
+
 class GetHandler(BaseHTTPRequestHandler):
 	def page(self):
-		fd = open('node/head/face.htm','r')
+		fd = open('node/head/face.htm', 'r')
 		results = fd.read()
 		fd.close()
 		return results
@@ -59,18 +59,17 @@ class GetHandler(BaseHTTPRequestHandler):
 		if self.path == '/':
 			response = self.page()
 			self.send_response(200)
-			self.send_header('Content-type','text/html')
+			self.send_header('Content-type', 'text/html')
 			self.end_headers()
 			self.wfile.write(response)
 		else:
 			print "GetHandler doesn't support %s" % self.path
 			self.send_response(404)
-			self.send_header('Content-type','text/html')
+			self.send_header('Content-type', 'text/html')
 			self.end_headers()
 			self.wfile.write('<html><head></head><body>')
 			self.wfile.write('<h1>File not found</h1>')
 			self.wfile.write('</body></html>')
-
 
 
 if __name__ == '__main__':
@@ -80,7 +79,7 @@ if __name__ == '__main__':
 	k = Kludge()
 	k.start()
 
-	print 'Starting server on '+str(ipaddr)+':'+str(PORT)+', use <Ctrl-C> to stop'
+	print 'Starting server on ' + str(ipaddr) + ':' + str(PORT) + ', use <Ctrl-C> to stop'
 	server = HTTPServer(('0.0.0.0', PORT), GetHandler)
 	server.serve_forever()
 
