@@ -33,6 +33,9 @@ class Vector(dict):
 		self.update(default)
 		if kw: self.update(kw)
 
+	def __str__(self):  # pretty up the print statement
+		return 'Vector[x,y,z]: {:.4f} {:.4f} {:.4f}'.format(self.get('x'), self.get('y'), self.get('z'))
+
 	# def set(self, xx, yy, zz):
 	# 	self.update(x=xx, y=yy, z=zz)
 
@@ -56,9 +59,11 @@ class Quaternion(dict):
 					# print k,v
 					self.update({k: v / d})
 
-	def set(self, xx, yy, zz, ww):
-		self.update(x=xx, y=yy, z=zz, w=ww)
+	# def set(self, xx, yy, zz, ww):
+	# 	self.update(x=xx, y=yy, z=zz, w=ww)
 
+	def __str__(self):  # pretty up the print statement
+		return 'Quaternion[x,y,z,w]: {:.4f} {:.4f} {:.4f} {:.4f}'.format(self.get('x'), self.get('y'), self.get('z'), self.get('w'))
 # q=Quaternion(x=1,y=3,w=4); print q
 
 
@@ -73,6 +78,9 @@ class Twist(dict):
 		dict.__init__(self)
 		self.update(linear=Vector())
 		self.update(angular=Vector())
+
+	def __str__(self):  # pretty up the print statement
+		return 'Twist:\n\tLinear {}\n\tAngular {}'.format(self.get('linear'), self.get('angular'))
 
 
 class Wrench(dict):
@@ -113,12 +121,20 @@ class Range(dict):
 
 
 class IMU(dict):
-	def __init__(self, ranges):
+	def __init__(self):
 		dict.__init__(self)
 		self.update(stamp=time.time())
 		self.update(linear_acceleration=Vector())
 		self.update(angular_velocity=Vector())
 		self.update(orientation=Quaternion())
+		self.update(heading=0.0)  # degrees
+		self.update(temperature=0.0)  # degrees C
+
+	def __str__(self):
+		return 'IMU:\n\tLinear Accel {}\n\tAngular Vel {}\n\tOrientation {}\n\tHeading [deg]: {}\n\tTemp [C]: {}'.format(
+			self.get('linear_acceleration'), self.get('angular_velocity'),
+			self.get('orientation'), self.get('heading'), self.get('temperature')
+		)
 
 
 class Odom(dict):
@@ -161,6 +177,12 @@ class Text(dict):
 
 if __name__ == '__main__':
 	# print 'run "nosetests -v ./Messages.py" to test'
-	v=Vector()
-	v.set(1,2,3)
-	print v.norm(),v
+	v = Vector(x=1.23, y=-1.23, z=32.1)
+	# v.set()
+	print v
+
+	t = Twist()
+	print t
+
+	i = IMU()
+	print i

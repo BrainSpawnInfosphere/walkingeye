@@ -294,7 +294,7 @@ class Server(mp.Process):
 		self.logger = logging.getLogger('robot')
 
 	def init(self):
-		a = 1  # do some setup here
+		pass  # do some setup here
 
 	def run(self):
 		self.logger.info(str(self.name) + '[' + str(self.pid) + '] started on' + str(self.host) + ':' + str(self.port) + ', Daemon: ' + str(self.daemon))

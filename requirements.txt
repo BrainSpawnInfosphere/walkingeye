@@ -1,2 +1,3 @@
 pyzmq
 pyyaml
+python-forecastio
