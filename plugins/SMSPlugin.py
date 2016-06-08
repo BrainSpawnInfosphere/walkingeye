@@ -53,7 +53,7 @@ class Plugin(mod.Module):
 			return 'error'
 
 		except:
-			self.logger.error( '[-] Error:'+ str(entity) )
+			self.logger.error('[-] Error:' + str(entity))
 			return 'error'
 
 		return 'empty'

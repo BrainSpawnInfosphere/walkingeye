@@ -11,7 +11,8 @@ ignore-paths:
     - sim
     - sounds
     - tmp
+    - IMU
 ignore-patterns:
-    - ^IMU/Adafruit_.*\.py$
+    - ^soccer/Adafruit_.*\.py$
 python-targets:
     - 2
