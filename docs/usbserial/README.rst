@@ -20,3 +20,16 @@ Pin Signal Description
 5   GND    Ground
 6   3V3    Power
 === ====== ===========================
+
+
+Other
+----------
+
+=== === ======================================================
+
+=== === ======================================================
+JP1 SYS Powered by FTDI chip, supplies power to remote board
+JP1 LCL If remote board is powered, use this setting
+LED 1   Data transfer from host computer USB to UART
+LED 2   Data transfer from UART to host computer USB
+=== === ======================================================
