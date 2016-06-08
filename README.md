@@ -2,6 +2,7 @@
 
 [![Travis](https://img.shields.io/travis/walchko/soccer2.svg)](https://travis-ci.org/walchko/soccer2)
 [![Code Health](https://landscape.io/github/walchko/soccer2/master/landscape.svg?style=flat)](https://landscape.io/github/walchko/soccer2/master)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/walchko/soccer2/master/MIT_License.txt)
 
 This is the second version of my soccer robot.
 
@@ -18,6 +19,22 @@ This is the second version of my soccer robot.
 ## Wiki Documentation
 
 Documentation is on the [wiki](https://github.com/walchko/soccer2/wiki)
+
+## Layout of software
+
+* config - config files
+* docs - various PDFs, latex, or whatever for background
+* IMU[old] - old inertial measurement software, need to remove
+* lib - my ros alternative core libraries
+* node[old] - human machine interface, most likely stick with all python, need to remove
+* pic - pictures
+* plugins - plugin modules for the speech/audio capabilities
+* quadruped - walking robot ... move this somehow and combine with my wheeled robot
+* sim[old] - used pygame, not really completely running, need to remove
+* sound - sound clips for the speech/audio capabilities
+* test - nose test scripts
+* tmp - various things I am testing that may or may not work or make it to my robot
+* tools - tools for my ros alternative
 
 # Future
 
