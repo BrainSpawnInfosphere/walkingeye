@@ -11,7 +11,12 @@ class Plugin(mod.Module):
 	"""
 	"""
 	def __init__(self, auth_token, account_sid):
-		mod.Module.__init__(self, 'sms')
+		"""
+		in:
+			sid - ???
+			token - api token
+		"""
+		mod.Module.__init__(self, 'sms', sid, token)
 		# Your Account Sid and Auth Token from twilio.com/user/account
 		# account_sid = self.info['Twilio']['sid']
 		# auth_token  = self.info['Twilio']['token']
@@ -54,12 +59,11 @@ class Plugin(mod.Module):
 		return 'empty'
 
 if __name__ == '__main__':
-	f = open('/Users/kevin/Dropbox/accounts.yaml')
-	info = yaml.safe_load(f)
+	token = os.getenv('TWILIO_TOKEN')
+	sid = os.getenv('TWILIO_SID')
 
-	if len(sys.argv) == 2:
-		ret = sendMsg(info,sys.argv[1])
-	else:
-		ret = sendMsg(info)
+	if token is None or sid is None:
+		exit('No Twilio token or sid given in os env')
 
+	p = Plugin(token, sid)
 	print ret

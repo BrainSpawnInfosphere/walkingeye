@@ -1,4 +1,4 @@
-doc-warnings: yes
+doc-warnings: no
 test-warnings: no
 strictness: medium
 autodetect: yes
@@ -12,6 +12,6 @@ ignore-paths:
     - sounds
     - tmp
 ignore-patterns:
-    - ^/Adafruit_.*\.py$
+    - ^IMU/Adafruit_.*\.py$
 python-targets:
     - 2
