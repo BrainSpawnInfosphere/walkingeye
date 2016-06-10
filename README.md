@@ -33,6 +33,12 @@ Documentation is on the [wiki](https://github.com/walchko/soccer2/wiki)
 * test - nose test scripts
 * tmp - various things I am testing that may or may not work or make it to my robot
 * tools - tools for my ros alternative
+	* topic - publish/subscribe to a topic
+	* bag - save messages for a topic to a file
+	* camera_calibrate
+	* mjpeg_server - take images and allow any browser to view them
+	* webserver - not done
+	* servic - not done
 
 Need to organize everything in the main directory
 
