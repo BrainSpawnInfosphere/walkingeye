@@ -22,6 +22,7 @@ def test_yaml():
 	fs.readYaml(fname)
 
 	# print fs.db
+	os.remove(fname)
 
 	assert fs.db == data
 
@@ -41,5 +42,6 @@ def test_json():
 	fs.readJson(fname)
 
 	# print fs.db
+	os.remove(fname)
 
 	assert fs.db == data

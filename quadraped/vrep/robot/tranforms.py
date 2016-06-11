@@ -2,37 +2,68 @@ import numpy as np
 import math
 
 
-def get_axis(axis):
-	if axis == "x":
-		return [1, 0, 0]
-	elif axis == "y":
-		return [0, 1, 0]
-	elif axis == "z":
-		return [0, 0, 1]
-	else:
-		return axis
+# def get_axis(axis):
+# 	"""
+# 	is there value for this function?
+# 	"""
+# 	# if axis == "x":
+# 	# 	return [1, 0, 0]
+# 	# elif axis == "y":
+# 	# 	return [0, 1, 0]
+# 	# elif axis == "z":
+# 	# 	return [0, 0, 1]
+# 	# else:
+# 	# 	return axis
+# 	ret = [0,0,1]
+# 	if axis == "x": ret = [1, 0, 0]
+# 	elif axis == "y": ret = [0, 1, 0]
+# 	# elif axis == "z": ret = [0, 0, 1]
+# 	return ret
 
 
 def distance(a, b):
-	return math.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2 + (b[2] - a[2])**2)
+	# return math.sqrt((b[0] - a[0])**2.0 + (b[1] - a[1])**2.0 + (b[2] - a[2])**2.0)
+	return math.sqrt(np.dot(a,b))
 
 
 def rotateAroundCenter(matrix, axis, theta):
-	axis = get_axis(axis)
-	axis = np.asarray(axis)
-	theta = np.asarray(theta)
+	"""
+	not sure what this does
+
+	in:
+		matrix - ????
+		axis of rotation - 'x', 'y', or 'z'
+		theta - angle of rotation (rads)
+	out: ???
+	"""
+	# axis = get_axis(axis)
+	aa  = [0,0,1]
+	if axis == "x": aa = [1, 0, 0]
+	elif axis == "y": aa = [0, 1, 0]
+	# elif axis == "z": ret = [0, 0, 1]
+
+	axis = np.asarray(aa)
+	# theta = np.asarray(theta)
 	axis = axis / math.sqrt(np.dot(axis, axis))
-	a = math.cos(theta / 2)
-	b, c, d = -axis * math.sin(theta / 2)
+	a = math.cos(theta / 2.0)
+	b, c, d = -axis * math.sin(theta / 2.0)
 	aa, bb, cc, dd = a * a, b * b, c * c, d * d
 	bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
-	rot = np.array([[aa+bb-cc-dd, 2*(bc+ad), 2*(bd-ac)],
-					 [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab)],
-					 [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
+	rot = np.array([[aa+bb-cc-dd, 2.0*(bc+ad), 2.0*(bd-ac)],
+					 [2.0*(bc-ad), aa+cc-bb-dd, 2.0*(cd+ab)],
+					 [2.0*(bd+ac), 2.0*(cd-ab), aa+dd-bb-cc]])
 	return np.dot(rot, matrix)
 
 
 def rotate(matrix, axis, theta, center=None):
+	"""
+	how is this different???
+	in:
+		matix - ??
+		axis - axis of rotation??
+		theta - angle of rotation (rads)
+	out: ???
+	"""
 	if not center:
 		center = np.matrix([[0], [0], [0]])
 	else:
@@ -53,6 +84,6 @@ def rotate(matrix, axis, theta, center=None):
 	relocated = np.add(rotated, center)
 	return relocated
 
-test = [[1], [0], [0]]
+# test = [[1], [0], [0]]
 
-print (rotate(test, 'y', math.pi, [0, 1, 0]))
+# print (rotate(test, 'y', math.pi, [0, 1, 0]))

@@ -1,16 +1,13 @@
 import numpy
-from robot import robotData
 from math import *
 from math import radians as d2r
 from math import degrees as r2d
-import abc
 
 
-class Leg():
+class Leg(object):
 	"""
 	This should be an abstract leg, it's responsible for moving and locating each leg.
 	"""
-	__metaclass__ = abc.ABCMeta
 
 	panServo = None
 	tibiaServo = None
@@ -18,10 +15,10 @@ class Leg():
 	position = None
 	orientation = None
 	ydirection = 1
-	footPosition = [0, 0, 0]
-	angles = [0, 0, 0]
+	footPosition = [0.0, 0.0, 0.0]
+	angles = [0.0, 0.0, 0.0]
 
-	def __init__(self, name, position, resting_position):
+	def __init__(self, name, position, resting_position, lengths):
 		"""
 		:param name: leg name, used to get it's pointing difection in some implementations
 		:param position: body-relative leg position
@@ -31,8 +28,9 @@ class Leg():
 		self.name = name
 		self.position = position
 		self.resting_position = resting_position
-		self.tibiaLength = robotData.tibiaLength
-		self.femurLength = robotData.femurLength
+		self.tibiaLength = lengths['tibiaLength']
+		self.femurLength = lengths['femurLength']
+
 		if "right" in self.name:
 			self.ydirection = -1
 
@@ -48,8 +46,8 @@ class Leg():
 		dy = y0 - self.position[1]
 		dz = z0 - self.position[2]
 		COXA_LENGTH = 20
-		FEMUR_LENGTH = robotData.femurLength
-		TIBIA_LENGTH = robotData.tibiaLength
+		FEMUR_LENGTH = self.femurLength
+		TIBIA_LENGTH = self.tibiaLength
 
 		x, y, z = dy * self.ydirection, -dz, -dx * self.ydirection
 
@@ -81,7 +79,7 @@ class Leg():
 
 	def move_by(self, pos):
 		"""
-		attempts to move it's foot my an offset of it's current position
+		attempts to move it's foot by an offset of it's current position
 		"""
 		target = self.position + pos
 		self.move_to_pos(self, *target)
@@ -94,9 +92,9 @@ class Leg():
 		femurAngle = degrees(femurAngle)
 		tibiaAngle = degrees(tibiaAngle)
 
-		femurServoLimits = robotData.femurServoLimits
-		shoulderServoLimits = robotData.shoulderServoLimits
-		tibiaServoLimits = robotData.tibiaServoLimits
+		femurServoLimits = self.robot.femurServoLimits
+		shoulderServoLimits = self.robot.shoulderServoLimits
+		tibiaServoLimits = self.robot.tibiaServoLimits
 
 		if self.ydirection == -1:
 			shoulderServoLimits = [-shoulderServoLimits[1], -shoulderServoLimits[0]]
@@ -113,13 +111,3 @@ class Leg():
 			raise Exception(self.name,":shoulder out of bounds, attempted {0}".format(shoulderAngle))
 		if shoulderAngle > shoulderServoLimits[1]:
 			raise Exception(self.name,":shoulder out of bounds, attempted {0}".format(shoulderAngle))
-
-	@abc.abstractmethod
-	def move_to_angle(self, shoulderAngle, femurAngle, tibiaAngle):
-		"""
-		moves the actuators to get leg on desired angle
-		:param shoulderAngle:
-		:param femurAngle:
-		:param tibiaAngle:
-		:return:
-		"""

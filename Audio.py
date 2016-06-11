@@ -17,15 +17,6 @@ import lib.FileStorage as fs
 # import lib.wit as wit				# wit.ai
 import lib.WitInput as wi
 
-"""
-OMG!!
-
-use pip install wit
-
-NOT
-
-pip install pywit
-"""
 
 
 # class YamlKeys(object):

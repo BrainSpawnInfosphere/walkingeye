@@ -1,17 +1,16 @@
-from robot import robotData
+#!/usr/bin/env python
+
 from robot.robotInterfaces.genericRobot import Robot
 from robot.robotInterfaces.legInterfaces.virtualLegVrep import VirtualLegVrep
-
 from vreptest import vrep
 
 
 class VirtualRobotVrep(Robot):
-	width = robotData.width
-	length = robotData.length
-	heigth = robotData.heigth
-	orientation = [0, 0, 0]
-
+	"""
+	"""
 	def __init__(self):
+		Robot.__init__(self,'./robot/robotData.json')
+
 		vrep.simxFinish(-1)  # just in case, close all opened connections
 		self.clientID = vrep.simxStart('127.0.0.1', 19997, True, True, 5000, 5)
 		vrep.simxStartSimulation(self.clientID,vrep.simx_opmode_oneshot)
@@ -19,7 +18,7 @@ class VirtualRobotVrep(Robot):
 		self.legs = self.load_legs()
 		self.i = 0
 		vrep.simxSynchronous(self.clientID, True)
-		print "connected with id ", self.clientID
+		print "VirtualRobotVrep: connected with id ", self.clientID
 
 	def finish_iteration(self):
 		vrep.simxSynchronousTrigger(self.clientID)
@@ -46,27 +45,34 @@ class VirtualRobotVrep(Robot):
 		length = self.length
 		heigth = self.heigth
 		fl, fr, rr, rl = self.get_joints()
-		rests = robotData.legs_resting_positions
+		rests = self.legs_resting_positions
+		lengths = {'tibiaLength': self.tibiaLength, 'femurLength': self.femurLength}
 		legs = {
-			"front_left": VirtualLegVrep("front_left",  fl, self.clientID,   (length / 2,width/2,   heigth), rests[0]),
-			"front_right": VirtualLegVrep("front_right",fr, self.clientID, (length / 2, -width/2,   heigth), rests[1]),
-			"rear_right": VirtualLegVrep("rear_right",  rr, self.clientID,  (-length / 2, -width/2, heigth), rests[2]),
-			"rear_left": VirtualLegVrep("rear_left",	rl, self.clientID,	(-length / 2, width/2,  heigth), rests[3]),
+			"front_left": VirtualLegVrep("front_left",  fl, self.clientID, (length / 2.0, width / 2.0, heigth), rests[0],lengths),
+			"front_right": VirtualLegVrep("front_right",fr, self.clientID, (length / 2.0, -width / 2.0, heigth), rests[1],lengths),
+			"rear_right": VirtualLegVrep("rear_right",  rr, self.clientID, (-length / 2.0, -width / 2.0, heigth), rests[2],lengths),
+			"rear_left": VirtualLegVrep("rear_left",	rl, self.clientID, (-length / 2.0, width / 2.0, heigth), rests[3],lengths),
 			}
 
 		return legs
 
-	def move_legs_to_angles(self, angles):
-		for leg in self.legs.items():
-			# print leg[1]
-			leg[1].move_to_angle(*angles)
+	# def move_legs_to_angles(self, angles):
+	# 	for leg in self.legs.items():
+	# 		print leg[1]
+	# 		leg[1].move_to_angle(*angles)
 
 	def read_feet(self):
-			return [0, 0, 0, 0]
+		"""
+		wtf
+		"""
+		return [0, 0, 0, 0]
 
 	def read_imu(self):
-		self.orientation[1] += 0.1
-		self.orientation[1]%= 30
+		"""
+		wtf
+		"""
+		# self.orientation[1] += 0.1
+		# self.orientation[1] %= 30
 		#print(self.orientation)
 		return self.orientation
 
