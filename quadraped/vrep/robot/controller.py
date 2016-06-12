@@ -45,10 +45,10 @@ class RobotController(object):
 		"""
 		runs one iteration of the code, usually called in a loop
 		"""
-		self.dx = 0.0
+		self.dx = -0.50
 		self.dy = 0.0
 		self.dz = 0.0
-		self.drot[2] = 0.5  # i think these are rates not positions
+		self.drot[2] = 0.00  # i think these are rates not positions
 
 		msg = self.sub.recv()
 		# if msg:

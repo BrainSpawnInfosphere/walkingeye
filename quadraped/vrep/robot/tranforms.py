@@ -44,7 +44,7 @@ def rotateAroundCenter(matrix, axis, theta):
 
 	axis = np.asarray(aa)
 	# theta = np.asarray(theta)
-	axis = axis / math.sqrt(np.dot(axis, axis))
+	axis = axis / math.sqrt(np.dot(axis, axis))  # normalizing axis
 	a = math.cos(theta / 2.0)
 	b, c, d = -axis * math.sin(theta / 2.0)
 	aa, bb, cc, dd = a * a, b * b, c * c, d * d

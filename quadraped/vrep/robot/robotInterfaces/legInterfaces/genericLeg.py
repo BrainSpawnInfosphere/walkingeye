@@ -68,46 +68,46 @@ class Leg(object):
 		Attempts to move it's foot to coordinates [x,y,z]
 		"""
 		try:
-			angles = self.ik_to(x, y, z)
+			angles = self.ik_to(x, y, z)  # inverse kinematics
 			# print("ik result:", angles)
-			self.move_to_angle(*angles)
+			self.move_to_angle(*angles)  # displays in vrep when virtual
 
 			self.footPosition = numpy.array([x, y, z])
 			self.angles = angles
 		except Exception as e:
 			print (e)
 
-	def move_by(self, pos):
-		"""
-		attempts to move it's foot by an offset of it's current position
-		"""
-		target = self.position + pos
-		self.move_to_pos(self, *target)
+	# def move_by(self, pos):
+	# 	"""
+	# 	attempts to move it's foot by an offset of it's current position
+	# 	"""
+	# 	target = self.position + pos
+	# 	self.move_to_pos(self, *target)
 
-	def check_limits(self, shoulderAngle, femurAngle, tibiaAngle):
-		"""
-		Checks if the desired angles are inside the physically possible constraints.
-		"""
-		shoulderAngle = degrees(shoulderAngle)
-		femurAngle = degrees(femurAngle)
-		tibiaAngle = degrees(tibiaAngle)
-
-		femurServoLimits = self.robot.femurServoLimits
-		shoulderServoLimits = self.robot.shoulderServoLimits
-		tibiaServoLimits = self.robot.tibiaServoLimits
-
-		if self.ydirection == -1:
-			shoulderServoLimits = [-shoulderServoLimits[1], -shoulderServoLimits[0]]
-
-		if femurAngle < femurServoLimits[0]:
-			raise Exception("femur out of bounds")
-		if femurAngle > femurServoLimits[1]:
-			raise Exception("femur out of bounds")
-		if tibiaAngle < tibiaServoLimits[0]:
-			raise Exception("tibia out of bounds")
-		if tibiaAngle > tibiaServoLimits[1]:
-			raise Exception("tibia out of bounds")
-		if shoulderAngle < shoulderServoLimits[0]:
-			raise Exception(self.name,":shoulder out of bounds, attempted {0}".format(shoulderAngle))
-		if shoulderAngle > shoulderServoLimits[1]:
-			raise Exception(self.name,":shoulder out of bounds, attempted {0}".format(shoulderAngle))
+	# def check_limits(self, shoulderAngle, femurAngle, tibiaAngle):
+	# 	"""
+	# 	Checks if the desired angles are inside the physically possible constraints.
+	# 	"""
+	# 	shoulderAngle = degrees(shoulderAngle)
+	# 	femurAngle = degrees(femurAngle)
+	# 	tibiaAngle = degrees(tibiaAngle)
+	#
+	# 	femurServoLimits = self.robot.femurServoLimits
+	# 	shoulderServoLimits = self.robot.shoulderServoLimits
+	# 	tibiaServoLimits = self.robot.tibiaServoLimits
+	#
+	# 	if self.ydirection == -1:
+	# 		shoulderServoLimits = [-shoulderServoLimits[1], -shoulderServoLimits[0]]
+	#
+	# 	if femurAngle < femurServoLimits[0]:
+	# 		raise Exception("femur out of bounds")
+	# 	if femurAngle > femurServoLimits[1]:
+	# 		raise Exception("femur out of bounds")
+	# 	if tibiaAngle < tibiaServoLimits[0]:
+	# 		raise Exception("tibia out of bounds")
+	# 	if tibiaAngle > tibiaServoLimits[1]:
+	# 		raise Exception("tibia out of bounds")
+	# 	if shoulderAngle < shoulderServoLimits[0]:
+	# 		raise Exception(self.name,":shoulder out of bounds, attempted {0}".format(shoulderAngle))
+	# 	if shoulderAngle > shoulderServoLimits[1]:
+	# 		raise Exception(self.name,":shoulder out of bounds, attempted {0}".format(shoulderAngle))
