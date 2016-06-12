@@ -2,7 +2,7 @@ import time
 import math
 from math import radians as d2r
 from robot.tranforms import rotate
-from robot.gaits import TrotGait
+from robot.gaits import TrotGait, CrawlGait
 import sys
 import os
 sys.path.insert(0, os.path.abspath('../..'))
@@ -25,7 +25,8 @@ class RobotController(object):
 		self.drot = [0.0, 0.0, 0.0]  # roll pitch yaw deltas?
 
 		self.startTime = time.time()
-		self.trotgait = TrotGait(self.robot)
+		# self.trotgait = TrotGait(self.robot)
+		self.trotgait = CrawlGait(self.robot)
 		self.trotgait.reset()
 
 	def start(self):
@@ -39,24 +40,30 @@ class RobotController(object):
 		"""
 		executes a step of the "trot" gait.
 		"""
-		self.trotgait.iterate([self.dx, self.dy, self.dz], self.drot)
+		return self.trotgait.iterate([self.dx, self.dy, self.dz], self.drot)
 
 	def iterate(self):
 		"""
 		runs one iteration of the code, usually called in a loop
 		"""
-		self.dx = -0.50
+		self.dx = 0.0
 		self.dy = 0.0
 		self.dz = 0.0
-		self.drot[2] = 0.00  # i think these are rates not positions
+		self.drot[2] = -0.50  # i think these are rates not positions
+
+		ret = 1
 
 		msg = self.sub.recv()
 		# if msg:
 		# 	self.dx = msg['linear']['x']
 		# 	self.dy = msg['linear']['y']
 		# 	self.dz = msg['linear']['z']
-		self.trot()
-		self.robot.finish_iteration()
+
+		while ret != 0:  # complete one full gait and be stable
+			# if not msg: break  # don't move if no command
+			ret = self.trot()
+			self.robot.finish_iteration()
+			time.sleep(0.05)
 
 
 

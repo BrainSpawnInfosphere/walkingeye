@@ -51,17 +51,26 @@ class Leg(object):
 
 		x, y, z = dy * self.ydirection, -dz, -dx * self.ydirection
 
+		# tibiaAngle = acos(((sqrt(
+		# 	((sqrt(x ** 2 + z ** 2)) - COXA_LENGTH) ** 2 + y ** 2)) ** 2 - TIBIA_LENGTH ** 2 - FEMUR_LENGTH ** 2) / (-2 * FEMUR_LENGTH * TIBIA_LENGTH)) * 180 / pi
+		# coxaAngle = atan2(z, x) * 180 / pi
+		# femurAngle = (((atan(((sqrt(x ** 2 + z ** 2)) - COXA_LENGTH) / y)) + (acos((
+		# 	TIBIA_LENGTH ** 2 - FEMUR_LENGTH ** 2 - (
+		# 	sqrt(((sqrt(
+		# 		x ** 2 + z ** 2)) - COXA_LENGTH) ** 2 + y ** 2)) ** 2) / (
+		# 		-2 * FEMUR_LENGTH * (sqrt(((sqrt(
+		# 			x ** 2 + z ** 2)) - COXA_LENGTH) ** 2 + y ** 2)))))) * 180 / pi) - 90
 		tibiaAngle = acos(((sqrt(
-			((sqrt(x ** 2 + z ** 2)) - COXA_LENGTH) ** 2 + y ** 2)) ** 2 - TIBIA_LENGTH ** 2 - FEMUR_LENGTH ** 2) / (-2 * FEMUR_LENGTH * TIBIA_LENGTH)) * 180 / pi
-		coxaAngle = atan2(z, x) * 180 / pi
-		femurAngle = (((atan(((sqrt(x ** 2 + z ** 2)) - COXA_LENGTH) / y)) + (acos((
-			TIBIA_LENGTH ** 2 - FEMUR_LENGTH ** 2 - (
+			((sqrt(x ** 2.0 + z ** 2.0)) - COXA_LENGTH) ** 2.0 + y ** 2.0)) ** 2.0 - TIBIA_LENGTH ** 2.0 - FEMUR_LENGTH ** 2.0) / (-2.0 * FEMUR_LENGTH * TIBIA_LENGTH))
+		coxaAngle = atan2(z, x)
+		femurAngle = (((atan(((sqrt(x ** 2.0 + z ** 2.0)) - COXA_LENGTH) / y)) + (acos((
+			TIBIA_LENGTH ** 2.0 - FEMUR_LENGTH ** 2.0 - (
 			sqrt(((sqrt(
-				x ** 2 + z ** 2)) - COXA_LENGTH) ** 2 + y ** 2)) ** 2) / (
-				-2 * FEMUR_LENGTH * (sqrt(((sqrt(
-					x ** 2 + z ** 2)) - COXA_LENGTH) ** 2 + y ** 2)))))) * 180 / pi) - 90
-
-		return d2r(coxaAngle), d2r(femurAngle), d2r(tibiaAngle - 90)
+				x ** 2.0 + z ** 2.0)) - COXA_LENGTH) ** 2.0 + y ** 2.0)) ** 2.0) / (
+				-2.0 * FEMUR_LENGTH * (sqrt(((sqrt(
+					x ** 2.0 + z ** 2.0)) - COXA_LENGTH) ** 2.0 + y ** 2.0))))))) - pi/2.0
+		# print 'cft:', coxaAngle, femurAngle, tibiaAngle
+		return coxaAngle, femurAngle, tibiaAngle - pi/2.0
 
 	def move_to_pos(self, x, y, z):
 		"""
@@ -69,7 +78,7 @@ class Leg(object):
 		"""
 		try:
 			angles = self.ik_to(x, y, z)  # inverse kinematics
-			# print("ik result:", angles)
+			# print "ik result:", angles
 			self.move_to_angle(*angles)  # displays in vrep when virtual
 
 			self.footPosition = numpy.array([x, y, z])

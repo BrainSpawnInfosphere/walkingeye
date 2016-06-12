@@ -13,7 +13,6 @@ def run():
 
 	while True:
 		cntlr.iterate()
-		time.sleep(0.05)
 
 if __name__ == "__main__":
 	run()
