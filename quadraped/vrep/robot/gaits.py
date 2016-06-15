@@ -3,6 +3,8 @@ import math
 import time
 import numpy
 from robot.tranforms import rotateAroundCenter, distance
+from __future__ import print_function
+from __future__ import division
 
 
 class Gait(object):
@@ -84,7 +86,7 @@ class CrawlGait(Gait):
 		newpos = self.legs[leg].resting_position + move
 		# if leg == 2: print 'prog, scale', prog, scale
 		# if leg == 2: print 'move, newpos:', move, newpos
-		if leg == legnum: print '[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, move[0],move[1],move[2])
+		if leg == legnum: print('[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, move[0],move[1],move[2]))
 		# if leg == legnum: print '[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, newpos[0],newpos[1],newpos[2])
 
 		self.legs[leg].move_to_pos(*(newpos))
@@ -92,7 +94,7 @@ class CrawlGait(Gait):
 	def reset(self):
 		for leg in self.legs:
 			leg.move_to_pos(*(leg.resting_position))
-		pass
+		# pass
 
 	def iterate(self, delta, deltaRot):
 		gaitLength = len(self.z_profile)

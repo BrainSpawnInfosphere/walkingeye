@@ -18,6 +18,8 @@ import lib.zmqclass as zmq
 import lib.Messages as msg
 import lib.FileStorage as fs
 
+from __future__ import print_function
+from __future__ import division
 
 def ecef(lat, lon, H):
 	# phi = lat
@@ -111,7 +113,7 @@ class Navigation(mp.Process):
 
 
 def main():
-	print A
+	print(A)
 
 
 if __name__ == '__main__':

@@ -320,6 +320,7 @@ class Server(mp.Process):
 			# print 'Error:', e
 			raise
 
+
 def draw(pts):
 	import matplotlib.pyplot as plt
 	x = []
@@ -333,8 +334,8 @@ def draw(pts):
 	# li.set_ydata(y)
 	# li.set_xdata(x)
 	# fig.canvas.draw()
-	plt.subplot(2,1,1)
-	plt.plot(x,y)
+	plt.subplot(2, 1, 1)
+	plt.plot(x, y)
 	# plt.axis([0, 6, 0, 20])
 	plt.grid(True)
 	plt.ylabel('y')
@@ -342,16 +343,18 @@ def draw(pts):
 	# plt.draw()
 	# plt.pause(15)
 
-	plt.subplot(2,1,2)
-	yy = np.linspace(0,1,len(z))
+	plt.subplot(2, 1, 2)
+	yy = np.linspace(0, 1, len(z))
 	# plt.clf()
-	plt.plot(yy,z)
+	plt.plot(yy, z)
 	plt.grid(True)
 	plt.ylabel('z')
 
 	plt.draw()
 	plt.pause(25)
 	# time.sleep(5)
+
+
 def main():
 	cam = {
 		'type': 'video',

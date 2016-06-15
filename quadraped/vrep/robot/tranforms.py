@@ -1,5 +1,7 @@
 import numpy as np
 import math
+from __future__ import print_function
+from __future__ import division
 
 
 # def get_axis(axis):
@@ -22,8 +24,8 @@ import math
 
 
 def distance(a, b):
-	# return math.sqrt((b[0] - a[0])**2.0 + (b[1] - a[1])**2.0 + (b[2] - a[2])**2.0)
-	return math.sqrt(np.dot(a,b))
+	return math.sqrt((b[0] - a[0])**2.0 + (b[1] - a[1])**2.0 + (b[2] - a[2])**2.0)
+	# return math.sqrt(np.dot(a, b))
 
 
 def rotateAroundCenter(matrix, axis, theta):
@@ -37,7 +39,7 @@ def rotateAroundCenter(matrix, axis, theta):
 	out: ???
 	"""
 	# axis = get_axis(axis)
-	aa  = [0,0,1]
+	aa = [0, 0, 1]
 	if axis == "x": aa = [1, 0, 0]
 	elif axis == "y": aa = [0, 1, 0]
 	# elif axis == "z": ret = [0, 0, 1]
@@ -50,8 +52,8 @@ def rotateAroundCenter(matrix, axis, theta):
 	aa, bb, cc, dd = a * a, b * b, c * c, d * d
 	bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
 	rot = np.array([[aa+bb-cc-dd, 2.0*(bc+ad), 2.0*(bd-ac)],
-					 [2.0*(bc-ad), aa+cc-bb-dd, 2.0*(cd+ab)],
-					 [2.0*(bd+ac), 2.0*(cd-ab), aa+dd-bb-cc]])
+					[2.0*(bc-ad), aa+cc-bb-dd, 2.0*(cd+ab)],
+					[2.0*(bd+ac), 2.0*(cd-ab), aa+dd-bb-cc]])
 	return np.dot(rot, matrix)
 
 

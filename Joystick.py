@@ -10,6 +10,9 @@ import time  # sleep ... why?
 import argparse
 import zmqclass as zmq
 
+from __future__ import division
+from __future__ import print_function
+
 
 class Joystick(object):
 	"""
@@ -17,7 +20,8 @@ class Joystick(object):
 	publish the outputs via ZeroMQ.
 	"""
 	def __init__(self, host, port):
-		self.pub = zmq.Pub('tcp://' + str(host) + ':' + str(port))
+		# self.pub = zmq.Pub('tcp://' + str(host) + ':' + str(port))
+		self.pub = zmq.Pub((host, port))
 
 		# init SDL2 and grab joystick
 		sdl2.SDL_Init(sdl2.SDL_INIT_JOYSTICK)
@@ -28,10 +32,10 @@ class Joystick(object):
 		b = sdl2.SDL_JoystickNumButtons(self.js)
 		h = sdl2.SDL_JoystickNumHats(self.js)
 
-		print '=========================================='
-		print ' Joystick '
-		print '   axes:', a, 'buttons:', b, 'hats:', h
-		print '=========================================='
+		print('==========================================')
+		print(' Joystick ')
+		print('   axes:', a, 'buttons:', b, 'hats:', h)
+		print('==========================================')
 
 	def formatCmd(self, ps4):
 		"""
@@ -114,19 +118,19 @@ class Joystick(object):
 				ps4['hat'] = sdl2.SDL_JoystickGetHat(js, 0)
 
 				if verbose:
-					print ps4
+					print(ps4)
 
 				self.pub.pub('js', self.formatCmd(ps4))
 
 				time.sleep(0.1)
 
 			except (IOError, EOFError):
-				print '[-] Connection gone .... bye'
+				print('[-] Connection gone .... bye')
 				break
 
 		# clean-up
 		sdl2.SDL_JoystickClose(js)
-		print 'Bye ...'
+		print('Bye ...')
 
 
 # set up and handle command line args

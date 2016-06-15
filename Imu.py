@@ -9,6 +9,8 @@ import multiprocessing as mp
 import lib.Messages as Msg
 import lib.zmqclass as Zmq
 import lib.BNO055 as BNO055
+from __future__ import print_function
+from __future__ import division
 
 
 class IMUError(Exception):
@@ -96,7 +98,7 @@ class Imu(mp.Process):
 			# print('gravity[x,y,z]: {0:0.2F}\t{1:0.2F}\t{2:0.2F}'.format(x, y, z))
 			# Sleep for a second until the next reading.
 			# print('-----------------------------------\n\n')
-			print msg
+			print(msg)
 
 			pub.pub('imu', msg)
 
