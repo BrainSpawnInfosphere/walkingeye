@@ -2,9 +2,6 @@ from __future__ import print_function
 from __future__ import division
 import numpy
 from math import *
-# import Servo
-# from math import radians as d2r
-# from math import degrees as r2d
 
 
 class Leg(object):
@@ -12,16 +9,12 @@ class Leg(object):
 	This should be an abstract leg, it's responsible for moving and locating each leg.
 	"""
 
-	# panServo = None
-	# tibiaServo = None
-	# femurServo = None
-	position = None
-	orientation = None
+	position = None  # leg refence frame loc in body reference frame
+	# orientation = None  # might be useful
 	ydirection = 1
 	footPosition = [0.0, 0.0, 0.0]
 	angles = [0.0, 0.0, 0.0]
 
-	# def __init__(self, name, position, panServo, femurServo, tibiaServo, resting_position, lengths):
 	def __init__(self, name, position, resting_position, lengths):
 		"""
 		:param name: leg name, used to get it's pointing difection in some implementations
@@ -34,10 +27,7 @@ class Leg(object):
 		self.resting_position = resting_position
 		self.tibiaLength = lengths['tibiaLength']
 		self.femurLength = lengths['femurLength']
-		self.position = position
-		# self.panServo = panServo
-		# self.tibiaServo = tibiaServo
-		# self.femurServo = femurServo
+		self.angles = self.resting_position
 
 		if "right" in self.name:
 			self.ydirection = -1
@@ -87,26 +77,11 @@ class Leg(object):
 		"""
 		try:
 			angles = self.ik_to(x, y, z)  # inverse kinematics
-			# print "ik result:", angles
-			# self.moveToAngle(*angles)  # displays in vrep when virtual
-
 			self.footPosition = numpy.array([x, y, z])
 			self.angles = angles
 		except Exception as e:
 			print (e)
 			raise
 
-	# def moveToAngle(self, shoulderAngle, femurAngle, tibiaAngle):
-	# 	"""
-	# 	Moves joints to specified angles
-	# 	"""
-	# 	# self.check_limits(shoulderAngle, femurAngle, tibiaAngle)  # done in servo ... why here?
-	# 	self.panServo.moveToAngle(shoulderAngle)
-	# 	self.femurServo.moveToAngle(femurAngle)
-	# 	self.tibiaServo.moveToAngle(tibiaAngle)
-
 	def reset(self):
-		self.angles = [0.0, 0.0, 0.0]
-		# self.panServo.reset()
-		# self.tibiaServo.reset()
-		# self.femurServo.reset()
+		self.angles = self.resting_position

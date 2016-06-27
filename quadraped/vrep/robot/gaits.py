@@ -35,12 +35,14 @@ class CrawlGait(Gait):
 	def __init__(self, robot):
 		Gait.__init__(self, robot)
 		self.robot = robot
-		self.legs = [
-			robot.legs["front_left"],   # 0
-			robot.legs["front_right"],  # 1
-			robot.legs["rear_right"],   # 2
-			robot.legs["rear_left"]     # 3
-		]
+		# self.legs = [
+		# 	robot.legs["front_left"],   # 0
+		# 	robot.legs["front_right"],  # 1
+		# 	robot.legs["rear_right"],   # 2
+		# 	robot.legs["rear_left"]     # 3
+		# ]
+		self.legs = robot.legs  # why redefine?
+
 		self.current_step = 0
 		self.legOffsets = [0, 6, 3, 9]
 		self.i = 0
