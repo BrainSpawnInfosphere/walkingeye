@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
+from __future__ import division
 import numpy as np
 import cv2
 # import argparse
@@ -44,7 +46,7 @@ class VideoOdom(object):
 		elif cam == 'video':
 			self.cam = Cam.Camera('video')
 			self.cam.init(fileName=camera['fileName'])
-			print self.cam
+			print(self.cam)
 		else:
 			raise VOError('Error: bad init parameters')
 		# cam = video.Camera('floor.mp4')
@@ -70,9 +72,12 @@ class VideoOdom(object):
 		ret, im = self.cam.read()
 		self.p0 = self.featureDetection(old_im)
 
+		########################################################
 		# remove me ... only for this test!
-		roi = (0,479,210,639)
-		self.old_im = old_im[roi[0]:roi[1],roi[2]:roi[3]]
+		# roi = (0,479,210,639)
+		# self.old_im = old_im[roi[0]:roi[1],roi[2]:roi[3]]
+		self.old_im = old_im
+		########################################################
 
 		# p0, p1 = featureTrack(im,old_im,p0)
 		# E, mask = cv2.findEssentialMat(p0,p1,focal,pp,cv2.FM_RANSAC, 0.999, 1.0)
@@ -103,7 +108,7 @@ class VideoOdom(object):
 			minDistance=7,
 			blockSize=7)
 		keypoints = cv2.goodFeaturesToTrack(im, mask=None, **feature_params)
-		print 'goodFeaturesToTrack shape', keypoints.shape
+		print('goodFeaturesToTrack shape', keypoints.shape)
 
 		return keypoints
 
@@ -145,7 +150,7 @@ class VideoOdom(object):
 	def grab(self):
 
 		if not self.cam:
-			print 'Error: camera not setup, run init() first'
+			print('Error: camera not setup, run init() first')
 			return Msg.Odom()
 
 		try:
@@ -168,14 +173,17 @@ class VideoOdom(object):
 
 			# end of video
 			if not ret:
-				print 'video end'
+				print('video end')
 				draw(save_pts)
 				# break
 				exit()
 
+			################################################
 			# only for development ... delete!
-			roi = (0,479,210,639)
-			im = raw[roi[0]:roi[1],roi[2]:roi[3]]
+			# roi = (0,479,210,639)
+			# im = raw[roi[0]:roi[1],roi[2]:roi[3]]
+			im = raw
+			################################################
 
 			if ret:
 				cv2.imshow('debug', im)
@@ -183,10 +191,10 @@ class VideoOdom(object):
 
 			# Not enough old points, p0 ... find new ones
 			if p0.shape[0] < 50:
-				print '------- reset --------'
+				print('------- reset --------')
 				p0 = self.featureDetection(old_im)  # old_im instead?
 				if p0.shape[0] == 0:
-					print 'bad image'
+					print('bad image')
 					# continue
 					return
 
@@ -196,8 +204,8 @@ class VideoOdom(object):
 
 			# not enough new points p1 ... bad image?
 			if p1.shape[0] < 50:
-				print '------- reset p1 --------'
-				print 'p1 size:', p1.shape
+				print('------- reset p1 --------')
+				print('p1 size:', p1.shape)
 				self.old_im = im
 				self.p0 = p1
 				# continue
@@ -236,7 +244,7 @@ class VideoOdom(object):
 
 			# num = np.array([t_f[0]/t_f[2],t_f[1]/t_f[2]])
 			# num = t_f
-			print 'position:', t_f
+			print('position:', t_f)
 			# print 'distance:', dist
 			# R_f = R*R_f
 			# print 'R:',R_f,'t:',t_f
@@ -274,7 +282,7 @@ class VideoOdom(object):
 			return odom
 
 		except KeyboardInterrupt:
-			print 'captured interrupt'
+			print('captured interrupt')
 			exit()
 			# break
 

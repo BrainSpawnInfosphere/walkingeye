@@ -11,6 +11,7 @@ old
 Arduino
 *.mp4
 *.m4v
-*.wav
+# *.wav
 website
 node_modules
+tmp

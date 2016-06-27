@@ -7,6 +7,8 @@ Might make this its own library: wit.ai
 - sox
 """
 
+from __future__ import print_function
+from __future__ import division
 import requests
 import os
 import logging
@@ -91,7 +93,7 @@ def main():
 	token = os.getenv('WIT')
 	client = Wit(token)
 	resp = client.message('hi')
-	print resp
+	print(resp)
 
 
 if __name__ == "__main__":

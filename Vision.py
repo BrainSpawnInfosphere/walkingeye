@@ -3,6 +3,8 @@
 # Kevin J. Walchko 11 Nov 2014
 #
 
+from __future__ import print_function
+from __future__ import division
 # import sys
 # import time
 # import json
@@ -12,9 +14,10 @@ import logging
 import datetime as dt
 import cv2
 import argparse
+import lib.Camera as Cam
 
 
-class RobotCameraServer(mp.Process):  # FIXME: 20160522 need to use lib.Camera
+class RobotCameraServer(mp.Process):
 	"""
 	Streams camera images as fast as possible
 	"""
@@ -32,20 +35,25 @@ class RobotCameraServer(mp.Process):  # FIXME: 20160522 need to use lib.Camera
 	def run(self):
 		self.logger.info(str(self.name) + '[' + str(self.pid) + '] started on' + str(self.host) + ':' + str(self.port) + ', Daemon: ' + str(self.daemon))
 
-		pub = zmq.PubBase64('tcp://' + self.host + ':' + self.port)
-		camera = cv2.VideoCapture(self.camera_num)
+		# pub = zmq.PubBase64('tcp://' + self.host + ':' + self.port)
+		pub = zmq.PubBase64((self.host, self.port))
+		# camera = cv2.VideoCapture(self.camera_num)
+		camera = Cam.Camera()
+		camera.init(cameraNumber=self.camera_num)
+
 		self.logger.info('Openned camera: ' + str(self.camera_num))
 
 		try:
 			while True:
 				ret, frame = camera.read()
-				jpeg = cv2.imencode('.jpg', frame)[1]
+				jpeg = cv2.imencode('.jpg', frame)[1]  # jpeg compression
 				pub.pub('image', jpeg)
 				# print '[*] frame: %d k   jpeg: %d k'%(frame.size/1000,len(jpeg)/1000)
 				# time.sleep(0.1)
 
 		except KeyboardInterrupt:
-			pass
+			print('Ctl-C ... exiting')
+			return
 
 
 # class SaveVideo(object):
@@ -216,8 +224,9 @@ def handleArgs():
 	args = vars(parser.parse_args())
 	return args
 
+
 def main():
-	print 'Hello cowboy!'
+	print('Hello cowboy!')
 	# """
 	# need to figure out how to cleanly handle window size, save to file for everything
 	#

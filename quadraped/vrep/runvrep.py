@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-
-import time
+from __future__ import division
+from __future__ import print_function
+# import time
 import robot.controller as Controller
 
 from robot.robotInterfaces.virtualRobot.virtualRobotVrep import VirtualRobotVrep as VirtualRobot

@@ -1,31 +1,26 @@
-import numpy as np
-import math
+#!/usr/bin/env python
+
 from __future__ import print_function
 from __future__ import division
+import numpy as np
+import math
 
+"""
+This file is needed by gait Trot class
+"""
 
-# def get_axis(axis):
-# 	"""
-# 	is there value for this function?
-# 	"""
-# 	# if axis == "x":
-# 	# 	return [1, 0, 0]
-# 	# elif axis == "y":
-# 	# 	return [0, 1, 0]
-# 	# elif axis == "z":
-# 	# 	return [0, 0, 1]
-# 	# else:
-# 	# 	return axis
-# 	ret = [0,0,1]
-# 	if axis == "x": ret = [1, 0, 0]
-# 	elif axis == "y": ret = [0, 1, 0]
-# 	# elif axis == "z": ret = [0, 0, 1]
-# 	return ret
+# FIXME: 20160625 add euler -> quaternion transform and reverse
 
 
 def distance(a, b):
+	"""
+	Calculate the distance between pt a and pt b.
+	in: vector a, vector b
+	out: magnitude(b-a)
+	"""
 	return math.sqrt((b[0] - a[0])**2.0 + (b[1] - a[1])**2.0 + (b[2] - a[2])**2.0)
-	# return math.sqrt(np.dot(a, b))
+	# c = b-a
+	# return math.sqrt(np.dot(c, c))
 
 
 def rotateAroundCenter(matrix, axis, theta):

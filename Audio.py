@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+from __future__ import division
+from __future__ import print_function
 import os							# run commands and get/use path
 import platform						# determine os
 import sys							# ?
@@ -340,4 +341,4 @@ class SoundServer(mp.Process):
 if __name__ == '__main__':
 	s = SoundServer('/Users/kevin/Dropbox/accounts.yaml')
 	s.start()
-	print 'bye ...'
+	print('bye ...')

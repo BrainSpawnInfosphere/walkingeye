@@ -1,8 +1,38 @@
 #!/usr/bin/python
 
-import Adafruit_MCP230xx as Ada
-import RPi.GPIO as GPIO
+from __future__ import division
+from __future__ import print_function
 
+# since i do a lot of dev on Apple, this creates a fake interface
+import platform
+if platform.system().lower() == 'linux':
+	# pip install Adafruit_MCP230XX
+	from Adafruit_MCP230XX import Adafruit_MCP230XX as MCP230XX
+	# import RPi.GPIO as GPIO  # PWM
+	from RPi.GPIO import PWM, setmode, setup, cleanup, BCM, OUT
+
+	# print('RPi detected:', GPIO.RPI_INFO['P1_REVISION'])
+	# print('GPIO Version:', GPIO.VERSION)
+
+else:
+	class MCP230XX(object):  # mux
+		def __init__(self, a, b, c): pass
+		def write8(self, a): print('mux wrote:', a)
+		def config(self, a, b): pass
+
+	class PWM(object):  # motors
+		def __init__(self, a, b): pass
+		def start(self, a): pass
+		def stop(self): pass
+		def ChangeDutyCycle(self, a): print('ChangeDutyCycle', a)
+
+	# class GPIO:  # this shit isn't working!!!!
+	# I don't like this solution!!!
+	BCM = 11
+	OUT = 0
+	def setmode(a): pass
+	def setup(a, b): pass
+	def cleanup(): pass
 
 class MotorDriver(object):
 	"""
@@ -16,62 +46,37 @@ class MotorDriver(object):
 	def __init__(self, pwm0, pwm1, pwm2, pwm3):
 		"""
 		"""
-		self.mux = Ada.Adafruit_MCP230XX(0x20, 16, 1)
-
-		print 'RPi detected:', GPIO.RPI_INFO['P1_REVISION']
-		print 'GPIO Version:', GPIO.VERSION
+		self.mux = MCP230XX(0x20, 16, 1)
 
 		for pin in range(0, 15):
-			self.mux.config(pin, Ada.MCP230XX_GPIO.OUT)
-
-		# don't need these anymore
-# 		self.pin0 = pwm0
-# 		self.pin1 = pwm1
-# 		self.pin2 = pwm2
-# 		self.pin3 = pwm3
+			self.mux.config(pin, OUT)
 
 		# this can be:
 		# BOARD -> Board numbering scheme. The pin numbers follow the pin numbers on header P1.
 		# BCM -> Broadcom chip-specific pin numbers.
-# 		GPIO.setmode(GPIO.BOARD)
-		GPIO.setmode(GPIO.BCM)  # Pi cover uses BCM pin numbers
-# 		GPIO.setup(pwm0, GPIO.OUT)
-# 		GPIO.setup(pwm1, GPIO.OUT)
-# 		GPIO.setup(pwm2, GPIO.OUT)
-# 		GPIO.setup(pwm3, GPIO.OUT)
-		GPIO.setup([pwm0, pwm1, pwm2, pwm3], GPIO.OUT)
+# 		GPIO.setmode(GPIO.BCM)
+		setmode(BCM)  # Pi cover uses BCM pin numbers, GPIO.BCM = 11
+		setup([pwm0, pwm1, pwm2, pwm3], OUT)  # GPIO.OUT = 0
 
 		freq = 100.0  # Hz
-		self.motor0 = GPIO.PWM(pwm0, freq)
-		self.motor1 = GPIO.PWM(pwm1, freq)
-		self.motor2 = GPIO.PWM(pwm2, freq)
-		self.motor3 = GPIO.PWM(pwm3, freq)
+		self.motor0 = PWM(pwm0, freq)
+		self.motor1 = PWM(pwm1, freq)
+		self.motor2 = PWM(pwm2, freq)
+		self.motor3 = PWM(pwm3, freq)
 
 		self.motor0.start(0)
 		self.motor1.start(0)
 		self.motor2.start(0)
 		self.motor3.start(0)
 
-# 		self.motor0 = PWM.Servo(0)
-		# self.motor0.stop_servo(self.pin0)
-
-# 		self.motor1 = PWM.Servo(1)
-		# self.motor1.stop_servo(self.pin1)
-
-# 		self.motor2 = PWM.Servo(2)
-		# self.motor2.stop_servo(self.pin2)
-
-# 		self.motor3 = PWM.Servo(3)
-		# self.motor3.stop_servo(self.pin3)
-
 	def __del__(self):
-		print 'motor drive ... bye'
+		print('motor drive ... bye')
 		self.allStop()
 		self.motor0.stop()
 		self.motor1.stop()
 		self.motor2.stop()
 		self.motor3.stop()
-		GPIO.cleanup()
+		cleanup()
 
 	def clamp(self, x):
 		"""
@@ -94,36 +99,26 @@ class MotorDriver(object):
 		MotorDriver.COAST   = 3
 		"""
 		# if not 'dir' in m0 or not 'duty' in m0: return
+		# low = 0
+		# high = 100
 
-		low = 0
-		high = 100
-
-		print m0, m1, m2, m3
+		print(m0, m1, m2, m3)
 
 		# set mux
 		val = m3['dir'] << 6 | m2['dir'] << 4 | m1['dir'] << 2 | m0['dir']
-		print 'mux:', val
 		self.mux.write8(val)
 
 		# set pwm
 		pwm = self.clamp(m0['duty'])
-		print pwm
-# 		self.motor0.set_servo(self.pin0,pwm)
 		self.motor0.ChangeDutyCycle(pwm)
 
 		pwm = self.clamp(m1['duty'])
-		print pwm
-# 		self.motor1.set_servo(self.pin1,pwm)
 		self.motor1.ChangeDutyCycle(pwm)
 
 		pwm = self.clamp(m2['duty'])
-		print pwm
-# 		self.motor2.set_servo(self.pin2,pwm)
 		self.motor2.ChangeDutyCycle(pwm)
 
 		pwm = self.clamp(m3['duty'])
-		print pwm
-# 		self.motor3.set_servo(self.pin3,pwm)
 		self.motor3.ChangeDutyCycle(pwm)
 
 	def allStop(self):

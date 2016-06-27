@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 # algorithm based on sheep.art.pl
-
+from __future__ import division
+from __future__ import print_function
 import Math
 
 """

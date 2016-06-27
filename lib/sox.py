@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+from __future__ import division
+from __future__ import print_function
 from subprocess import call
 import logging
 # import datetime

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-
+from __future__ import division
+from __future__ import print_function
+# from __future__ import division
 import cv2             # OpenCV camera
 import time            # sleep
 import numpy as np
@@ -115,7 +117,7 @@ class Camera(object):
 		if self.cameraType == 'pi': self.camera.close()
 		else: self.camera.release()
 
-		print 'exiting camera ... bye!'
+		print('exiting camera ... bye!')
 
 	def init(self, win=(640, 480), cameraNumber=0, fileName=None, calibration=None):
 		"""
@@ -171,7 +173,7 @@ class Camera(object):
 			# return True, gray
 
 		if self.cal:  # FIXME 2016-05-15
-			print 'do calibration correction ... not done yet'
+			print('do calibration correction ... not done yet')
 
 		return True, gray
 
@@ -185,7 +187,7 @@ class Camera(object):
 
 
 def main():
-	print 'Hello!'
+	print('Hello!')
 
 if __name__ == "__main__":
 	main()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+from __future__ import division
+from __future__ import print_function
 from robot.robotInterfaces.genericRobot import Robot
 from robot.robotInterfaces.legInterfaces.virtualLegVrep import VirtualLegVrep
 from vreptest import vrep

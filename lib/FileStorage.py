@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+from __future__ import division
+from __future__ import print_function
 import yaml
 import json
 
@@ -19,13 +20,15 @@ class FileStorage(object):
 	def readYaml(self, fname):
 		"""
 		Reads a Yaml file
+		in: file name
+		out: length of file, dictionary
 		"""
 		try:
 			f = open(fname, 'r')
 			d = yaml.safe_load(f)
 			f.close()
 			self.db = d
-			return len(self.db)
+			return len(self.db), d
 		except IOError:
 			# print '[-] YamlDoc: IOError'
 			raise FileStorageError('Could not open %s for reading' % (fname))
@@ -33,28 +36,37 @@ class FileStorage(object):
 	def writeYaml(self, filename, data=None):
 		"""
 		Writes a Yaml file
+		in:
+			filename - file name
+			data - [optional] data to be written, otherwise, it uses data in self.db
 		"""
-		if data is None:
-			data = self.db
-		f = open(filename, 'w')
-		yaml.safe_dump(data, f)
-		f.close()
+		try:
+			if data is None:
+				data = self.db
+			f = open(filename, 'w')
+			yaml.safe_dump(data, f)
+			f.close()
+		except IOError:
+			# print '[-] YamlDoc: IOError'
+			raise FileStorageError('Could not open %s for writing' % (fname))
 
-	def readJson(self, fname):  # FIXME: 20160522
+	def readJson(self, fname):
 		"""
 		Reads a Json file
+		in: file name
+		out: length of file, dictionary
 		"""
 		try:
 			with open(fname, 'r') as f:
 				data = json.load(f)
 
 			self.db = data
-			return len(self.db)
+			return len(self.db), data
 		except IOError:
 			# print '[-] YamlDoc: IOError'
 			raise FileStorageError('Could not open %s for reading' % (fname))
 
-	def writeJson(self, fname, data=None):  # FIXME: 20160522
+	def writeJson(self, fname, data=None):
 		"""
 		Writes a Json file
 		"""
@@ -81,43 +93,6 @@ class FileStorage(object):
 	def clear(self):
 		self.db = None
 
-# 
-# def test_yaml():
-# 	data = {
-# 		'bob': 1,
-# 		'tom': 2,
-# 		'sam': 3
-# 	}
-#
-# 	fname = 'test.yaml'
-#
-# 	fs = FileStorage()
-# 	fs.writeYaml(fname, data)
-# 	fs.clear()
-# 	fs.readYaml(fname)
-#
-# 	# print fs.db
-#
-# 	assert fs.db == data
-#
-#
-# def test_json():
-# 	data = {
-# 		'bob': 1,
-# 		'tom': 2,
-# 		'sam': 3
-# 	}
-#
-# 	fname = 'test.json'
-#
-# 	fs = FileStorage()
-# 	fs.writeJson(fname, data)
-# 	fs.clear()
-# 	fs.readJson(fname)
-#
-# 	# print fs.db
-#
-# 	assert fs.db == data
 
 if __name__ == "__main__":
-	print 'good bye cowboy!'
+	print('good bye cowboy!')

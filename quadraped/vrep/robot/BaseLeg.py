@@ -1,7 +1,9 @@
+from __future__ import print_function
+from __future__ import division
 import numpy
 from math import *
-from math import radians as d2r
-from math import degrees as r2d
+# from math import radians as d2r
+# from math import degrees as r2d
 
 
 class Leg(object):
@@ -72,6 +74,7 @@ class Leg(object):
 		# print 'cft:', coxaAngle, femurAngle, tibiaAngle
 		return coxaAngle, femurAngle, tibiaAngle - pi/2.0
 
+	# change def setFoot(self, x, y, z):
 	def move_to_pos(self, x, y, z):
 		"""
 		Attempts to move it's foot to coordinates [x,y,z]
@@ -79,12 +82,13 @@ class Leg(object):
 		try:
 			angles = self.ik_to(x, y, z)  # inverse kinematics
 			# print "ik result:", angles
-			self.move_to_angle(*angles)  # displays in vrep when virtual
+			self.moveToAngle(*angles)  # displays in vrep when virtual
 
 			self.footPosition = numpy.array([x, y, z])
 			self.angles = angles
 		except Exception as e:
 			print (e)
+			raise
 
 	# def move_by(self, pos):
 	# 	"""
@@ -94,6 +98,7 @@ class Leg(object):
 	# 	self.move_to_pos(self, *target)
 
 	# def check_limits(self, shoulderAngle, femurAngle, tibiaAngle):
+	# 	pass
 	# 	"""
 	# 	Checks if the desired angles are inside the physically possible constraints.
 	# 	"""

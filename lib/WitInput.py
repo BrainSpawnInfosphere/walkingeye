@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+from __future__ import division
 # import json
 import wit
 import sox
@@ -41,7 +43,7 @@ class WitInput(object):
 			# print '--------'
 			result = self.listen()
 			# print '/////',result
-			print result
+			print(result)
 
 		return self.listen(True)
 
@@ -54,11 +56,11 @@ class WitInput(object):
 		try:
 			# result = wit.voice_query_auto( self.wit_token )
 			# if ps: self.playSound('../sounds/misc/beep_hi.wav')
-			print 'Speak'
+			print('Speak')
 			self.mic.getAudio()
 			kv = self.wit.speech(self.mic.audio)
 			ans = self.getKey(kv, confidence)
-			print 'Got: %s' % ans
+			print('Got: %s' % ans)
 			# if ps: self.playSound('../sounds/misc/beep_lo.wav')
 			return ans
 		except:
@@ -109,10 +111,10 @@ def main():
 	while True:
 		txt = raw_input(">> ")
 		resp = w.text(txt)
-		print '>>', resp
-		print 'listening'
+		print('>>', resp)
+		print('listening')
 		resp = w.listen()
-		print 'heard:', resp
+		print('heard:', resp)
 
 
 if __name__ == "__main__":

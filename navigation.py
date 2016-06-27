@@ -3,6 +3,8 @@
 # Kevin J. Walchko 3 April 2016
 #
 
+from __future__ import print_function
+from __future__ import division
 # import sys
 import time
 # import json
@@ -18,8 +20,6 @@ import lib.zmqclass as zmq
 import lib.Messages as msg
 import lib.FileStorage as fs
 
-from __future__ import print_function
-from __future__ import division
 
 def ecef(lat, lon, H):
 	# phi = lat

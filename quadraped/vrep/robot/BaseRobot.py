@@ -1,9 +1,11 @@
-
+from __future__ import division
+from __future__ import print_function
 import sys
 import os
 import numpy as np
 sys.path.insert(0, os.path.abspath('../..'))
 import lib.FileStorage as Fs
+
 
 class Robot(object):
 	legs = []
@@ -25,7 +27,7 @@ class Robot(object):
 		self.width = params['width']
 		self.length = params['length']
 		self.height = params['height']
-		totalDistance = self.femurLength+self.tibiaLength
+		totalDistance = self.femurLength + self.tibiaLength
 		front = self.length / 2.0
 		back = - self.length / 2.0
 		left = self.width / 2.0
@@ -56,31 +58,26 @@ class Robot(object):
 		# these are the foot positions
 		self.legs_resting_positions = np.array(legs_resting_positions)
 
-	# @abc.abstractmethod
-	def load_legs(self):
-		"""
-		Start the legs, init code
-		"""
+	# def load_legs(self):
+	# 	"""
+	# 	Start the legs, init code
+	# 	"""
+	# 
+	# def read_feet(self):
+	# 	"""
+	# 	return array of feet sensor values
+	# 	:return:
+	# 	"""
+	#
+	# def read_imu(self):
+	# 	"""
+	# 	returns orientation array
+	# 	:return:
+	# 	"""
 
-	# @abc.abstractmethod
-	def read_feet(self):
-		"""
-		return array of feet sensor values
-		:return:
-		"""
-
-	# @abc.abstractmethod
-	def read_imu(self):
-		"""
-		returns orientation array
-		:return:
-		"""
-
-	# @abc.abstractmethod
 	def move_legs_to_angles(self, angles):
 		pass
 
-	# @abc.abstractmethod
 	def move_leg_to_point(self, leg, x, y, z):
 		"""
 		move legs to absolute point

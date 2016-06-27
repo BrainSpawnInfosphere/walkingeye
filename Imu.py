@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
+from __future__ import division
 # import argparse
 import time
 # import datetime as dtm
@@ -9,8 +11,6 @@ import multiprocessing as mp
 import lib.Messages as Msg
 import lib.zmqclass as Zmq
 import lib.BNO055 as BNO055
-from __future__ import print_function
-from __future__ import division
 
 
 class IMUError(Exception):

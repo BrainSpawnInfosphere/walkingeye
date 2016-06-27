@@ -1,5 +1,8 @@
-from robot.robotInterfaces.legInterfaces.genericLeg import Leg
+from __future__ import division
+from __future__ import print_function
+# from robot.robotInterfaces.legInterfaces.genericLeg import Leg
 from vreptest import vrep
+import BaseLeg as Leg
 # import time
 
 

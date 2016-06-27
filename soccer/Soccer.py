@@ -5,14 +5,17 @@
 # Log:
 # 12 Oct 14 Broke out into its own file
 #
-
+from __future__ import division
+from __future__ import print_function
 import time
 # import datetime as date
 import multiprocessing as mp
 import logging
-import IMU.MotorDriver as md
-import RPi.GPIO as GPIO  # IR
-
+import MotorDriver as md
+# import RPi.GPIO as GPIO  # IR
+import sys
+import os
+sys.path.insert(0, os.path.abspath('..'))
 import lib.zmqclass as zmq
 import lib.Messages as Msg
 import lib.FileStorage as Fs
@@ -66,7 +69,6 @@ class RobotHardwareServer(mp.Process):
 		self.port = port
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger('robot')
-# 		self.md = md.MotorDriver(11,12,15,16)
 		self.md = None
 
 	def createMotorCmd(dir, duty):
@@ -95,7 +97,7 @@ class RobotHardwareServer(mp.Process):
 		"""
 		Needed?
 		"""
-		0
+		pass
 
 	def test(self):
 		dt = 5
@@ -126,16 +128,22 @@ class RobotHardwareServer(mp.Process):
 		while True:
 			time.sleep(0.05)  # 0.5 => 20Hz
 			# get info
-			msg = self.sub.recv()
-# 			if msg:
+			topic, msg = self.sub.recv()
+			if msg:
+				print('msg:', topic, msg)
 # 				self.parseMsg( msg )
-			self.test()
+			# get IR sensors
+			# get drop sensors
+			# send motor commands
+			# send head servo commands
+			# self.test()
 
 
 class NonHolonomic(RobotHardwareServer):
 	def __init__(self, host="localhost", port=9000):
 		RobotHardwareServer.__init__(self, host, port)
 		self.md = md.MotorDriver(11, 12)  # FIXME: 20160528 why these two pins?
+		self.md.allStop()
 
 	def motorCmd(self, cmd):
 		self.logger.info(cmd)
@@ -143,9 +151,10 @@ class NonHolonomic(RobotHardwareServer):
 
 
 class Holonomic(RobotHardwareServer):
-	def __init__(self, pinA=11, pinB=12, pinC=15, pinD=16):
-		RobotHardwareServer.__init__(self)
+	def __init__(self, host="localhost", port=9000, pinA=11, pinB=12, pinC=15, pinD=16):
+		RobotHardwareServer.__init__(self, host, port)
 		self.md = md.MotorDriver(pinA, pinB, pinC, pinD)
+		self.md.allStop()
 
 	def motorCmd(self, cmd):
 		self.logger.info(cmd)
