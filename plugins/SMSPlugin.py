@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import Module as mod
-import logging
+# import logging
 import twilio
 from twilio.rest import TwilioRestClient
 from twilio.rest.exceptions import TwilioRestException
@@ -23,16 +23,16 @@ class Plugin(mod.Module):
 		self.client = TwilioRestClient(account_sid, auth_token)
 		# self.from_phone = self.info['Twilio']['phone']['Twilio']
 
-		self.logger.debug('Twilio sid: %s' % (account_sid))
-		self.logger.debug('Twilio token: %s' % (auth_token))
+		# self.logger.debug('Twilio sid: %s' % (account_sid))
+		# self.logger.debug('Twilio token: %s' % (auth_token))
 
 	def process(self, entity):
 		"""
 		"""
-		#print '>> process',entity
+		# print '>> process',entity
 		try:
 			if ('message_body' not in entity) or ('contact' not in entity):
-				self.logger.error( '[-] Error:'+ str(entity) )
+				# self.logger.error( '[-] Error:'+ str(entity) )
 				return 'error'
 
 			# need better solution
@@ -41,24 +41,25 @@ class Plugin(mod.Module):
 			if who == 'nina': who = 'Nina'
 			msg = entity['message_body']['value']
 
-			#print 'who',who,'msg',msg,'from phone',self.from_phone,'to phone',self.info['Twilio']['phone']
+			# print 'who',who,'msg',msg,'from phone',self.from_phone,'to phone',self.info['Twilio']['phone']
 
 			message = self.client.messages.create(body=msg,
 				to=self.info['Twilio']['phone'][who],
-				from_=self.from_phone )
-			self.logger.debug( '[+] Good SMS: %s'%(message.sid) )
+				from_=self.from_phone)
+			# self.logger.debug( '[+] Good SMS: %s'%(message.sid) )
 
 		except TwilioRestException as e:
-			self.logger.error( e )
+			# self.logger.error(e)
 			return 'error'
 
 		except:
-			self.logger.error('[-] Error:' + str(entity))
+			# self.logger.error('[-] Error:' + str(entity))
 			return 'error'
 
 		return 'empty'
 
 if __name__ == '__main__':
+	import os
 	token = os.getenv('TWILIO_TOKEN')
 	sid = os.getenv('TWILIO_SID')
 
@@ -66,4 +67,4 @@ if __name__ == '__main__':
 		exit('No Twilio token or sid given in os env')
 
 	p = Plugin(token, sid)
-	print ret
+	# print ret

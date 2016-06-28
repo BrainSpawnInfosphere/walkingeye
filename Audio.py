@@ -279,7 +279,7 @@ class SoundServer(mp.Process):
 		if True:
 			# fname = self.tts.tts(txt)
 			# os.system('afplay %s'%(fname))
-			print 'speak:', txt
+			print('speak:', txt)
 		else:
 			if self.os == 'Darwin': os.system('say -v vicki ' + txt)
 			elif self.os == 'Linux': os.system('say ' + txt)

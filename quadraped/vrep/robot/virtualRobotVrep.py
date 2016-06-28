@@ -19,7 +19,7 @@ class VirtualRobotVrep(Robot):
 		self.legs = self.load_legs()
 		self.i = 0
 		vrep.simxSynchronous(self.clientID, True)
-		print "VirtualRobotVrep: connected with id ", self.clientID
+		print("VirtualRobotVrep: connected with id ", self.clientID)
 
 	def finish_iteration(self):
 		vrep.simxSynchronousTrigger(self.clientID)

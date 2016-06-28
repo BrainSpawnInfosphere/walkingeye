@@ -11,7 +11,7 @@
 # - add camera calibration matrix
 #
 
-import numpy as np
+# import numpy as np
 import cv2
 import yaml
 import argparse
@@ -21,7 +21,7 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 # import lib.zmqclass as zmq
-import lib.Messages as msg
+# import lib.Messages as msg
 import lib.Camera as Camera
 
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
 	source = args['camera']
 	shotdir = args['path']
-	file = args['video_name']
+	filename = args['video_name']
 
 	# image size
 	if args['size'] is not None:
@@ -125,7 +125,7 @@ if __name__ == '__main__':
 				# setup video output
 				mpg4 = cv2.cv.CV_FOURCC('m', 'p', '4', 'v')
 				out = cv2.VideoWriter()
-				vfn = '%s_%d.mp4v' % (file, video_idx)
+				vfn = '%s_%d.mp4v' % (filename, video_idx)
 				h, w = img.shape[:2]
 				out.open(vfn, mpg4, 20.0, (w, h))
 				print '[+] start capture', vfn

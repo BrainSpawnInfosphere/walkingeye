@@ -124,8 +124,8 @@ class Microphone(object):
 
 def main():
 	mic = Microphone()
-	print 'Say something:'
-	print 'Audio size:', mic.getAudio()
+	print('Say something:')
+	print('Audio size:', mic.getAudio())
 	mic.play()
 	# mic.playAudio(filename)
 	# snd = mic.readAudio(filename)

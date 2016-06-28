@@ -48,8 +48,8 @@ class Bag(object):
 			self.writeToFile()
 
 	def open(self, topic, path='./'):
-		file = path + topic + '.bag'
-		self.fd = gzip.open(file, "w")
+		filen = path + topic + '.bag'
+		self.fd = gzip.open(filen, "w")
 		# self.fd = open(file, "w")
 
 	def close(self):
@@ -166,8 +166,8 @@ def test_bag():
 	bag.close()
 
 	filename = 'imu.bag'
-	ans = bag.readFromFile('imu.bag')
-	# os.remove(filename)
+	ans = bag.readFromFile(filename)
+	os.remove(filename)
 	# print 'Found {} messages in file {}'.format(len(ans), filename)
 	# print 'type:', type(ans[0])
 	# print ans[0]

@@ -18,7 +18,7 @@ import math
 
 import lib.zmqclass as zmq
 import lib.Messages as msg
-import lib.FileStorage as fs
+# import lib.FileStorage as fs
 
 
 def ecef(lat, lon, H):
@@ -72,7 +72,7 @@ class Navigation(mp.Process):
 	"""
 	Still needs lots of work!
 	"""
-	def __init__(self, host="localhost", port='9110'):  # FIXME: 20160522 instead of host and port, just do a tuple (host,port)?
+	def __init__(self, host="localhost", port='9110'):
 		mp.Process.__init__(self)
 		# self.epoch = dt.datetime.now()
 		self.host = host
@@ -82,7 +82,7 @@ class Navigation(mp.Process):
 		self.logger = logging.getLogger('navigation')
 
 		self.kalman = cv2.KalmanFilter(4, 2)
-		self.kalman.measurementMatrix = C  # np.array([[1,0,0,0],[0,1,0,0]],np.float32)
+		# self.kalman.measurementMatrix = C  # np.array([[1,0,0,0],[0,1,0,0]],np.float32)
 		self.kalman.transitionMatrix = A   # np.array([[1,0,1,0],[0,1,0,1],[0,0,1,0],[0,0,0,1]],np.float32)
 		self.kalman.processNoiseCov = nQ   # np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],np.float32) * 0.03
 
@@ -94,7 +94,7 @@ class Navigation(mp.Process):
 
 	def run(self):
 		self.logger.info(str(self.name) + '[' + str(self.pid) + '] started on' + str(self.host) + ':' + str(self.port) + ', Daemon: ' + str(self.daemon))
-		sub = zmq.Sub('/cmd', 'tcp://%s:%s' % (self.host, self.port))
+		sub = zmq.Sub((self.host, self.port))
 		pub = zmq.Pub()
 		# self.logger.info('Openned camera: '+str(self.camera_num))
 

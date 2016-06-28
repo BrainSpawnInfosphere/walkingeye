@@ -17,8 +17,8 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath('..'))
 import lib.zmqclass as zmq
-import lib.Messages as Msg
-import lib.FileStorage as Fs
+# import lib.Messages as Msg
+# import lib.FileStorage as Fs
 
 # def test():
 # 	import time
@@ -71,7 +71,7 @@ class RobotHardwareServer(mp.Process):
 		self.logger = logging.getLogger('robot')
 		self.md = None
 
-	def createMotorCmd(dir, duty):
+	def createMotorCmd(self, dir, duty):
 		return {'dir': dir, 'duty': duty}
 
 	def soundCmd(self, cmd):
@@ -142,12 +142,12 @@ class RobotHardwareServer(mp.Process):
 class NonHolonomic(RobotHardwareServer):
 	def __init__(self, host="localhost", port=9000):
 		RobotHardwareServer.__init__(self, host, port)
-		self.md = md.MotorDriver(11, 12)  # FIXME: 20160528 why these two pins?
-		self.md.allStop()
+		# self.md = md.MotorDriver(11, 12)  # FIXME: 20160528 why these two pins?
+		# self.md.allStop()
 
 	def motorCmd(self, cmd):
 		self.logger.info(cmd)
-		self.md.setMotors(cmd)
+		# self.md.setMotors(cmd)
 
 
 class Holonomic(RobotHardwareServer):
@@ -158,7 +158,7 @@ class Holonomic(RobotHardwareServer):
 
 	def motorCmd(self, cmd):
 		self.logger.info(cmd)
-		self.md.setMotors(cmd)
+		# self.md.setMotors(cmd)
 
 
 if __name__ == '__main__':

@@ -2,23 +2,24 @@
 
 from Module import *
 import glob
-import wave
+# import wave
 import random
+import os
 
 
 class Plugin(Module):
 	def __init__(self):
-		Module.__init__(self,'tv_movie_sounds')
+		Module.__init__(self, 'tv_movie_sounds')
 		self.intent = 'tv_movie_sounds'
 
 		self.star_wars_sounds = self.loadSounds('star_wars')
 		self.venture_bros_sounds = self.loadSounds('venture_brothers')
 		self.blues_bros_sounds = self.loadSounds('blues_bros')
 
-	def loadSounds(self,type):
-		file = '/Users/kevin/github/jarvis/sounds/' + type
-		snds = glob.glob(file + '/*.wav')
-		self.logger.info('   [>] %s loaded %d sound files'%(type,len(snds)))
+	def loadSounds(self, kind):
+		filename = '/Users/kevin/github/jarvis/sounds/' + kind  # FIXME 20160627 path wrong
+		snds = glob.glob(filename + '/*.wav')
+		self.logger.info('   [>] %s loaded %d sound files' % (type, len(snds)))
 		return snds
 
 	def process(self, entity):
@@ -28,31 +29,29 @@ class Plugin(Module):
 		name = entity['contact'][0]['value'].lower()
 		# venture bros not working??? also, might be a bad wave file
 		if name == 'star wars':
-			sound = random.choice( self.star_wars_sounds )
+			sound = random.choice(self.star_wars_sounds)
 		elif name == 'blues brothers':
-			sound = random.choice( self.blues_bros_sounds )
+			sound = random.choice(self.blues_bros_sounds)
 		elif name == 'venture brothers':
-			sound = random.choice( self.venture_bros_sounds )
+			sound = random.choice(self.venture_bros_sounds)
 
 		if sound == '':
-			print 'Error: sound for %s does not exist'%name
+			print 'Error: sound for {} does not exist'.format(name)
 		else:
-			self.playWave( sound )
+			self.playWave(sound)
 		return ''
 
-
-	def playWave(self,fname):
+	def playWave(self, fname):
 		"""
 		Plays a Wave file
 		in: path to sound to play
 		out: none
 		"""
-		os.system('afplay %s'%(fname))
-
+		os.system('afplay %s' % (fname))
 
 
 if __name__ == '__main__':
 	s = Plugin()
-	en = {'contact': {'body' : 'Star Wars'}}
+	en = {'contact': {'body': 'Star Wars'}}
 	snd = s.process(en)
 	print snd

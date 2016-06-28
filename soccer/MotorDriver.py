@@ -34,6 +34,7 @@ else:
 	def setup(a, b): pass
 	def cleanup(): pass
 
+
 class MotorDriver(object):
 	"""
 	This uses RPI.GPIO
