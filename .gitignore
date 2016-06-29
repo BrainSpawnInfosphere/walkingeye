@@ -14,4 +14,5 @@ Arduino
 # *.wav
 website
 node_modules
-tmp
+# tmp
+tmp/*.wav
