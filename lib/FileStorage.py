@@ -48,7 +48,7 @@ class FileStorage(object):
 			f.close()
 		except IOError:
 			# print '[-] YamlDoc: IOError'
-			raise FileStorageError('Could not open %s for writing' % (fname))
+			raise FileStorageError('Could not open %s for writing' % (filename))
 
 	def readJson(self, fname):
 		"""

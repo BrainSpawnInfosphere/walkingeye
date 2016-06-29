@@ -18,7 +18,7 @@ class ZMQError(Exception):
 	pass
 
 
-class Base:  # FIXME: 20160525 move printing statements to logging instead?
+class Base(object):  # FIXME: 20160525 move printing statements to logging instead?
 	"""
 	Base class for other derived pub/sub/service classes
 	"""

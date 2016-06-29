@@ -3,7 +3,7 @@
 
 import cv2
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-# from socket import gethostname, gethostbyname
+from socket import gethostname, gethostbyname
 # import BaseHTTPServer
 # import StringIO
 import time
@@ -190,3 +190,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
+	

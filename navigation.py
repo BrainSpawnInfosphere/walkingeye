@@ -103,7 +103,7 @@ class Navigation(mp.Process):
 				ans = {}
 				ans = sub.recv()
 				if ans:
-					x = self.process()
+					x = self.process(1)  # FIXME: what is z
 					odom = msg.Odom()
 					pub.pub('/nav', odom)
 				time.sleep(0.05)

@@ -47,7 +47,7 @@ class WitInput(object):
 
 		return self.listen(True)
 
-	def listen(self, confidence=0.7, ps=False):
+	def listen(self, confidence=0.7):
 		"""
 		Will grab audio from microphone and process the wit.ai json message
 		in: nothing

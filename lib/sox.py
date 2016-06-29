@@ -3,8 +3,6 @@ from __future__ import division
 from __future__ import print_function
 from subprocess import call
 import logging
-# import datetime
-# from time import sleep
 import tempfile
 import StringIO
 import pyaudio
@@ -84,7 +82,7 @@ class Microphone(object):
 
 		# rec -q -t wav -c 1 test.wav rate 8k silence 1 0.1 3% 1 3.0 3%
 		temp = tempfile.NamedTemporaryFile().name
-		self.logger.debug('Openned tempfile: %s' % {temp})
+		self.logger.debug('Openned tempfile: %s', temp)
 		cmd = 'rec -q -t wav -c 1 %s rate 16k silence 1 0.1 %s 1 3.0 %s' % (temp, self.threshold, self.threshold)
 		call(cmd, shell=True)
 

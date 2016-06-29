@@ -39,8 +39,8 @@ class SaveVideo(object):
 class VideoPublisher(object):
 	"""
 	"""
-	def __init__(self, fileName):
-		a = 0
+	def __init__(self):
+		pass
 
 
 """

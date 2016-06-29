@@ -10,7 +10,16 @@ import logging
 import multiprocessing as mp
 import lib.Messages as Msg
 import lib.zmqclass as Zmq
-import lib.BNO055 as BNO055
+
+# import platform
+# if platform.system().lower() == 'linux':
+from lib.BNO055 import BNO055
+# else:
+# 	class BNO055(object):
+# 		def __init__(self, a): pass
+# 		def begin(self): pass
+# 		def get_system_status(self): return 1, 0x0F, 0
+# 		def read_euler(self): return 0, 0, 0
 
 
 class IMUError(Exception):
@@ -28,7 +37,7 @@ class Imu(mp.Process):
 
 	def init(self, USB_SERIAL_PORT):  # FIXME: 20160605 put these into logging
 		try:
-			self.bno = BNO055.BNO055(serial_port=USB_SERIAL_PORT)
+			self.bno = BNO055(serial_port=USB_SERIAL_PORT)
 			if not self.bno.begin():
 				raise RuntimeError('Failed to initialize BNO055! Is the sensor connected?')
 
@@ -41,12 +50,12 @@ class Imu(mp.Process):
 				print('See datasheet section 4.3.59 for the meaning.')
 
 			# Print BNO055 software revision and other diagnostic data.
-			sw, bl, accel, mag, gyro = self.bno.get_revision()
-			print('Software version:   {0}'.format(sw))
-			print('Bootloader version: {0}'.format(bl))
-			print('Accelerometer ID:   0x{0:02X}'.format(accel))
-			print('Magnetometer ID:	0x{0:02X}'.format(mag))
-			print('Gyroscope ID:	   0x{0:02X}\n'.format(gyro))
+			# sw, bl, accel, mag, gyro = self.bno.get_revision()
+			# print('Software version:   {0}'.format(sw))
+			# print('Bootloader version: {0}'.format(bl))
+			# print('Accelerometer ID:   0x{0:02X}'.format(accel))
+			# print('Magnetometer ID:	0x{0:02X}'.format(mag))
+			# print('Gyroscope ID:	   0x{0:02X}\n'.format(gyro))
 
 		except Exception as err:
 			raise IMUError('IMU init error: {0}'.format(err))

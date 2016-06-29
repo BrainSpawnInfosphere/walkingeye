@@ -14,8 +14,8 @@ import argparse
 import socket
 import gzip
 import multiprocessing as mp
-sys.path.insert(0, os.path.abspath('..'))
 
+sys.path.insert(0, os.path.abspath('..'))
 import lib.zmqclass as Zmq
 import lib.Messages as Msg
 
@@ -28,8 +28,9 @@ class Bag(object):
 	"""
 	def __init__(self, buffer_size=100):
 		"""
-		in: topic - name of topic to capture
-		    path - path to save file to, default is ./
+		in:
+			topic - name of topic to capture
+			path - path to save file to, default is ./
 		"""
 		self.buffer = []
 		self.serialize = Msg.serialize
@@ -129,11 +130,11 @@ def handleArgs():
 	topic or subscribe to a topic and print the messages.
 
 	Format:
-	  topic pub port topic message -r|-once
-	  topic echo port topic
+	- topic pub port topic message -r|-once
+	- topic echo port topic
 
 	Examples:
-	  bag 'imu' -p '../save_stuff'
+		bag 'imu' -p '../save_stuff'
 	""")
 
 	parser.add_argument('info', nargs=3, help='address port topic, ex. 1.1.1.1 9000 imu')
@@ -151,28 +152,5 @@ def main():
 	srv.start()
 
 
-def test_bag():
-	import random
-	import os
-	bag = Bag()
-	bag.open('imu')
-
-	num_msg = 105
-
-	for i in range(0, num_msg):
-		msg = Msg.Vector()
-		msg.update(x=random.uniform(-3, 3), y=random.uniform(10, 50), z=random.uniform(-20, 5))
-		bag.push(msg)
-	bag.close()
-
-	filename = 'imu.bag'
-	ans = bag.readFromFile(filename)
-	os.remove(filename)
-	# print 'Found {} messages in file {}'.format(len(ans), filename)
-	# print 'type:', type(ans[0])
-	# print ans[0]
-	assert len(ans) == num_msg and isinstance(ans[0], dict)
-
 if __name__ == '__main__':
 	main()
-	# test_bag()
