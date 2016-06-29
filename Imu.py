@@ -30,8 +30,8 @@ class Imu(mp.Process):
 	def __init__(self, host="localhost", port='9000'):
 		mp.Process.__init__(self)
 
-		logging.basicConfig(level=logging.INFO)
-		self.logger = logging.getLogger('robot')
+		logging.basicConfig(level=logging.DEBUG)
+		self.logger = logging.getLogger(__name__)
 
 		self.pubinfo = (host, port)
 
@@ -42,20 +42,20 @@ class Imu(mp.Process):
 				raise RuntimeError('Failed to initialize BNO055! Is the sensor connected?')
 
 			status, self_test, error = self.bno.get_system_status()
-			print('System status: {0}'.format(status))
-			print('Self test result (0x0F is normal): 0x{0:02X}'.format(self_test))
+			self.logger.debug('System status: {0}', status)
+			self.logger.debug('Self test result (0x0F is normal): 0x{0:02X}', self_test)
 			# Print out an error if system status is in error mode.
 			if status == 0x01:
-				print('System error: {0}'.format(error))
-				print('See datasheet section 4.3.59 for the meaning.')
+				self.logger.debug('System error: {0}', error)
+				self.logger.debug('See datasheet section 4.3.59 for the meaning.')
 
 			# Print BNO055 software revision and other diagnostic data.
-			# sw, bl, accel, mag, gyro = self.bno.get_revision()
-			# print('Software version:   {0}'.format(sw))
-			# print('Bootloader version: {0}'.format(bl))
-			# print('Accelerometer ID:   0x{0:02X}'.format(accel))
-			# print('Magnetometer ID:	0x{0:02X}'.format(mag))
-			# print('Gyroscope ID:	   0x{0:02X}\n'.format(gyro))
+			sw, bl, accel, mag, gyro = self.bno.get_revision()
+			self.logger.debug('Software version:   {0}', sw)
+			self.logger.debug('Bootloader version: {0}', bl)
+			self.logger.debug('Accelerometer ID:   0x{0:02X}', accel)
+			self.logger.debug('Magnetometer ID:	0x{0:02X}', mag)
+			self.logger.debug('Gyroscope ID:	   0x{0:02X}\n', gyro)
 
 		except Exception as err:
 			raise IMUError('IMU init error: {0}'.format(err))
@@ -107,7 +107,7 @@ class Imu(mp.Process):
 			# print('gravity[x,y,z]: {0:0.2F}\t{1:0.2F}\t{2:0.2F}'.format(x, y, z))
 			# Sleep for a second until the next reading.
 			# print('-----------------------------------\n\n')
-			print(msg)
+			self.logger.debug(msg)
 
 			pub.pub('imu', msg)
 
@@ -115,8 +115,15 @@ class Imu(mp.Process):
 
 
 def main():
+	serialPort = None
+	import platform
+	if platform.system().lower() == 'linux':
+		serialPort = ''
+	else:
+		serialPort = '/dev/tty.usbserial-A4004Qzg'
+
 	imu = Imu()
-	imu.init('/dev/tty.usbserial-A4004Qzg')
+	imu.init(serialPort)
 	imu.start()
 
 if __name__ == "__main__":
