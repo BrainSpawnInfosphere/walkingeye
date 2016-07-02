@@ -85,16 +85,25 @@ class ServoController(object):
 	servos = []
 	pwm_max = 600  # Max pulse length out of 4096
 	pwm_min = 200  # Min pulse length out of 4096
+	minAngle = -90  # not sure the right way to do this!
+	maxAngle = 90
 
-	def __init__(self):
-		for i in range(0, 16): servos[i] = Servo(i, 0, 0)
+	def __init__(self, freq=60):
+		self.pwm = PCA9685()
+		self.pwm.set_pwm_freq(freq)
+		for i in range(0, 16): self.servos[i] = Servo(i, 0, 0)
 
-	def moveServos(self):
+	def moveAllServos(self):
 		for i, servo in enumerate(self.servos):
 			pulse = self.angleToPWM(servo.angle, servo.minAngle, servo.maxAngle)
-			pwm.set_pwm(i, 0, pulse)
+			self.pwm.set_pwm(i, 0, pulse)
 
-	def angleToPWM(angle, mina, maxa):
+	def moveServo(self, i):
+		servo = self.servos[i]
+		pulse = self.angleToPWM(servo.angle, servo.minAngle, servo.maxAngle)
+		self.pwm.set_pwm(i, 0, pulse)
+
+	def angleToPWM(self, angle, mina, maxa):
 		"""
 		in:
 			- angle: angle to convert to pwm pulse
@@ -102,17 +111,20 @@ class ServoController(object):
 			- maxa: max servo angle
 		out: pwm pulse size (0-4096)
 		"""
+		mina = self.minAngle
+		maxa = self.maxAngle
 		# servo_min = 150  # Min pulse length out of 4096
 		# servo_max = 600  # Max pulse length out of 4096
 		m = (self.pwm_max - self.pwm_min) / (maxa - mina)
 		b = self.pwm_max - m * maxa
-		pulse = m * angle + b  # y=mx+b
+		pulse = m * angle + b  # y=m*x+b
 		return int(pulse)
 
 	def allStop(self):
-		pass
+		self.pwm.set_all_pwm(0,0x1010)
 
 def testRange(servo):
+	sc = ServoController()
 
 def handleArgs():
 	parser = argparse.ArgumentParser(description='A simple zero MQ publisher for joystick messages')
