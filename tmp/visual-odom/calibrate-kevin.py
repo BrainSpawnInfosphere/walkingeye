@@ -49,10 +49,10 @@ class CameraCalibration:
 		#print 'newcameramtx:',self.data['newcameramtx']
 		m = self.data['camera_matrix']
 		k = self.data['dist_coeff']
-		print 'focal length %3.1f %3.1f'%(m[0][0],m[1][1])
-		print 'image center %3.1f %3.1f'%(m[0][2],m[1][2])
-		print 'radial distortion %3.3f %3.3f'%(k[0][0],k[0][1])
-		print 'tangental distortion %3.3f %3.3f'%(k[0][2],k[0][3])
+		print 'focal length {0:3.1f} {1:3.1f}'.format(m[0][0], m[1][1])
+		print 'image center {0:3.1f} {1:3.1f}'.format(m[0][2], m[1][2])
+		print 'radial distortion {0:3.3f} {1:3.3f}'.format(k[0][0], k[0][1])
+		print 'tangental distortion {0:3.3f} {1:3.3f}'.format(k[0][2], k[0][3])
 
 	# Pass a gray scale image and find the markers (i.e., checkerboard, circles)
 	def findMarkers(self,gray,objpoints,imgpoints):
@@ -159,7 +159,7 @@ def handleArgs():
 def main():
 	imgs_folder = handleArgs()
 
-	calibration_images = '%s/*.png'%(imgs_folder)
+	calibration_images = '{0!s}/*.png'.format((imgs_folder))
 	images = []
 	images = glob.glob(calibration_images)
 	cal.calibrate(images)

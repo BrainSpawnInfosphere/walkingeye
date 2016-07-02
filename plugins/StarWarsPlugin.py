@@ -19,7 +19,7 @@ class Plugin(Module):
 	def loadSounds(self, kind):
 		filename = '/Users/kevin/github/jarvis/sounds/' + kind  # FIXME 20160627 path wrong
 		snds = glob.glob(filename + '/*.wav')
-		self.logger.info('   [>] %s loaded %d sound files' % (type, len(snds)))
+		self.logger.info('   [>] {0!s} loaded {1:d} sound files'.format(type, len(snds)))
 		return snds
 
 	def process(self, entity):
@@ -47,7 +47,7 @@ class Plugin(Module):
 		in: path to sound to play
 		out: none
 		"""
-		os.system('afplay %s' % (fname))
+		os.system('afplay {0!s}'.format((fname)))
 
 
 if __name__ == '__main__':

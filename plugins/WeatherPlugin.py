@@ -42,7 +42,7 @@ class Plugin(mod.Module):
 		if day > 2:
 			day = 2
 
-		resp = '%s will be a high of %d and low of %d with %d percent clouds and %d mile per hour winds'%(days[day],high,low,clouds,wind)
+		resp = '{0!s} will be a high of {1:d} and low of {2:d} with {3:d} percent clouds and {4:d} mile per hour winds'.format(days[day], high, low, clouds, wind)
 
 		return resp
 
@@ -87,7 +87,7 @@ class Plugin(mod.Module):
 		else:
 			temp = j['currently']['apparentTemperature']
 			rain = j['currently']['precipProbability']*100.0
-			resp = 'The weather is currently %d degrees with %d percent chance of rain'%(temp,rain)
+			resp = 'The weather is currently {0:d} degrees with {1:d} percent chance of rain'.format(temp, rain)
 
 		return resp
 

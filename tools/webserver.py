@@ -55,7 +55,7 @@ class GetHandler(BaseHTTPRequestHandler):
 		return results
 
 	def do_GET(self):
-		print 'Processing request: %s' % self.path
+		print 'Processing request: {0!s}'.format(self.path)
 		if self.path == '/':
 			response = self.page()
 			self.send_response(200)
@@ -63,7 +63,7 @@ class GetHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 			self.wfile.write(response)
 		else:
-			print "GetHandler doesn't support %s" % self.path
+			print "GetHandler doesn't support {0!s}".format(self.path)
 			self.send_response(404)
 			self.send_header('Content-type', 'text/html')
 			self.end_headers()

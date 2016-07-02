@@ -31,7 +31,7 @@ class FileStorage(object):
 			return len(self.db), d
 		except IOError:
 			# print '[-] YamlDoc: IOError'
-			raise FileStorageError('Could not open %s for reading' % (fname))
+			raise FileStorageError('Could not open {0!s} for reading'.format((fname)))
 
 	def writeYaml(self, filename, data=None):
 		"""
@@ -48,7 +48,7 @@ class FileStorage(object):
 			f.close()
 		except IOError:
 			# print '[-] YamlDoc: IOError'
-			raise FileStorageError('Could not open %s for writing' % (filename))
+			raise FileStorageError('Could not open {0!s} for writing'.format((filename)))
 
 	def readJson(self, fname):
 		"""
@@ -64,7 +64,7 @@ class FileStorage(object):
 			return len(self.db), data
 		except IOError:
 			# print '[-] YamlDoc: IOError'
-			raise FileStorageError('Could not open %s for reading' % (fname))
+			raise FileStorageError('Could not open {0!s} for reading'.format((fname)))
 
 	def writeJson(self, fname, data=None):
 		"""
@@ -79,7 +79,7 @@ class FileStorage(object):
 
 		except IOError:
 			# print '[-] YamlDoc: IOError'
-			raise FileStorageError('Could not open %s for writing' % (fname))
+			raise FileStorageError('Could not open {0!s} for writing'.format((fname)))
 
 	def getKey(self, keyName):
 		"""
