@@ -463,19 +463,19 @@ def simxAuxiliaryConsoleOpen(clientID, title, maxLines, mode, position, size, te
     '''
 
     consoleHandle = c_int()
-    if position != None:
+    if position is not None:
         c_position = (c_int*2)(*position)
     else:
         c_position = None
-    if size != None:
+    if size is not None:
         c_size = (c_int*2)(*size)
     else:
         c_size = None
-    if textColor != None:
+    if textColor is not None:
         c_textColor = (c_float*3)(*textColor)
     else:
         c_textColor = None
-    if backgroundColor != None:
+    if backgroundColor is not None:
         c_backgroundColor = (c_float*3)(*backgroundColor)
     else:
         c_backgroundColor = None
@@ -736,11 +736,11 @@ def simxDisplayDialog(clientID, titleText, mainText, dialogType, initialText, ti
     '''
     Please have a look at the function description/documentation in the V-REP user manual
     '''
-    if titleColors != None:
+    if titleColors is not None:
         c_titleColors  = (c_float*6)(*titleColors)
     else:
         c_titleColors  = None
-    if dialogColors != None:
+    if dialogColors is not None:
         c_dialogColors  = (c_float*6)(*dialogColors)
     else:
         c_dialogColors  = None
@@ -1090,7 +1090,7 @@ def simxCreateDummy(clientID, size, color, operationMode):
     '''
 
     handle = c_int()
-    if color != None:
+    if color is not None:
         c_color = (c_ubyte*12)(*color)
     else:
         c_color = None
