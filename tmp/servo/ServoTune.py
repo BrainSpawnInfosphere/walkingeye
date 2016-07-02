@@ -10,10 +10,15 @@ import math
 
 
 class Servo(object):
+	_angle = 0.0
+	_pos0 = 0.0
+	maxAngle = 90.0
+	minAngle = -90.0
+	
 	"""
 	Keeps info for servo. This only holds angle info.
 	"""
-	def __init__(self, pin, pos0, rate, limits=None):
+	def __init__(self, pos0=0.0, limits=None):
 		"""
 		pin [int ]- pin number the servo is attached too
 		pos0 [angle] - initial or neutral position
@@ -21,23 +26,30 @@ class Servo(object):
 		limits [angle, angle] - [optional] set the angular limits of the servo to avoid collision
 		"""
 		self.pos0 = pos0
-# 		self.rate = rate  # why?
-# 		self.pin = pin  # why?
+		self.angle = pos0
 
-		if limits:
-			self.setServoLimits(*limits)
-		else:
-			self.maxAngle = 90
-			self.minAngle = -90
+		if limits: self.setServoLimits(*limits)
 
-		self.angle = 0
-
-	def clamp(self, angle):
-		"""
-		clamps angle between min/max angle range
-		"""
-		return max(min(self.maxAngle, angle), self.minAngle)
-
+	@property
+	def angle(self):
+# 		print('@property angle')
+		return self._angle
+		
+	@angle.setter
+	def angle(self, angle):
+		self._angle = max(min(self.maxAngle, angle), self.minAngle)
+# 		print('@angle.setter: {} {}'.format(angle, self._angle))
+	
+	@property
+	def pos0(self):
+# 		print('@property pos0')
+		return self._pos0
+		
+	@angle.setter
+	def pos0(self, angle):
+		self._pos0 = max(min(self.maxAngle, angle), self.minAngle)
+# 		print('@pos0.setter: {} {}'.format(angle, self._angle))
+		
 	def setServoLimits(self, minAngle, maxAngle):
 		"""
 		sets maximum and minimum achievable angles.
@@ -62,12 +74,7 @@ class Servo(object):
 		in: angle [radians]
 		out: None
 		"""
-		angle = math.degrees(angle)
-
-		# clamp to limits
-		newAngle = clamp(angle, self.minAngle, self.maxAngle)
-
-		self.angle = newAngle
+		self.angle = math.degrees(angle)
 
 
 class ServoController(object):
@@ -84,7 +91,7 @@ class ServoController(object):
 	def __init__(self, freq=60):
 		self.pwm = PCA9685()
 		self.pwm.set_pwm_freq(freq)
-		for i in range(0, 16): self.servos.append(Servo(i, 0, 0))
+		for i in range(0, 16): self.servos.append(Servo())
 
 	def moveAllServos(self, angle=None):
 		for i, servo in enumerate(self.servos):
@@ -94,9 +101,9 @@ class ServoController(object):
 			self.pwm.set_pwm(i, 0, pulse)
 
 	def moveServo(self, i, angle=None):
+		servo = self.servos[i]
 		if angle is None:
 			angle = servo.angle
-		servo = self.servos[i]
 		pulse = self.angleToPWM(angle, servo.minAngle, servo.maxAngle)
 		self.pwm.set_pwm(i, 0, pulse)
 
@@ -128,6 +135,8 @@ class ServoController(object):
 			time.sleep(1)
 			# towerpro 100-660
 			# tg9e 130-650
+		self.allStop()
+
 
 def handleArgs():
 	parser = argparse.ArgumentParser(description='A simple zero MQ publisher for joystick messages')
@@ -139,12 +148,20 @@ def handleArgs():
 	
 
 def main():
+	channel = 15
 	sc = ServoController()
 	sc.allStop()
-# 	sc.test(15)
-	for angle in range(-90,90,10): 
-		sc.moveServo(15, angle)
-		time.sleep(1)
+# 	sc.test(channel)
+# 	for angle in range(-90,90,10): 
+# 		sc.moveServo(channel, angle)
+# 		time.sleep(1)
+	sc.servos[channel].angle = 145.0
+	sc.moveServo(channel)
+	time.sleep(1)
+	sc.servos[channel].angle = -90.0
+	sc.moveServo(channel)
+	time.sleep(1)
+	
 	sc.allStop()
 	
 	
