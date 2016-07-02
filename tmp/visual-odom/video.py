@@ -111,7 +111,7 @@ def main():
 		cam.size(args['window'][0],args['window'][1])
 
 	# cam.load('camera_params.npz')
-	if args['matrix'] != None:
+	if args['matrix'] is not None:
 		cam.load(args['matrix'])
 
 	while(cam.isOpened()):
