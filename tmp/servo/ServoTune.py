@@ -10,14 +10,14 @@ import math
 
 
 class Servo(object):
+	"""
+	Keeps info for servo. This only holds angle info.
+	"""
 	_angle = 0.0
 	_pos0 = 0.0
 	maxAngle = 90.0
 	minAngle = -90.0
 	
-	"""
-	Keeps info for servo. This only holds angle info.
-	"""
 	def __init__(self, pos0=0.0, limits=None):
 		"""
 		pin [int ]- pin number the servo is attached too
@@ -79,6 +79,8 @@ class Servo(object):
 
 class ServoController(object):
 	"""
+	A controller that talks to the i2c servo controller.
+	
 	Tried to optimize pwm params for TG9e servos.
 	TG9e = [130, 655]
 	"""
