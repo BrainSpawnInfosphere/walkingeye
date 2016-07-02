@@ -5,6 +5,7 @@
 # PS4 has 6 axes, 14 buttons, 1 hat
 # This program doesn't grab all buttons, just the most useful :)
 
+
 from __future__ import division
 from __future__ import print_function
 import sdl2

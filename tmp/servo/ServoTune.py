@@ -11,7 +11,7 @@ import math
 
 class Servo(object):
 	"""
-	Keeps info for servo. This only holds angle info.
+	Keeps info for servo. This only holds angle info and all angles are in degrees.
 	"""
 	_angle = 0.0
 	_pos0 = 0.0
@@ -20,9 +20,7 @@ class Servo(object):
 	
 	def __init__(self, pos0=0.0, limits=None):
 		"""
-		pin [int ]- pin number the servo is attached too
 		pos0 [angle] - initial or neutral position
-		rate - ???
 		limits [angle, angle] - [optional] set the angular limits of the servo to avoid collision
 		"""
 		self.pos0 = pos0
@@ -37,6 +35,9 @@ class Servo(object):
 		
 	@angle.setter
 	def angle(self, angle):
+		"""
+		Sets the servo angle and clamps it between [minAngle, maxAngle]
+		"""
 		self._angle = max(min(self.maxAngle, angle), self.minAngle)
 # 		print('@angle.setter: {} {}'.format(angle, self._angle))
 	
@@ -47,6 +48,9 @@ class Servo(object):
 		
 	@angle.setter
 	def pos0(self, angle):
+		"""
+		Sets the servo initial angle and clamps it between [minAngle, maxAngle]
+		"""
 		self._pos0 = max(min(self.maxAngle, angle), self.minAngle)
 # 		print('@pos0.setter: {} {}'.format(angle, self._angle))
 		
@@ -66,25 +70,23 @@ class Servo(object):
 		in: None
 		out: None
 		"""
-		self.angle = self.pos0
-
-	def moveToAngle(self, angle):
-		"""
-		Moves the sevo to desired angle
-		in: angle [radians]
-		out: None
-		"""
-		self.angle = math.degrees(angle)
+		self._angle = self._pos0
 
 
 class ServoController(object):
 	"""
-	A controller that talks to the i2c servo controller.
+	A controller that talks to the i2c servo controller. Normal RC servos operate between
+	max CCW (1.0 msec) to max CW (2.0 msec) in which these two positions should be ~180
+	degrees apart. However, every servo is a little different with most servos having 
+	>180 degrees of motion.
+	
 	
 	Tried to optimize pwm params for TG9e servos.
-	TG9e = [130, 655]
+	TG9e = [130, 655] -> [1ms, 2ms] and appears to be ~190 degrees
 	"""
 	servos = []
+	
+	# these are used to convert an angle [degrees] into a pulse
 	pwm_max = 655  # Max pulse length out of 4096
 	pwm_min = 130  # Min pulse length out of 4096
 	minAngle = -90  # not sure the right way to do this!
@@ -158,6 +160,9 @@ def main():
 # 		sc.moveServo(channel, angle)
 # 		time.sleep(1)
 	sc.servos[channel].angle = 145.0
+	sc.moveServo(channel)
+	time.sleep(1)
+	sc.servos[channel].reset()
 	sc.moveServo(channel)
 	time.sleep(1)
 	sc.servos[channel].angle = -90.0
