@@ -125,7 +125,7 @@ if __name__ == '__main__':
 				# setup video output
 				mpg4 = cv2.cv.CV_FOURCC('m', 'p', '4', 'v')
 				out = cv2.VideoWriter()
-				vfn = '%s_%d.mp4v' % (filename, video_idx)
+				vfn = '{0!s}_{1:d}.mp4v'.format(filename, video_idx)
 				h, w = img.shape[:2]
 				out.open(vfn, mpg4, 20.0, (w, h))
 				print '[+] start capture', vfn
@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
 		# Capture a single frame
 		elif ch == ord('f'):
-			fn = '%s/shot_%03d.png' % (shotdir, shot_idx)
+			fn = '{0!s}/shot_{1:03d}.png'.format(shotdir, shot_idx)
 			cv2.imwrite(fn, img)
 			print '[*] saved image to', fn
 			shot_idx += 1

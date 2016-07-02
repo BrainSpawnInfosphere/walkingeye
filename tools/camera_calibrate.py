@@ -68,10 +68,10 @@ class CameraCalibration(object):
 		# print 'newcameramtx:',self.data['newcameramtx']
 		m = self.data['camera_matrix']
 		k = self.data['dist_coeff']
-		print 'focal length %3.1f %3.1f' % (m[0][0], m[1][1])
-		print 'image center %3.1f %3.1f' % (m[0][2], m[1][2])
-		print 'radial distortion %3.3f %3.3f' % (k[0][0], k[0][1])
-		print 'tangental distortion %3.3f %3.3f' % (k[0][2], k[0][3])
+		print 'focal length {0:3.1f} {1:3.1f}'.format(m[0][0], m[1][1])
+		print 'image center {0:3.1f} {1:3.1f}'.format(m[0][2], m[1][2])
+		print 'radial distortion {0:3.3f} {1:3.3f}'.format(k[0][0], k[0][1])
+		print 'tangental distortion {0:3.3f} {1:3.3f}'.format(k[0][2], k[0][3])
 
 	# Pass a gray scale image and find the markers (i.e., checkerboard, circles)
 	def findMarkers(self, gray, objpoints, imgpoints):
@@ -163,14 +163,14 @@ def main():
 	args = handleArgs()
 	imgs_folder = args['path']
 
-	print('Searching %s for images' % imgs_folder)
+	print('Searching {0!s} for images'.format(imgs_folder))
 
 	# calibration_images = '%s/left*.jpg' % (imgs_folder)
-	calibration_images = '%s/shot_*.png' % (imgs_folder)
+	calibration_images = '{0!s}/shot_*.png'.format((imgs_folder))
 	images = []
 	images = glob.glob(calibration_images)
 
-	print('Number images found: %d' % len(images))
+	print('Number images found: {0:d}'.format(len(images)))
 	# print(images)
 
 	cal = CameraCalibration()

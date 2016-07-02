@@ -66,7 +66,7 @@ class App:
                 self.tracks = new_tracks
                 cv2.polylines(vis, [np.int32(tr) for tr in self.tracks], False, (0, 255, 0))
                 #draw_str(vis, (20, 20), 'track count: %d' % len(self.tracks))
-                print 'track count: %d' % len(self.tracks)
+                print 'track count: {0:d}'.format(len(self.tracks))
 
             if self.frame_idx % self.detect_interval == 0:
                 mask = np.zeros_like(frame_gray)

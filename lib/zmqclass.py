@@ -32,7 +32,7 @@ class Base(object):  # FIXME: 20160525 move printing statements to logging inste
 		"""
 		What version of the zmq (C++) library is python tied to?
 		"""
-		print('Using ZeroMQ version: %s' % (zmq.version_info()))
+		print('Using ZeroMQ version: {0!s}'.format((zmq.version_info())))
 
 	def _stop(self, msg='some pub/sub/srvc'):
 		"""
@@ -57,7 +57,7 @@ class Pub(Base):
 			self.socket.bind(self.bind_to)
 
 		except Exception, e:
-			error = '[-] Pub Error, %s' % (str(e))
+			error = '[-] Pub Error, {0!s}'.format((str(e)))
 			# print error
 			raise ZMQError(error)
 
@@ -97,12 +97,12 @@ class Sub(Base):
 				print("Receiving messages on ALL topics...")
 				self.socket.setsockopt(zmq.SUBSCRIBE, '')
 			else:
-				print("Receiving messages on topics: %s ..." % topics)
+				print("Receiving messages on topics: {0!s} ...".format(topics))
 				for t in topics:
 					self.socket.setsockopt(zmq.SUBSCRIBE, t)
 
 		except Exception, e:
-			error = '[-] Sub Error, %s' % (str(e))
+			error = '[-] Sub Error, {0!s}'.format((str(e)))
 			# print error
 			raise ZMQError(error)
 

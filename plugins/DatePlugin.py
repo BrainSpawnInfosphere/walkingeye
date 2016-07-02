@@ -19,7 +19,7 @@ class Plugin(mod.Module):
 		months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 		mon = months[t[1] - 1]
 		yr = t[0]
-		resp = 'The date is %d %s %d' % (day, mon, yr)
+		resp = 'The date is {0:d} {1!s} {2:d}'.format(day, mon, yr)
 		return resp
 
 

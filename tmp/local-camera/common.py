@@ -140,7 +140,7 @@ def Timer(msg):
     try:
         yield
     finally:
-        print "%.2f ms" % ((clock()-start)*1000)
+        print "{0:.2f} ms".format(((clock()-start)*1000))
 
 class StatValue:
     def __init__(self, smooth_coef = 0.5):

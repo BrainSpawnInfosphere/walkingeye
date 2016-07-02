@@ -142,9 +142,9 @@ class mjpgServer(BaseHTTPRequestHandler):
 			self.send_header('Content-type', 'text/html')
 			self.end_headers()
 			self.wfile.write('<html><head></head><body>')
-			self.wfile.write('<h1>http://%s:%s/cam.html</h1>' % self.server.server_address)
-			self.wfile.write('<img src="http://%s:%s/camera.mjpg"/>' % self.server.server_address)
-			self.wfile.write('<p>%s</p>' % (self.version_string()))
+			self.wfile.write('<h1>http://{0!s}:{1!s}/cam.html</h1>'.format(*self.server.server_address))
+			self.wfile.write('<img src="http://{0!s}:{1!s}/camera.mjpg"/>'.format(*self.server.server_address))
+			self.wfile.write('<p>{0!s}</p>'.format((self.version_string())))
 			self.wfile.write('</body></html>')
 			return
 
@@ -154,7 +154,7 @@ class mjpgServer(BaseHTTPRequestHandler):
 			self.send_header('Content-type', 'text/html')
 			self.end_headers()
 			self.wfile.write('<html><head></head><body>')
-			self.wfile.write('<h1>%s not found</h1>' % self.path)
+			self.wfile.write('<h1>{0!s} not found</h1>'.format(self.path))
 			self.wfile.write('</body></html>')
 
 
