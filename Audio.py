@@ -105,12 +105,13 @@ class SoundServer(mp.Process):
 	def sound(snd):
 		os.system('afplay {0!s}'.format((snd)))
 
-	"""
-	Main process run loop
-	in: none
-	out: none
-	"""
+
 	def run(self):
+		"""
+		Main process run loop
+		in: none
+		out: none
+		"""
 		# main loop
 		try:
 			# self.logger.info(str(self.name)+'['+str(self.pid)+'] started on '+
