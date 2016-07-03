@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 
-from Module import *
+import Module as Mod
 import glob
 # import wave
 import random
 import os
 
 
-class Plugin(Module):
+class Plugin(Mod.Module):
+	"""
+	Handles commands related to star wars.
+	"""
 	def __init__(self):
-		Module.__init__(self, 'tv_movie_sounds')
+		Mod.Module.__init__(self, 'tv_movie_sounds')
 		self.intent = 'tv_movie_sounds'
 
 		self.star_wars_sounds = self.loadSounds('star_wars')

@@ -116,7 +116,8 @@ if __name__ == '__main__':
 		ch = cv2.waitKey(20)
 
 		# Quit program using ESC or q
-		if ch == 27 or ch == ord('q'):
+		# if ch == 27 or ch == ord('q'):
+		if ch in [27, ord('q')]:
 			exit(0)
 
 		# Start/Stop capturing video

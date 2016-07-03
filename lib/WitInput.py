@@ -89,11 +89,10 @@ class WitInput(object):
 			# key = 'error'
 		elif len(msg['outcomes']) == 0:
 			self.logger.debug('outcome empty')
-		elif msg['outcomes'][0]['intent']:  # FIXME: 20150304, assume [0] is highest outcome for now
-			if msg['outcomes'][0]['confidence'] > confidenceLevel:
-				key = msg['outcomes'][0]['intent']
-				ent = msg['outcomes'][0]['entities']
-				cl = msg['outcomes'][0]['confidence']
+		elif msg['outcomes'][0]['intent'] and msg['outcomes'][0]['confidence'] > confidenceLevel:  # FIXME: 20150304, assume [0] is highest outcome for now
+			key = msg['outcomes'][0]['intent']
+			ent = msg['outcomes'][0]['entities']
+			cl = msg['outcomes'][0]['confidence']
 
 		ans = {}
 		ans['intent'] = key
