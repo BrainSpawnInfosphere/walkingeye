@@ -78,7 +78,7 @@ class Wit(object):
 				**kwargs
 			)
 		else:
-			raise WitError('This library does not support %s path' % {path})
+			raise WitError('This library does not support {0!s} path'.format({path}))
 
 		if rsp.status_code > 200:
 			raise WitError('Wit responded with status: ' + str(rsp.status_code) +

@@ -104,7 +104,7 @@ class Camera(object):
 			self.cameraType = 'video'  # opencv
 			self.camera = cv2.VideoCapture()
 		else:
-			raise VideoError('Error, %s not supported' % (cam))
+			raise VideoError('Error, {0!s} not supported'.format((cam)))
 
 		time.sleep(1)  # let camera warm-up
 

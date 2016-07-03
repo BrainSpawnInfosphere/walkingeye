@@ -1,45 +1,59 @@
+#!/usr/bin/env python
+
+# from __future__ import print_function
+# from __future__ import division
 from __future__ import print_function
 from __future__ import division
 import time
 from Adafruit_PCA9685 import PCA9685
-
-
-#!/usr/bin env python
-from __future__ import print_function
-from __future__ import division
 import math
 
 
 class Servo(object):
 	"""
-	Keeps info for servo.
+	Keeps info for servo. This only holds angle info and all angles are in degrees.
 	"""
-	def __init__(self, pin, pos0, rate, limits=None):
+	_angle = 0.0
+	_pos0 = 0.0
+	maxAngle = 90.0
+	minAngle = -90.0
+	
+	def __init__(self, pos0=0.0, limits=None):
 		"""
-		pin [int ]- pin number the servo is attached too
 		pos0 [angle] - initial or neutral position
-		rate - ???
-		limits [angle, angle] - [optional] set the angular limits of the servo
+		limits [angle, angle] - [optional] set the angular limits of the servo to avoid collision
 		"""
 		self.pos0 = pos0
-		self.rate = rate
-		self.pin = pin
+		self.angle = pos0
 
-		if limits:
-			self.setServoLimits(*limits)
-		else:
-			self.maxAngle = 90
-			self.minAngle = -90
+		if limits: self.setServoLimits(*limits)
 
-		# self.serial = serial
-		self.angle = 0
-
-	def clamp(self, angle):
+	@property
+	def angle(self):
+# 		print('@property angle')
+		return self._angle
+		
+	@angle.setter
+	def angle(self, angle):
 		"""
-		clamps angle between min/max angle range
+		Sets the servo angle and clamps it between [minAngle, maxAngle]
 		"""
-		return max(min(self.maxAngle, angle), self.minAngle)
-
+		self._angle = max(min(self.maxAngle, angle), self.minAngle)
+# 		print('@angle.setter: {} {}'.format(angle, self._angle))
+	
+	@property
+	def pos0(self):
+# 		print('@property pos0')
+		return self._pos0
+		
+	@angle.setter
+	def pos0(self, angle):
+		"""
+		Sets the servo initial angle and clamps it between [minAngle, maxAngle]
+		"""
+		self._pos0 = max(min(self.maxAngle, angle), self.minAngle)
+# 		print('@pos0.setter: {} {}'.format(angle, self._angle))
+		
 	def setServoLimits(self, minAngle, maxAngle):
 		"""
 		sets maximum and minimum achievable angles.
@@ -56,51 +70,45 @@ class Servo(object):
 		in: None
 		out: None
 		"""
-		self.angle = self.pos0
-
-	# def getServoAngle(self):
-	# 	"""
-	# 	Return the current commanded servo angle
-	# 	in: None
-	# 	out: servo angle [degrees]
-	# 	"""
-	# 	return self.angle
-
-	def moveToAngle(self, angle):
-		"""
-		Moves the sevo to desired angle
-		in: angle [radians]
-		out: None
-		"""
-		angle = math.degrees(angle)
-
-		# clamp to limits
-		newAngle = clamp(angle, self.minAngle, self.maxAngle)
-
-		if newAngle != self.angle:
-			self.angle = newAngle
+		self._angle = self._pos0
 
 
 class ServoController(object):
+	"""
+	A controller that talks to the i2c servo controller. Normal RC servos operate between
+	max CCW (1.0 msec) to max CW (2.0 msec) in which these two positions should be ~180
+	degrees apart. However, every servo is a little different with most servos having 
+	>180 degrees of motion.
+	
+	
+	Tried to optimize pwm params for TG9e servos.
+	TG9e = [130, 655] -> [1ms, 2ms] and appears to be ~190 degrees
+	"""
 	servos = []
-	pwm_max = 600  # Max pulse length out of 4096
-	pwm_min = 200  # Min pulse length out of 4096
+	
+	# these are used to convert an angle [degrees] into a pulse
+	pwm_max = 655  # Max pulse length out of 4096
+	pwm_min = 130  # Min pulse length out of 4096
 	minAngle = -90  # not sure the right way to do this!
 	maxAngle = 90
 
 	def __init__(self, freq=60):
 		self.pwm = PCA9685()
 		self.pwm.set_pwm_freq(freq)
-		for i in range(0, 16): self.servos[i] = Servo(i, 0, 0)
+		for i in range(0, 16): self.servos.append(Servo())
 
-	def moveAllServos(self):
+	def moveAllServos(self, angle=None):
 		for i, servo in enumerate(self.servos):
-			pulse = self.angleToPWM(servo.angle, servo.minAngle, servo.maxAngle)
+			if angle is None:
+				angle = servo.angle
+			pulse = self.angleToPWM(angle, servo.minAngle, servo.maxAngle)
 			self.pwm.set_pwm(i, 0, pulse)
 
-	def moveServo(self, i):
+	def moveServo(self, i, angle=None):
 		servo = self.servos[i]
-		pulse = self.angleToPWM(servo.angle, servo.minAngle, servo.maxAngle)
+		if angle is None:
+			angle = servo.angle
+		pulse = self.angleToPWM(angle, servo.minAngle, servo.maxAngle)
 		self.pwm.set_pwm(i, 0, pulse)
 
 	def angleToPWM(self, angle, mina, maxa):
@@ -120,11 +128,19 @@ class ServoController(object):
 		pulse = m * angle + b  # y=m*x+b
 		return int(pulse)
 
-	def allStop(self):
-		self.pwm.set_all_pwm(0,0x1010)
+	def allStop(self):  # FIXME: 20160702 can i stop individual servos too?
+		self.pwm.set_all_pwm(0,0x1000)
+		
+	def checkPwmRange(self, channel):
+		self.allStop()
+		for i in range(0, 700, 10):
+			print('pos: {}'.format(i))
+			self.pwm.set_pwm(channel, 0, i)
+			time.sleep(1)
+			# towerpro 100-660
+			# tg9e 130-650
+		self.allStop()
 
-def testRange(servo):
-	sc = ServoController()
 
 def handleArgs():
 	parser = argparse.ArgumentParser(description='A simple zero MQ publisher for joystick messages')
@@ -133,29 +149,28 @@ def handleArgs():
 	parser.add_argument('-v', '--verbose', help='display info to screen', action='store_true')
 	args = vars(parser.parse_args())
 	return args
-
-# channel = 3
-# pwm = PCA9685()
-# pwm.set_pwm_freq(60)  # not sure why ... should be 50 Hz
-#
-# pwm.set_pwm(channel, 0, 150)
-# time.sleep(3)
-# pwm.set_pwm(channel, 0, 600)
-# time.sleep(3)
-#
-# angle = -90.0
-#
-# while angle < 90.0:
-# 	pulse = angleToPWM(angle, -90, 90)
-# 	pwm.set_pwm(channel, 0, pulse)
-# 	time.sleep(0.1)  # 50 Hz update rate
-# 	angle += 5.0
+	
 
 def main():
-	args = handleArgs()
-	mins, maxs = args['limits']
-	pwm = PCA9685()
-	pwm.set_pwm_freq(60)
-
+	channel = 15
+	sc = ServoController()
+	sc.allStop()
+# 	sc.test(channel)
+# 	for angle in range(-90,90,10): 
+# 		sc.moveServo(channel, angle)
+# 		time.sleep(1)
+	sc.servos[channel].angle = 145.0
+	sc.moveServo(channel)
+	time.sleep(1)
+	sc.servos[channel].reset()
+	sc.moveServo(channel)
+	time.sleep(1)
+	sc.servos[channel].angle = -90.0
+	sc.moveServo(channel)
+	time.sleep(1)
+	
+	sc.allStop()
+	
+	
 if __name__ == "__main__":
 	main()

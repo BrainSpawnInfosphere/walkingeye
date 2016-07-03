@@ -21,7 +21,7 @@ class Plugin(mod.Module):
 		else:
 			ampm = 'am'
 		mins = t[4]
-		resp = 'The current time is %d %d %s' % (hrs, mins, ampm)
+		resp = 'The current time is {0:d} {1:d} {2!s}'.format(hrs, mins, ampm)
 		return resp
 
 

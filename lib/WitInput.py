@@ -60,7 +60,7 @@ class WitInput(object):
 			self.mic.getAudio()
 			kv = self.wit.speech(self.mic.audio)
 			ans = self.getKey(kv, confidence)
-			print('Got: %s' % ans)
+			print('Got: {0!s}'.format(ans))
 			# if ps: self.playSound('../sounds/misc/beep_lo.wav')
 			return ans
 		except:

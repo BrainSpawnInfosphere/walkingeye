@@ -11,7 +11,7 @@ class Module(object):
 		logging.basicConfig(level=logging.INFO)
 		self.logger = logging.getLogger('robot')
 		self.intent = mod_name
-		self.logger.info('[+] Init module %s' % (self.intent))
+		self.logger.info('[+] Init module {0!s}'.format((self.intent)))
 
 	def handleIntent(self, intent):
 		"""

@@ -128,7 +128,7 @@ class Particle(object):
         self.w = w
 
     def __repr__(self):
-        return "(%f, %f, w=%f)" % (self.x, self.y, self.w)
+        return "({0:f}, {1:f}, w={2:f})".format(self.x, self.y, self.w)
 
     @property
     def xy(self):

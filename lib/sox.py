@@ -35,7 +35,7 @@ class Microphone(object):
 		in: file name
 		out: none
 		"""
-		cmd = 'play -q %s' % fileName
+		cmd = 'play -q {0!s}'.format(fileName)
 		call(cmd, shell=True)
 
 	def readAudio(self, fileName, chunk=1024):
@@ -83,7 +83,7 @@ class Microphone(object):
 		# rec -q -t wav -c 1 test.wav rate 8k silence 1 0.1 3% 1 3.0 3%
 		temp = tempfile.NamedTemporaryFile().name
 		self.logger.debug('Openned tempfile: %s', temp)
-		cmd = 'rec -q -t wav -c 1 %s rate 16k silence 1 0.1 %s 1 3.0 %s' % (temp, self.threshold, self.threshold)
+		cmd = 'rec -q -t wav -c 1 {0!s} rate 16k silence 1 0.1 {1!s} 1 3.0 {2!s}'.format(temp, self.threshold, self.threshold)
 		call(cmd, shell=True)
 
 		# print 'ok ... got it!'

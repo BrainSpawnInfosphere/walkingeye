@@ -1,0 +1,5 @@
+# config file for https://www.quantifiedcode.com
+tmp/*
+old/*
+otherLibs/*
+

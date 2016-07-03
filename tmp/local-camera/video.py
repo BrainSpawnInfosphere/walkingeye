@@ -186,13 +186,13 @@ if __name__ == '__main__':
         for i, cap in enumerate(caps):
             ret, img = cap.read()
             imgs.append(img)
-            cv2.imshow('capture %d' % i, img)
+            cv2.imshow('capture {0:d}'.format(i), img)
         ch = 0xFF & cv2.waitKey(1)
         if ch == 27:
             break
         if ch == ord(' '):
             for i, img in enumerate(imgs):
-                fn = '%s/shot_%d_%03d.bmp' % (shotdir, i, shot_idx)
+                fn = '{0!s}/shot_{1:d}_{2:03d}.bmp'.format(shotdir, i, shot_idx)
                 cv2.imwrite(fn, img)
                 print fn, 'saved'
             shot_idx += 1
