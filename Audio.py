@@ -101,7 +101,8 @@ class SoundServer(mp.Process):
 				return txt
 		return ''
 
-	def sound(self, snd):
+	@staticmethod
+	def sound(snd):
 		os.system('afplay {0!s}'.format((snd)))
 
 	"""

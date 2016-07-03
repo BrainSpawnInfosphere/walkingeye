@@ -28,7 +28,8 @@ class Base(object):  # FIXME: 20160525 move printing statements to logging inste
 
 		# self.poller = zmq.Poller()
 
-	def zmq_version(self):
+	@staticmethod
+	def zmq_version():
 		"""
 		What version of the zmq (C++) library is python tied to?
 		"""

@@ -77,7 +77,8 @@ class Bag(object):
 		# print 'Wrote {} files'.format(len(self.buffer))
 		self.buffer = []
 
-	def readFromFile(self, file):
+	@staticmethod
+	def readFromFile(file):
 		ans = []
 		try:
 			with gzip.open(file, 'r') as f:

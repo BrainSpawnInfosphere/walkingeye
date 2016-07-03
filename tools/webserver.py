@@ -48,7 +48,8 @@ PORT = 8800
 
 
 class GetHandler(BaseHTTPRequestHandler):
-	def page(self):
+	@staticmethod
+	def page():
 		fd = open('node/head/face.htm', 'r')
 		results = fd.read()
 		fd.close()

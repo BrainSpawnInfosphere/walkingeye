@@ -86,7 +86,8 @@ class VideoOdom(object):
 		# save_pts = []
 		# while(cam.isOpened()):
 
-	def featureDetection(self, im):
+	@staticmethod
+	def featureDetection(im):
 		# Initiate FAST object with default values
 		# fast = cv2.FastFeatureDetector_create(20,True)
 		# fast = cv2.FastFeatureDetector_create()

@@ -29,7 +29,8 @@ class Microphone(object):
 			self.audio.close()
 		self.logger.debug('microphone closing')
 
-	def playAudioFile(self, fileName):
+	@staticmethod
+	def playAudioFile(fileName):
 		"""
 		Plays back the captured audio
 		in: file name

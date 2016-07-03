@@ -1,5 +1,8 @@
 # config file for https://www.quantifiedcode.com
 tmp/*
 old/*
+**/old/*
 otherLibs/*
-
+test/*
+quadruped/vrep/*
+docs/*
