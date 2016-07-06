@@ -65,8 +65,9 @@ class CrawlGait(Gait):
 		return speed
 
 	def eachLeg(self, leg, index, delta, deltaRot):
-		legnum = 3
+		legnum = 0
 		rest = self.legs[leg].resting_position
+		# print('rest', rest)
 
 		indexmod = (index + self.legOffsets[leg]) % len(self.z_profile)
 		z = self.z_profile[indexmod] * 40.0  # scale ???

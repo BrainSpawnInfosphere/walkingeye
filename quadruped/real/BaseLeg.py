@@ -61,7 +61,7 @@ class Leg(object):
 		r = T(params, d2r(phi))
 		foot = r.dot(np.array([Lt, 0, 0, 1]))  # ok [ 37.4766594  37.4766594 -63. 1.]
 
-		return foot
+		return foot[0:-1]  # DH return vector size 4, only grabe first 3 (x,y,z)
 
 	def ik_to(self, x, y, z):
 		"""
@@ -81,7 +81,7 @@ class Leg(object):
 
 		g -= pi  # fix to align fk and ik
 
-		print('ik angles:', r2d(a), r2d(b), r2d(g))
+		# print('ik angles:', r2d(a), r2d(b), r2d(g))
 
 		return a, b, g  # coxaAngle, femurAngle, tibiaAngle
 

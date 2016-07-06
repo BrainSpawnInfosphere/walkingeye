@@ -69,7 +69,7 @@ class RobotController(object):
 			# if not msg: break  # don't move if no command
 			ret = self.move()
 			# self.robot.finish_iteration()
-			time.sleep(0.1)
+			time.sleep(1)
 
 
 def run():
