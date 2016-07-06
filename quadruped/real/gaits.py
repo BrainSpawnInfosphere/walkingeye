@@ -100,6 +100,8 @@ class CrawlGait(Gait):
 		i = self.i
 		for legNum in [0, 2, 1, 3]:  # order them diagonally
 			self.eachLeg(legNum, i, delta, deltaRot)  # move each leg appropriately
+			# self.robot.servoCtrl.moveServo()
+		# self.robot.servoCtrl.moveAllServos()
 		self.i = (i + 1) % gaitLength
 
 		return self.i

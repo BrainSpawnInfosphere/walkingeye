@@ -100,11 +100,14 @@ class ServoController(object):
 		for i in range(0, 16): self.servos.append(Servo())
 		self.allStop()
 
+	def __del__(self):
+		self.allStop()
+
 	# def moveAllServos(self, angle=None):
 	# 	for i, servo in enumerate(self.servos):
 	# 		if angle is None:
 	# 			angle = servo.angle
-	# 		pulse = self.angleToPWM(angle, servo.minAngle, servo.maxAngle)
+	# 		pulse = self.angleToPWM(angle)
 	# 		self.pwm.set_pwm(i, 0, pulse)
 
 	def moveServo(self, i, angle=None):
