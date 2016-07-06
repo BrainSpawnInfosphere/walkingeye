@@ -30,7 +30,7 @@ class CrawlGait(Gait):
 	"""
 	# [0, 0, 0, 0, 0, 10, 40, 40, 30, 7]
 	# z_profile = [0.5,1,1,0.5,0,0,0,0,0,0,0,0]  # 12 steps, normalized leg height
-	z_profile = [0,0,0,0,0,0,0,0,0,0.5,1,0.5]  # 12 steps, normalized leg height
+	z_profile = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 0.5]  # 12 steps, normalized leg height
 
 	def __init__(self, robot):
 		Gait.__init__(self, robot)
@@ -56,7 +56,8 @@ class CrawlGait(Gait):
 
 		todo - just turn this into a lookup table ... why calculate it?
 		"""
-		if prog < 0.0 or prog > 1.0:
+		# if prog < 0.0 or prog > 1.0:
+		if 0.0 < prog < 1.0:
 			Exception('prog too high: {}'.format(prog))
 		speed = 0.0
 		if prog <= 0.75: speed = 4.0 / 3.0 * prog - 0.5
@@ -83,14 +84,15 @@ class CrawlGait(Gait):
 		newpos = self.legs[leg].resting_position + move
 		# if leg == 2: print 'prog, scale', prog, scale
 		# if leg == 2: print 'move, newpos:', move, newpos
-		if leg == legnum: print('[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, move[0],move[1],move[2]))
-		# if leg == legnum: print '[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, newpos[0],newpos[1],newpos[2])
+		# if leg == legnum: print('[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, move[0],move[1],move[2]))
+		if leg == legnum: print('[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, newpos[0],newpos[1],newpos[2]))
 
 		self.legs[leg].move_to_pos(*(newpos))
 
 	def reset(self):
 		for leg in self.legs:
 			leg.reset()
+		# pass
 
 	def iterate(self, delta, deltaRot):
 		gaitLength = len(self.z_profile)

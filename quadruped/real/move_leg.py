@@ -7,7 +7,7 @@ import sys
 import os
 from gaits import CrawlGait
 from realRobot import QuadrupedRobot
-sys.path.insert(0, os.path.abspath('../../..'))
+sys.path.insert(0, os.path.abspath('../..'))
 import lib.zmqclass as Zmq
 import lib.FileStorage as Fs
 
@@ -29,45 +29,18 @@ class RobotController(object):
 
 		self.startTime = time.time()
 		# self.trotgait = TrotGait(self.robot)
-		self.trotgait = CrawlGait(self.robot)
-		self.trotgait.reset()
+		# self.gait = CrawlGait(self.robot)
+		# self.gait.reset()
 
 	def init(self):
 		"""
 		setup everything before main loop.
 		"""
 		self.robot.init()
-		self.sub = Zmq.Sub('ctlr')
+		# self.sub = Zmq.Sub('ctlr')
 
-	def trot(self):
-		"""
-		executes a step of the "trot" gait.
-		"""
-		return self.trotgait.iterate([self.dx, self.dy, self.dz], self.drot)
-
-	def step(self):
-		"""
-		runs one iteration of the code, usually called in a loop
-		"""
-		self.dx = 0.0
-		self.dy = 0.0
-		self.dz = 0.0
-		self.drot[2] = -0.50  # i think these are rates not positions
-
-		ret = 1
-
-		topic, msg = self.sub.recv()
-		if msg:
-			print('msg:', msg)
-			self.dx = msg['linear']['x']
-		# 	self.dy = msg['linear']['y']
-		# 	self.dz = msg['linear']['z']
-
-		while ret != 0:  # complete one full gait and be stable
-			# if not msg: break  # don't move if no command
-			ret = self.trot()
-			self.robot.finish_iteration()
-			time.sleep(0.05)
+	def moveLeg(self):
+		
 
 
 def run():
@@ -82,6 +55,7 @@ def run():
 
 	while True:
 		cntlr.step()
+
 
 if __name__ == "__main__":
 	run()

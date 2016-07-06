@@ -105,7 +105,6 @@ class SoundServer(mp.Process):
 	def sound(snd):
 		os.system('afplay {0!s}'.format((snd)))
 
-
 	def run(self):
 		"""
 		Main process run loop

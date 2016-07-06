@@ -1,13 +1,14 @@
 {
   "width" : 100.0,
-  "length" : 150.0,
+  "length" : 76.0,
   "height" : 30.0,
-  "femurLength" : 46.0,
-  "tibiaLength" : 92.0,
+  "coxaLength" : 10.0,
+  "femurLength" : 43.0,
+  "tibiaLength" : 63.0,
   "femurServoLimits" : [-90.0, 65.0],
   "tibiaServoLimits" : [-55.0, 90.0],
   "shoulderServoLimits" : [-80.0, 80.0],
   "genericServoRate" : -13.88,
-  "resting_heigth" : -50.0,
+  "resting_heigth" : -72.0,
   "cg_offet_x" : 0.0
 }
