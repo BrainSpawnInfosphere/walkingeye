@@ -13,8 +13,8 @@ from __future__ import division
 import platform
 
 if platform.system().lower() == 'linux':
-	from Adafruit_Python_PCA9685 import PCA9685
-	from Adafruit_MCP230XX import Adafruit_MCP230XX as MCP230XX
+	from Adafruit_PCA9685 import PCA9685
+# 	from Adafruit_MCP230XX import Adafruit_MCP230XX as MCP230XX
 	import RPi.GPIO as Gpio  # PWM
 	# from RPi.GPIO import PWM, setmode, setup, cleanup, BCM, OUT
 	# import Adafruit_MCP230xx  # if more i2c i/o needed
