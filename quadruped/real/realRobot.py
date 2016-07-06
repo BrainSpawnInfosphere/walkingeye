@@ -98,6 +98,7 @@ class ServoController(object):
 		self.pwm = PCA9685()
 		self.pwm.set_pwm_freq(freq)
 		for i in range(0, 16): self.servos.append(Servo())
+		self.allStop()
 
 	# def moveAllServos(self, angle=None):
 	# 	for i, servo in enumerate(self.servos):

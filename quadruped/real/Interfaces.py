@@ -30,6 +30,7 @@ else:
 		def __init__(self): pass
 		def set_pwm_freq(self, a): logger.debug('set_pwm_freq: %d', a)
 		def set_pwm(self, a, b, c): logger.debug('set_pwm[%d]: %d %d', a, b, c)
+		def set_all_pwm(self, a, b): pass
 
 	class MCP230XX(object):  # mux
 		def __init__(self, a, b, c): pass
