@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+##############################################
+# The MIT License (MIT)
+# Copyright (c) 2016 Kevin Walchko
+# see LICENSE for full details
+##############################################
 
 """
 This allows either real or fake interfaces to low level hardware. When actually
@@ -11,10 +16,12 @@ from __future__ import print_function
 from __future__ import division
 
 import platform
+import os
 
-if platform.system().lower() in ['linux', 'linux2']:
+# I don't want this run in macOS or Travis.ci ... only on a linux machine
+if platform.system().lower() in ['linux', 'linux2'] and not os.getenv('TRAVIS', False):
 	from Adafruit_PCA9685 import PCA9685
-# 	from Adafruit_MCP230XX import Adafruit_MCP230XX as MCP230XX
+	# from Adafruit_MCP230XX import Adafruit_MCP230XX as MCP230XX
 	import RPi.GPIO as Gpio  # PWM
 	# from RPi.GPIO import PWM, setmode, setup, cleanup, BCM, OUT
 	# import Adafruit_MCP230xx  # if more i2c i/o needed
@@ -23,8 +30,9 @@ else:
 	print('************ Using FAKE interfaces ************')
 
 	import logging
-	logging.basicConfig(level=logging.DEBUG)
-	logger = logging.getLogger('fake')
+	# logging.basicConfig(level=logging.DEBUG)
+	logging.basicConfig(level=logging.ERROR)
+	logger = logging.getLogger(__name__)
 
 	class PCA9685(object):
 		def __init__(self): pass

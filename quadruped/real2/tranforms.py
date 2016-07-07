@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+##############################################
+# The MIT License (MIT)
+# Copyright (c) 2016 Kevin Walchko
+# see LICENSE for full details
+##############################################
 
 from __future__ import print_function
 from __future__ import division
@@ -87,10 +92,6 @@ def rotate(matrix, axis, theta, center=None):
 	relocated = np.add(rotated, center)
 	return relocated
 
-# test = [[1], [0], [0]]
-
-# print (rotate(test, 'y', pi, [0, 1, 0]))
-
 
 def rot(a, alpha, S, theta):
 	"""
@@ -128,29 +129,9 @@ def T(params, phi):
 	return t
 
 
-def ik_to(x, y, z, Lc, Lf, Lt):
-	"""
-	Calculates the inverse kinematics from a given foot coordinate (x,y,z)[mm]
-	and returns the joint angles
-	"""
-	a = atan2(y, x)
-	f = sqrt(x**2 + y**2) - Lc
-	b1 = atan2(z, f)
-	d = sqrt(f**2 + z**2)
-	# print(a,f,b1,d)
-	# print((Lf**2 + d**2 - Lt**2),(2 * Lf * d))
-	# print((Lf**2 + d**2 - Lt**2)/(2 * Lf * d))
-	b2 = acos((Lf**2 + d**2 - Lt**2) / (2.0 * Lf * d))
-	b = b1 + b2
-	g = acos((Lf**2 + Lt**2 - d**2) / (2.0 * Lf * Lt))
-
-	g -= pi  # fix to align fk and ik
-
-	return a, b, g  # coxaAngle, femurAngle, tibiaAngle
-
-
-def test():
+def test_t_r():
 	# works for Crane's Book, p 41
+	ans = np.array([24.11197183, 20.11256511, 18.16670832, 1.])
 	params = [
 		# a_ij alpha_ij  S_j  theta_j
 		[0,    d2r(90),  5.9, 5*pi/6],  # frame 12
@@ -161,53 +142,36 @@ def test():
 	]
 
 	r = T(params, 5*pi/4)
-	print(r)
-	print(r.dot(np.array([5, 3, 7, 1])))
-
-
-def test2():
-	Lc = 10.0
-	Lf = 43.0
-	Lt = 63.0
-	phi = 45
-	theta2 = 0
-	theta3 = -90
-	params = [
-		# a_ij alpha_ij  S_j  theta_j
-		[Lc,   d2r(90),   0,   d2r(theta2)],  # frame 12
-		[Lf,    d2r(0),   0,   d2r(theta3)]   # 23
-	]
-	r = T(params, d2r(phi))
-	foot = r.dot(np.array([Lt, 0, 0, 1]))  # ok [ 37.4766594  37.4766594 -63. 1.]
 	# print(r)
-	print('foot loc:', foot)  # ok [ 37.4766594  37.4766594 -63. 1.]
+	pos = r.dot(np.array([5, 3, 7, 1]))
+	res = np.linalg.norm(ans - pos)
+	# print('res:', res)
+	assert(res < 0.000001)
 
-	d = foot - np.array([37.4766594, 37.4766594, -63., 1.])
-	diff = np.inner(d, d)
-	print('diff:', diff)
+
+# def test2():
+# 	Lc = 10.0
+# 	Lf = 43.0
+# 	Lt = 63.0
+# 	phi = 45
+# 	theta2 = 0
+# 	theta3 = -90
+# 	params = [
+# 		# a_ij alpha_ij  S_j  theta_j
+# 		[Lc,   d2r(90),   0,   d2r(theta2)],  # frame 12
+# 		[Lf,    d2r(0),   0,   d2r(theta3)]   # 23
+# 	]
+# 	r = T(params, d2r(phi))
+# 	foot = r.dot(np.array([Lt, 0, 0, 1]))  # ok [ 37.4766594  37.4766594 -63. 1.]
+# 	# print(r)
+# 	print('foot loc:', foot)  # ok [ 37.4766594  37.4766594 -63. 1.]
+#
+# 	d = foot - np.array([37.4766594, 37.4766594, -63., 1.])
+# 	diff = np.inner(d, d)
+# 	print('diff:', diff)
 
 
-def test_fk_ik():
-	Lc = 10.0
-	Lf = 43.0
-	Lt = 63.0
-	phi = -45
-	theta2 = -10
-	theta3 = 0
 
-	print('input angles:', phi, theta2, theta3)
 
-	params = [
-		# a_ij alpha_ij  S_j  theta_j
-		[Lc,   d2r(90),   0,   d2r(theta2)],  # frame 12
-		[Lf,    d2r(0),   0,   d2r(theta3)]   # 23
-	]
-	r = T(params, d2r(phi))
-	foot = r.dot(np.array([Lt, 0, 0, 1]))  # ok [ 37.4766594  37.4766594 -63. 1.]
-	# print(r)
-	print('foot loc:', foot)  # ok [ 37.4766594  37.4766594 -63. 1.]
-
-	a, b, g = ik_to(foot[0], foot[1], foot[2], Lc, Lf, Lt)
-	print('ik angles:', r2d(a), r2d(b), r2d(g))
-
-test_fk_ik()
+if __name__ == "__main__":
+	testt_t_r()
