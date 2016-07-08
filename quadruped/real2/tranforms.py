@@ -63,34 +63,34 @@ def rotateAroundCenter(matrix, axis, theta):
 	return np.dot(rot, matrix)
 
 
-def rotate(matrix, axis, theta, center=None):
-	"""
-	how is this different???
-	in:
-		matix - ??
-		axis - axis of rotation??
-		theta - angle of rotation (rads)
-	out: ???
-	"""
-	if not center:
-		center = np.matrix([[0], [0], [0]])
-	else:
-		center = np.matrix(center)
-	matrix = np.matrix(matrix)
-	if matrix.shape[0] == 1:
-		matrix = np.transpose(matrix)
-
-	if center.shape[0] == 1:
-		center = np.transpose(center)
-	# print center
-	# print matrix
-
-	dislocated = np.subtract(matrix, center)
-	# print dislocated
-	rotated = rotateAroundCenter(dislocated, axis, theta)
-	# print rotated
-	relocated = np.add(rotated, center)
-	return relocated
+# def rotate(matrix, axis, theta, center=None):
+# 	"""
+# 	how is this different???
+# 	in:
+# 		matix - ??
+# 		axis - axis of rotation??
+# 		theta - angle of rotation (rads)
+# 	out: ???
+# 	"""
+# 	if not center:
+# 		center = np.matrix([[0], [0], [0]])
+# 	else:
+# 		center = np.matrix(center)
+# 	matrix = np.matrix(matrix)
+# 	if matrix.shape[0] == 1:
+# 		matrix = np.transpose(matrix)
+#
+# 	if center.shape[0] == 1:
+# 		center = np.transpose(center)
+# 	# print center
+# 	# print matrix
+#
+# 	dislocated = np.subtract(matrix, center)
+# 	# print dislocated
+# 	rotated = rotateAroundCenter(dislocated, axis, theta)
+# 	# print rotated
+# 	relocated = np.add(rotated, center)
+# 	return relocated
 
 
 def rot(a, alpha, S, theta):

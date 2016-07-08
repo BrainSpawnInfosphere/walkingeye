@@ -18,6 +18,8 @@ from tranforms import rotateAroundCenter, distance
 class CrawlGait(object):
 	"""
 	Slow stable, 3 legs on the ground at all times
+
+	This solution works but only allows 1 gait ... need to have multiple gaits
 	"""
 	z_profile = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 0.5]  # 12 steps, normalized leg height
 	scale_profile = [-0.5, -0.39, -0.28, -0.17, -0.06, 0.06, 0.17, 0.28, 0.39, 0.5, 0.17, -0.17]  # FIXME: wrong??
