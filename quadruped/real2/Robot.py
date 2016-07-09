@@ -11,6 +11,8 @@ from Leg import Leg
 import time
 import numpy
 from tranforms import rotateAroundCenter, distance
+import logging
+logging.getLogger("Adafruit_I2C").setLevel(logging.ERROR)
 
 ##########################
 
@@ -60,7 +62,7 @@ class CrawlGait(object):
 		index - the index of the gait: 0-n
 		cmd - [x,y,z_rot]
 		"""
-		legnum = 2
+		legnum = 0
 		delta = list(cmd)  # need to make a copy
 		zrot = float(delta[2])
 		delta[2] = 0
@@ -114,13 +116,15 @@ class CrawlGait(object):
 	def command(self, cmd):
 		for i in range(0, len(self.z_profile)):
 			self.step(i, cmd)
+			time.sleep(0.25)
 
 	def step(self, i, cmd):
 		"""
 		"""
-		for legNum in [0, 2, 1, 3]:  # order them diagonally
-			self.eachLeg(legNum, i, cmd)  # move each leg appropriately
-			time.sleep(0.01)  # need some time to wait for servos to move
+		# for legNum in [0, 2, 1, 3]:  # order them diagonally
+		# 	self.eachLeg(legNum, i, cmd)  # move each leg appropriately
+		# 	time.sleep(0.01)  # need some time to wait for servos to move
+		self.eachLeg(0, i, cmd)
 
 ##########################
 
@@ -133,6 +137,8 @@ class Quadruped(object):
 		for i in range(0, 4):
 			channel = i*4
 			# print('channel:', channel)
+			if 'legLimits' not in data:
+				data['legLimits'] = None
 			self.legs.append(
 				Leg(
 					data['legLengths'],
@@ -169,19 +175,20 @@ if __name__ == "__main__":
 	# quantize()
 	# exit()
 
+
 	test = {
 		'legLengths': {
 			'coxaLength': 10,
-			'tibiaLength': 50,
-			'femurLength': 100
+			'tibiaLength': 43,
+			'femurLength': 63
 		},
-		'legLimits': [[-45, 45], [-45, 45], [-90, 0]]
+		'legLimits': [[-45, 45], [-80, 80], [-90, 0]]
 	}
 	robot = Quadruped(test)
-	# robot.setGait(CrawlGait())
 	crawl = CrawlGait(robot)
 	i = 1
 	while i:
 		print('step:', i)
-		crawl.command([0, 0.0, 0.50])
+		crawl.command([1.0, 0.0, 0.0])
+		time.sleep(1)
 		i -= 1

@@ -16,3 +16,5 @@ website
 node_modules
 # tmp
 tmp/*.wav
+._*
+

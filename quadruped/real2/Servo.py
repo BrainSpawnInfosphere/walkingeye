@@ -14,8 +14,9 @@ from math import degrees as r2d
 # from tranforms import rot, T
 from Interfaces import PCA9685
 import logging
-logging.basicConfig(level=logging.DEBUG)
-# logging.basicConfig(level=logging.ERROR)
+import time
+# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 
 class PWM(object):
@@ -39,6 +40,9 @@ class PWM(object):
 
 	def set_freq(self, freq=60):
 		self.pwm.set_pwm_freq(freq)
+
+	def all_stop(self):  # FIXME: 20160702 can i stop individual servos too?
+		self.pwm.set_all_pwm(0, 0x1000)
 
 	def angleToPWM(self, angle):
 		"""
@@ -99,6 +103,7 @@ class Servo(PWM):
 		self.logger.debug('@angle.setter: {} {}'.format(angle, self._angle))
 		pulse = self.angleToPWM(angle)
 		self.pwm.set_pwm(self.channel, 0, pulse)
+		# time.sleep(0.5)
 
 	def setServoLimits(self, minAngle, maxAngle):
 		"""
@@ -112,11 +117,16 @@ class Servo(PWM):
 
 
 def test_servo():
-	s = Servo(10)
-	s.angle = -90
+	s = Servo(2)
+	time.sleep(.1)
+	s.angle = -45
+	time.sleep(.1)
 	s.angle = 0
-	s.angle = 90
-	assert(s.angle == 90 and s.channel == 10)
+	time.sleep(.2)
+	s.angle = 45
+	time.sleep(1)
+	s.all_stop()
+	# assert(s.angle == 90 and s.channel == 10)
 
 
 if __name__ == "__main__":
