@@ -91,19 +91,17 @@ class CrawlGait(object):
 		# newpos = self.legs[leg].resting_position + move
 		# newpos = rest + move
 
-		# I think this can be done better!!!!!
-		# I subtract off rest then add it back in ... why?
-		scale = self.scale_profile[indexmod]
+		scale = self.scale_profile[indexmod]*8.0  # FIXME: this is fucked up!!!
 		newpos = rest + scale * (numpy.array(delta) + rotateAroundCenter(rest, 'z', zrot) - rest)
 		newpos[2] += self.z_profile[indexmod]*25.0
 
-		if legNum == legnum:
+		# if legNum == legnum:
 			# dr = rotateAroundCenter(rest, 'z', 0.5)
 			# print('rest: {:3f}, {:3f}, {:3f}'.format(rest[0], rest[1], rest[2]))
 			# print('rotate: {:3f}, {:3f}, {:3f}'.format(dr[0], dr[1], dr[2]))
 			# print('scale:', scale)
 			# print('[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, move[0], move[1], move[2]))
-			print('[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, newpos[0], newpos[1], newpos[2]))
+			# print('[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, newpos[0], newpos[1], newpos[2]))
 
 		# now move leg/servos
 		# self.legs[legNum].move(*(newpos))
@@ -121,6 +119,7 @@ class CrawlGait(object):
 	def step(self, i, cmd):
 		"""
 		"""
+		# put this stuff back!!!!!!!!!! FIXME!!!!
 		# for legNum in [0, 2, 1, 3]:  # order them diagonally
 		# 	self.eachLeg(legNum, i, cmd)  # move each leg appropriately
 		# 	time.sleep(0.01)  # need some time to wait for servos to move
@@ -155,6 +154,7 @@ class Quadruped(object):
 		return self.legs[i].foot0
 
 	def moveFoot(self, i, pos):
+		# if i == 0: print('Leg 0 ------------------------------')
 		self.legs[i].move(*pos)
 
 
@@ -182,13 +182,13 @@ if __name__ == "__main__":
 			'tibiaLength': 43,
 			'femurLength': 63
 		},
-		'legLimits': [[-45, 45], [-80, 80], [-90, 0]]
+		'legLimits': [[-45, 45], [-80, 80], [-90, 90]]
 	}
 	robot = Quadruped(test)
 	crawl = CrawlGait(robot)
 	i = 1
 	while i:
 		print('step:', i)
-		crawl.command([1.0, 0.0, 0.0])
+		crawl.command([10.0, 0.0, 0.0])
 		time.sleep(1)
 		i -= 1

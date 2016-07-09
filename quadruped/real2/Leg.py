@@ -36,7 +36,7 @@ class Leg(object):
 		self.tibiaLength = lengths['tibiaLength']
 		self.femurLength = lengths['femurLength']
 
-		self.foot0 = self.fk(0, 0, -90)
+		self.foot0 = self.fk(45, 0, -90)
 
 		# Create each servo and move it to the initial position
 		# servo arrange: coxa femur tibia
@@ -52,6 +52,7 @@ class Leg(object):
 
 	def fk(self, a, b, g):
 		"""
+		angle are all degrees
 		"""
 		Lc = self.coxaLength
 		Lf = self.femurLength
@@ -75,25 +76,30 @@ class Leg(object):
 	def ik(self, x, y, z):
 		"""
 		Calculates the inverse kinematics from a given foot coordinate (x,y,z)[mm]
-		and returns the joint angles
+		and returns the joint angles[degrees]
 		"""
 		Lc = self.coxaLength
 		Lf = self.femurLength
 		Lt = self.tibiaLength
-		a = atan2(y, x)
+		a = atan2(y, x)  # <---
+		# a = atan2(x, y)
 		f = sqrt(x**2 + y**2) - Lc
-		b1 = atan2(z, f)
-		d = sqrt(f**2 + z**2)
+		b1 = atan2(z, f)  # <---
+		# b1 = atan2(f, z)
+		d = sqrt(f**2 + z**2)  # <---
 		b2 = acos((Lf**2 + d**2 - Lt**2) / (2.0 * Lf * d))
 		b = b1 + b2
 		g = acos((Lf**2 + Lt**2 - d**2) / (2.0 * Lf * Lt))
 
-		g -= pi  # fix to align fk and ik
+		#### FIXES ###################################
+		g -= pi  # fix to align fk and ik frames
+		g += pi/2.0  # fix tiba servo range
+		##############################################
 
-		print('ik angles:', r2d(a), r2d(b), r2d(g))
+		print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
 
 		# return a, b, g  # coxaAngle, femurAngle, tibiaAngle
-		return r2d(a), r2d(b), -r2d(g)  # coxaAngle, femurAngle, tibiaAngle
+		return r2d(a), r2d(b), r2d(g)  # coxaAngle, femurAngle, tibiaAngle
 
 	def move(self, x, y, z):
 		"""
@@ -105,6 +111,8 @@ class Leg(object):
 			# print('servos:', len(self.servos))
 			for i, servo in enumerate(self.servos):
 				# print('i, servo:', i, servo)
+				# angle = angles[i]
+				# if i == 2: angle += 90.0  # correct for tibia servo
 				servo.angle = angles[i]
 
 		except Exception as e:
@@ -125,18 +133,20 @@ def test_fk_ik():
 	}
 
 	channels = [0, 1, 2]
-	limits = [[-45, 45], [-45, 45], [-90, 0]]
+	# limits = [[-45, 45], [-45, 45], [-90, 0]]
 
-	leg = Leg(length, channels, limits)
-	angles = [-45, -10, 0]
+	leg = Leg(length, channels)
+	angles = [0, 0, -180]  # 0 is 45 angled from body
 	print('angles:', angles)
 	pts = leg.fk(*angles)
-	print('pts:', pts)
-	a, b, c = leg.ik(*pts)
-	angles2 = [r2d(a), r2d(b), r2d(c)]
-	print('angles2:', angles2)
-	print('diff:', np.linalg.norm(np.array(angles) - np.array(angles2)))
-	assert(np.linalg.norm(np.array(angles) - np.array(angles2)) < 0.00001)
+	# print('pts: {:.2f} {:.2f} {:.2f}'.format(*pts))
+	angles2 = leg.ik(*pts)
+	pts2 = leg.fk(*angles2)
+	# angles2 = [r2d(a), r2d(b), r2d(c)]
+	print('angles2: {:.2f} {:.2f} {:.2f}'.format(*angles2))
+	# print('diff:', np.linalg.norm(np.array(angles) - np.array(angles2)))
+	print('diff [mm]: {:.2f}'.format(np.linalg.norm(pts - pts2)))
+	# assert(np.linalg.norm(np.array(angles) - np.array(angles2)) < 0.00001)
 
 	# Lc = 10.0
 	# Lf = 43.0
@@ -161,6 +171,28 @@ def test_fk_ik():
 	# print('ik angles:', r2d(a), r2d(b), r2d(g))
 
 
+	def check_range():
+		length = {
+			'coxaLength': 10,
+			'tibiaLength': 43,
+			'femurLength': 63
+		}
+
+		channels = [0, 1, 2]
+		# limits = [[-45, 45], [-45, 45], [-90, 0]]
+
+		leg = Leg(length, channels)
+		angles = [0, 0, -180]  # 0 is 45 angled from body
+		print('angles:', angles)
+		pts = leg.fk(*angles)
+		# print('pts: {:.2f} {:.2f} {:.2f}'.format(*pts))
+		angles2 = leg.ik(*pts)
+		pts2 = leg.fk(*angles2)
+		# angles2 = [r2d(a), r2d(b), r2d(c)]
+		print('angles2: {:.2f} {:.2f} {:.2f}'.format(*angles2))
+		# print('diff:', np.linalg.norm(np.array(angles) - np.array(angles2)))
+		print('diff [mm]: {:.2f}'.format(np.linalg.norm(pts - pts2)))
+		# assert(np.linalg.norm(np.array(angles) - np.array(angles2)) < 0.00001)
 ################################################################
 
 
