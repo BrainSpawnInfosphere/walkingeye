@@ -103,7 +103,7 @@ class Leg(object):
 		g = acos((Lf**2 + Lt**2 - d**2) / (2.0 * Lf * Lt))
 
 		#### FIXES ###################################
-		# g -= pi  # fix to align fk and ik frames
+		g -= pi  # fix to align fk and ik frames
 		# g += pi/2.0  # fix tiba servo range
 		##############################################
 
@@ -117,12 +117,9 @@ class Leg(object):
 		Attempts to move it's foot to coordinates [x,y,z]
 		"""
 		try:
-			a,b,c = self.ik(x, y, z)  # inverse kinematics
-			angles = [a,b,c]
-			# print('servos:', len(self.servos))
-			# angles[0] *= -1
-			angles[2] *= -1
-			print('angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
+			a, b, c = self.ik(x, y, z)  # inverse kinematics
+			angles = [a, b, c]
+			# print('angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
 			for i, servo in enumerate(self.servos):
 				# print('i, servo:', i, servo)
 				# angle = angles[i]
@@ -141,14 +138,14 @@ class Leg(object):
 
 def test_fk_ik():
 	length = {
-		'coxaLength': 10,
-		'tibiaLength': 43,
-		'femurLength': 63
+		'coxaLength': 17,
+		'femurLength': 45,
+		'tibiaLength': 63
 	}
-	channels = [0, 1, 2]
+	channels = [10, 11, 12]
 	leg = Leg(length, channels)
 
-	angles = [45, 0, 0]  # 0 is 45 angled from body
+	angles = [80, -60, -60]
 
 	pts = leg.fk(*angles)
 	angles2 = leg.ik(*pts)
@@ -162,28 +159,6 @@ def test_fk_ik():
 	print('diff [mm]: {:.2f}'.format(np.linalg.norm(pts - pts2)))
 	time.sleep(1)
 	# assert(np.linalg.norm(np.array(angles) - np.array(angles2)) < 0.00001)
-
-	# Lc = 10.0
-	# Lf = 43.0
-	# Lt = 63.0
-	# phi = -45
-	# theta2 = -10
-	# theta3 = 0
-	#
-	# print('input angles:', phi, theta2, theta3)
-	#
-	# params = [
-	# 	# a_ij alpha_ij  S_j  theta_j
-	# 	[Lc,   d2r(90),   0,   d2r(theta2)],  # frame 12
-	# 	[Lf,    d2r(0),   0,   d2r(theta3)]   # 23
-	# ]
-	# r = T(params, d2r(phi))
-	# foot = r.dot(np.array([Lt, 0, 0, 1]))  # ok [ 37.4766594  37.4766594 -63. 1.]
-	# # print(r)
-	# print('foot loc:', foot)  # ok [ 37.4766594  37.4766594 -63. 1.]
-	#
-	# a, b, g = ik_to(foot[0], foot[1], foot[2], Lc, Lf, Lt)
-	# print('ik angles:', r2d(a), r2d(b), r2d(g))
 
 
 def check_range():
@@ -199,11 +174,11 @@ def check_range():
 	leg = Leg(length, channels)
 	time.sleep(1)
 	for servo in range(0, 3):
-		leg.servos[0].angle = -45; time.sleep(0.01)
-		leg.servos[1].angle = -20; time.sleep(0.01)
-		leg.servos[2].angle = -110; time.sleep(0.01)
+		leg.servos[0].angle = 45; time.sleep(0.01)
+		leg.servos[1].angle = 0; time.sleep(0.01)
+		leg.servos[2].angle = -90; time.sleep(0.01)
 		for angle in range(-45, 45, 20):
-			if servo == 2: angle -= 90
+			# if servo == 2: angle -= 90
 			print('servo: {} angle: {}'.format(servo, angle))
 			leg.servos[servo].angle = angle
 			time.sleep(1)

@@ -37,6 +37,8 @@ class PWM(object):
 		"""
 		"""
 		self.pwm = global_pwm
+		if 0 > channel > 15:
+			raise Exception('Servo channel out of range[0-15]: {}'.format(channel))
 		self.channel = channel
 		self.logger = logging.getLogger(__name__)
 
@@ -80,6 +82,7 @@ class PWM(object):
 			- angle: angle to convert to pwm pulse
 			- mina: min servo angle
 			- maxa: max servo angle
+			
 		out: pwm pulse size (0-4096)
 		"""
 		# these are just to shorten up the equation below
@@ -155,7 +158,7 @@ class Servo(PWM):
 		be within the servo range of [0, 180] ... anything more of less won't
 		work unless your change setServoRangleAngle() to something other than
 		0 - 180.
-		
+
 		in:
 			minAngle - degrees
 			maxAngle - degrees
