@@ -26,8 +26,9 @@ class PWM(object):
 	"""
 	This handles low level pwm controller and timing
 	"""
-	maxAngle = 90.0  # servo max angle
-	minAngle = -90.0
+	# changed this to match arduino: 0-180 deg range
+	maxAngle = 180.0  # servo max angle
+	minAngle = 0.0
 	pwm_max = 500  # Max pulse length out of 4096
 	pwm_min = 130  # Min pulse length out of 4096
 	# pwm = PCA9685()
@@ -55,12 +56,23 @@ class PWM(object):
 		"""
 		self.global_pwm.set_pwm(self.channel, 0, 0x1000)
 
-	def setPulseWidth(self, minp, maxp):
-		# double check bounds
+	def setServoRangePulse(self, minp, maxp):
+		"""
+		Sets the range of the on/off pulse. This must be between 0 and 4095.
+		"""
 		maxp = int(max(min(4095, maxp), 0))
 		minp = int(max(min(4095, minp), 0))
 		self.pwm_max = maxp
 		self.pwm_min = minp
+
+	def setServoRangeAngle(self, mina, maxa):
+		"""
+		There is no limit check on this. Some servos have >180 deg range while
+		some have <180 range. Suggest maxa - mina ~= 180, but they can be
+		any range, ex: mina 145 to maxa 325 deg which is 180 deg range.
+		"""
+		self.maxAngle = maxa
+		self.minAngle = mina
 
 	def angleToPWM(self, angle):
 		"""
@@ -70,6 +82,7 @@ class PWM(object):
 			- maxa: max servo angle
 		out: pwm pulse size (0-4096)
 		"""
+		# these are just to shorten up the equation below
 		mina = self.minAngle
 		maxa = self.maxAngle
 		maxp = self.pwm_max
@@ -139,8 +152,10 @@ class Servo(PWM):
 	def setServoLimits(self, minAngle, maxAngle):
 		"""
 		sets maximum and minimum achievable angles. Remeber, the limits have to
-		be within the servo range of [-90, 90] ... anything more of less won't
-		work.
+		be within the servo range of [0, 180] ... anything more of less won't
+		work unless your change setServoRangleAngle() to something other than
+		0 - 180.
+		
 		in:
 			minAngle - degrees
 			maxAngle - degrees

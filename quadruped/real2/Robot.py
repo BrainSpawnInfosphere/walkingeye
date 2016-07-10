@@ -96,13 +96,13 @@ class CrawlGait(object):
 		newpos = rest + scale * (numpy.array(delta) + rotateAroundCenter(rest, 'z', zrot) - rest)
 		newpos[2] = -50.0+self.z_profile[indexmod]*25.0
 
-		# if legNum == legnum:
+		if legNum == legnum:
 			# dr = rotateAroundCenter(rest, 'z', 0.5)
 			# print('rest: {:3f}, {:3f}, {:3f}'.format(rest[0], rest[1], rest[2]))
 			# print('rotate: {:3f}, {:3f}, {:3f}'.format(dr[0], dr[1], dr[2]))
 			# print('scale:', scale)
 			# print('[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, move[0], move[1], move[2]))
-			# print('[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, newpos[0], newpos[1], newpos[2]))
+			print('[{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(indexmod, newpos[0], newpos[1], newpos[2]))
 
 		# now move leg/servos
 		# self.legs[legNum].move(*(newpos))
@@ -141,16 +141,18 @@ class Quadruped(object):
 		self.legs = []
 		for i in range(0, 4):
 			channel = i*4
-			# print('channel:', channel)
-			if 'legLimits' not in data:
-				data['legLimits'] = None
 			self.legs.append(
 				Leg(
 					data['legLengths'],
-					[channel, channel+1, channel+2],
-					data['legLimits']
+					[channel, channel+1, channel+2]
 				)
 			)
+
+			for s in range(0, 3):
+				if 'servoRangeAngles' in data:
+					self.legs[i].servos[s].setServoRangeAngle(*data['servoRangeAngles'][s])
+				if 'servoLimits' in data:
+					self.legs[i].servos[s].setServoLimits(*data['servoLimits'][s])
 
 	def __del__(self):
 		"""
@@ -183,20 +185,22 @@ if __name__ == "__main__":
 	# quantize()
 	# exit()
 
+	# angles are always [min, max]
 	test = {
 		'legLengths': {
 			'coxaLength': 17,
 			'femurLength': 45,
 			'tibiaLength': 63
 		},
-		'legLimits': [[-80, 80], [-80, 80], [-80, 80]]
+		'servoLimits': [[10, 170], [-80, 80], [-170, -10]],
+		'servoRangeAngles': [[0, 180], [-90, 90], [-180, 0]]
 	}
 	robot = Quadruped(test)
 	crawl = CrawlGait(robot)
 	i = 5
 	while i:
 		print('step:', i)
-		crawl.command([0.0, 0.0, -40.0])
+		crawl.command([10.0, 0.0, 0.0])
 		# time.sleep(1)
 		i -= 1
 	# crawl.pose([-45, -20, -110])

@@ -39,7 +39,7 @@ class Leg(object):
 		self.femurLength = lengths['femurLength']
 
 		# initAngles = [-45, -20, -110]
-		initAngles = [45, 0, 0]
+		initAngles = [45, 0, -90]
 
 
 		self.foot0 = self.fk(*initAngles)
@@ -70,7 +70,8 @@ class Leg(object):
 
 		phi = a
 		theta2 = b
-		theta3 = g - 90.0  # fix tibia servo range
+		# theta3 = g - 90.0  # fix tibia servo range
+		theta3 = g
 
 		params = [
 			# a_ij alpha_ij  S_j  theta_j
@@ -102,8 +103,8 @@ class Leg(object):
 		g = acos((Lf**2 + Lt**2 - d**2) / (2.0 * Lf * Lt))
 
 		#### FIXES ###################################
-		g -= pi  # fix to align fk and ik frames
-		g += pi/2.0  # fix tiba servo range
+		# g -= pi  # fix to align fk and ik frames
+		# g += pi/2.0  # fix tiba servo range
 		##############################################
 
 		# print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
