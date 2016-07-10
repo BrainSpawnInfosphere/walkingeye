@@ -36,25 +36,26 @@ class CrawlGait(object):
 	# def setFoot(self, foot0):
 	# 	self.foot0 = foot0
 
-	# def height_at_progression(self, prog):
-	# 	"""
-	# 	Returns the normalized 1-D foot position for a 75% duty cycle
-	# 	|                   *
-	# 	|             *       *
-	# 	| *                      *
-	# 	+-------------------+----+-
-	# 	0                  .75  1.0
-	# 	Progress (step/gait_length)
-	#
-	# 	todo - just turn this into a lookup table ... why calculate it?
-	# 	"""
-	# 	# if prog < 0.0 or prog > 1.0:
-	# 	if 0.0 <= prog <= 1.0:
-	# 		Exception('prog out of bounds (0-1.0): {}'.format(prog))
-	# 	speed = 0.0
-	# 	if prog <= 0.75: speed = 4.0 / 3.0 * prog - 0.5
-	# 	else: speed = -4.0 * (prog - 0.75) + 0.5  # don't think this is right???
-	# 	return speed
+	def height_at_progression(self, prog):
+		"""
+		Returns the normalized 1-D foot position for a 75% duty cycle
+		|                   *
+		|             *       *
+		| *                      *
+		+-------------------+----+-
+		0                  .75  1.0
+		Progress (step/gait_length)
+
+		todo - just turn this into a lookup table ... why calculate it?
+		"""
+		# if prog < 0.0 or prog > 1.0:
+		if 0.0 > prog > 1.0:
+			raise Exception('prog out of bounds (0-1.0): {}'.format(prog))
+			print('wtf??')
+		speed = 0.0
+		if prog <= 0.75: speed = 4.0 / 3.0 * prog - 0.5
+		else: speed = -4.0 * (prog - 0.75) + 0.5  # don't think this is right???
+		return speed
 
 	def eachLeg(self, legNum, index, cmd):
 		"""
@@ -76,13 +77,13 @@ class CrawlGait(object):
 
 		# get correct index for this leg and get height
 		indexmod = (index + self.legOffsets[legNum]) % len(self.z_profile)
-		# z = self.z_profile[indexmod]
+		# z = self.z_profile[indexmod]*40.0
 
 		# how far through the gait are we?
 		# prog = indexmod/len(self.z_profile)
 
 		# now scale (?) and handle translational/rotational movement
-		# scale = self.height_at_progression(prog)
+		# scale = 0.50*self.height_at_progression(prog)
 		# move = scale * (numpy.array(delta) + rotMove)
 		# move = rotateAroundCenter(scale * numpy.array(delta), 'z', deltaRot[2])
 
@@ -91,9 +92,9 @@ class CrawlGait(object):
 		# newpos = self.legs[leg].resting_position + move
 		# newpos = rest + move
 
-		scale = self.scale_profile[indexmod]*8.0  # FIXME: this is fucked up!!!
+		scale = self.scale_profile[indexmod]  # FIXME: this is fucked up!!!
 		newpos = rest + scale * (numpy.array(delta) + rotateAroundCenter(rest, 'z', zrot) - rest)
-		newpos[2] += self.z_profile[indexmod]*25.0
+		newpos[2] = -50.0+self.z_profile[indexmod]*25.0
 
 		# if legNum == legnum:
 			# dr = rotateAroundCenter(rest, 'z', 0.5)
@@ -114,7 +115,8 @@ class CrawlGait(object):
 	def command(self, cmd):
 		for i in range(0, len(self.z_profile)):
 			self.step(i, cmd)
-			time.sleep(0.25)
+			time.sleep(0.05)  # maybe find biggest angular change to calculate this???
+			# time.sleep(1)
 
 	def step(self, i, cmd):
 		"""
@@ -124,6 +126,10 @@ class CrawlGait(object):
 		# 	self.eachLeg(legNum, i, cmd)  # move each leg appropriately
 		# 	time.sleep(0.01)  # need some time to wait for servos to move
 		self.eachLeg(0, i, cmd)
+
+	def pose(self, angles):
+		pts = self.robot.legs[0].fk(*angles)
+		self.robot.moveFoot(0, pts)
 
 ##########################
 
@@ -146,9 +152,11 @@ class Quadruped(object):
 				)
 			)
 
-		# only do this once
-		self.legs[0].servos[0].set_freq(60)
-		self.gait = None
+	def __del__(self):
+		"""
+		Leg kills all servos on exit
+		"""
+		pass
 
 	def getFoot0(self, i):
 		return self.legs[i].foot0
@@ -175,20 +183,21 @@ if __name__ == "__main__":
 	# quantize()
 	# exit()
 
-
 	test = {
 		'legLengths': {
-			'coxaLength': 10,
-			'tibiaLength': 43,
-			'femurLength': 63
+			'coxaLength': 17,
+			'femurLength': 45,
+			'tibiaLength': 63
 		},
-		'legLimits': [[-45, 45], [-80, 80], [-90, 90]]
+		'legLimits': [[-80, 80], [-80, 80], [-80, 80]]
 	}
 	robot = Quadruped(test)
 	crawl = CrawlGait(robot)
-	i = 1
+	i = 5
 	while i:
 		print('step:', i)
-		crawl.command([10.0, 0.0, 0.0])
-		time.sleep(1)
+		crawl.command([0.0, 0.0, -40.0])
+		# time.sleep(1)
 		i -= 1
+	# crawl.pose([-45, -20, -110])
+	# time.sleep(1)

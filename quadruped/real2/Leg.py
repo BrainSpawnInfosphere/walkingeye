@@ -15,6 +15,8 @@ from tranforms import rot, T
 # from Interfaces import PCA9685
 import logging
 from Servo import Servo
+import time
+
 # logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.ERROR)
 
@@ -29,14 +31,18 @@ class Leg(object):
 		if not len(channels) == 3: raise Exception('len(channels) = 3')
 
 		self.servos = []
-		self.footPosition = [0.0, 0.0, 0.0]
-		self.angles = [0.0, 0.0, 0.0]
+		# self.footPosition = [0.0, 0.0, 0.0]
+		# self.angles = [0.0, 0.0, 0.0]
 
 		self.coxaLength = lengths['coxaLength']
 		self.tibiaLength = lengths['tibiaLength']
 		self.femurLength = lengths['femurLength']
 
-		self.foot0 = self.fk(45, 0, -90)
+		# initAngles = [-45, -20, -110]
+		initAngles = [45, 0, 0]
+
+
+		self.foot0 = self.fk(*initAngles)
 
 		# Create each servo and move it to the initial position
 		# servo arrange: coxa femur tibia
@@ -45,7 +51,11 @@ class Leg(object):
 			if limits: lim = limits[i]
 			else: lim = None
 			self.servos.append(Servo(channels[i], lim))
-			self.servos[i].angle = self.foot0[i]
+			self.servos[i].angle = initAngles[i]
+			print('servo {} angle {}'.format(channels[i], initAngles[i]))
+			# time.sleep(1)
+
+		# self.servos[0].all_stop()
 
 	def __del__(self):
 		self.servos[0].all_stop()
@@ -60,7 +70,7 @@ class Leg(object):
 
 		phi = a
 		theta2 = b
-		theta3 = g
+		theta3 = g - 90.0  # fix tibia servo range
 
 		params = [
 			# a_ij alpha_ij  S_j  theta_j
@@ -96,7 +106,7 @@ class Leg(object):
 		g += pi/2.0  # fix tiba servo range
 		##############################################
 
-		print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
+		# print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
 
 		# return a, b, g  # coxaAngle, femurAngle, tibiaAngle
 		return r2d(a), r2d(b), r2d(g)  # coxaAngle, femurAngle, tibiaAngle
@@ -106,9 +116,12 @@ class Leg(object):
 		Attempts to move it's foot to coordinates [x,y,z]
 		"""
 		try:
-			angles = self.ik(x, y, z)  # inverse kinematics
-			# print('move:', angles)
+			a,b,c = self.ik(x, y, z)  # inverse kinematics
+			angles = [a,b,c]
 			# print('servos:', len(self.servos))
+			# angles[0] *= -1
+			angles[2] *= -1
+			print('angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
 			for i, servo in enumerate(self.servos):
 				# print('i, servo:', i, servo)
 				# angle = angles[i]
@@ -131,21 +144,22 @@ def test_fk_ik():
 		'tibiaLength': 43,
 		'femurLength': 63
 	}
-
 	channels = [0, 1, 2]
-	# limits = [[-45, 45], [-45, 45], [-90, 0]]
-
 	leg = Leg(length, channels)
-	angles = [0, 0, -180]  # 0 is 45 angled from body
-	print('angles:', angles)
+
+	angles = [45, 0, 0]  # 0 is 45 angled from body
+
 	pts = leg.fk(*angles)
-	# print('pts: {:.2f} {:.2f} {:.2f}'.format(*pts))
 	angles2 = leg.ik(*pts)
 	pts2 = leg.fk(*angles2)
 	# angles2 = [r2d(a), r2d(b), r2d(c)]
-	print('angles2: {:.2f} {:.2f} {:.2f}'.format(*angles2))
+	print('angles (orig):', angles)
+	print('pts from fk(orig): {:.2f} {:.2f} {:.2f}'.format(*pts))
+	print('angles2 from ik(pts): {:.2f} {:.2f} {:.2f}'.format(*angles2))
+	print('pts2 from fk(angle2): {:.2f} {:.2f} {:.2f}'.format(*pts2))
 	# print('diff:', np.linalg.norm(np.array(angles) - np.array(angles2)))
 	print('diff [mm]: {:.2f}'.format(np.linalg.norm(pts - pts2)))
+	time.sleep(1)
 	# assert(np.linalg.norm(np.array(angles) - np.array(angles2)) < 0.00001)
 
 	# Lc = 10.0
@@ -171,30 +185,29 @@ def test_fk_ik():
 	# print('ik angles:', r2d(a), r2d(b), r2d(g))
 
 
-	def check_range():
-		length = {
-			'coxaLength': 10,
-			'tibiaLength': 43,
-			'femurLength': 63
-		}
+def check_range():
+	length = {
+		'coxaLength': 17,
+		'femurLength': 45,
+		'tibiaLength': 63
+	}
 
-		channels = [0, 1, 2]
-		# limits = [[-45, 45], [-45, 45], [-90, 0]]
+	channels = [0, 1, 2]
+	# limits = [[-45, 45], [-45, 45], [-90, 0]]
 
-		leg = Leg(length, channels)
-		angles = [0, 0, -180]  # 0 is 45 angled from body
-		print('angles:', angles)
-		pts = leg.fk(*angles)
-		# print('pts: {:.2f} {:.2f} {:.2f}'.format(*pts))
-		angles2 = leg.ik(*pts)
-		pts2 = leg.fk(*angles2)
-		# angles2 = [r2d(a), r2d(b), r2d(c)]
-		print('angles2: {:.2f} {:.2f} {:.2f}'.format(*angles2))
-		# print('diff:', np.linalg.norm(np.array(angles) - np.array(angles2)))
-		print('diff [mm]: {:.2f}'.format(np.linalg.norm(pts - pts2)))
-		# assert(np.linalg.norm(np.array(angles) - np.array(angles2)) < 0.00001)
-################################################################
+	leg = Leg(length, channels)
+	time.sleep(1)
+	for servo in range(0, 3):
+		leg.servos[0].angle = -45; time.sleep(0.01)
+		leg.servos[1].angle = -20; time.sleep(0.01)
+		leg.servos[2].angle = -110; time.sleep(0.01)
+		for angle in range(-45, 45, 20):
+			if servo == 2: angle -= 90
+			print('servo: {} angle: {}'.format(servo, angle))
+			leg.servos[servo].angle = angle
+			time.sleep(1)
 
 
 if __name__ == "__main__":
 	test_fk_ik()
+	# check_range()
