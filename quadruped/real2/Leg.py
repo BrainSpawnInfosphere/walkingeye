@@ -88,6 +88,9 @@ class Leg(object):
 		"""
 		Calculates the inverse kinematics from a given foot coordinate (x,y,z)[mm]
 		and returns the joint angles[degrees]
+
+		Reference (there are typos)
+		https://tote.readthedocs.io/en/latest/ik.html
 		"""
 		Lc = self.coxaLength
 		Lf = self.femurLength
@@ -104,7 +107,6 @@ class Leg(object):
 
 		#### FIXES ###################################
 		g -= pi  # fix to align fk and ik frames
-		# g += pi/2.0  # fix tiba servo range
 		##############################################
 
 		# print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))

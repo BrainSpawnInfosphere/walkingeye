@@ -82,7 +82,7 @@ class PWM(object):
 			- angle: angle to convert to pwm pulse
 			- mina: min servo angle
 			- maxa: max servo angle
-			
+
 		out: pwm pulse size (0-4096)
 		"""
 		# these are just to shorten up the equation below
@@ -120,7 +120,7 @@ class Servo(PWM):
 		PWM.__init__(self, channel)
 
 		if limits: self.setServoLimits(*limits)
-		else: self.setServoLimits(-90.0, 90.0)
+		else: self.setServoLimits(0.0, 180.0)
 
 	def attach(self, channel, limits=None):
 		"""
@@ -167,7 +167,7 @@ class Servo(PWM):
 		self.limitMinAngle = minAngle
 
 
-def test_servo():
+def cmd_servo():
 	Servo.all_stop()
 	s = Servo(0, [-85, 85])
 	time.sleep(.1)
@@ -188,5 +188,21 @@ def test_servo():
 	# assert(s.angle == 90 and s.channel == 10)
 
 
+def test_servo():
+	Servo.all_stop()
+	s = Servo(10)
+	s.angle = 90
+	s.setServoRangePulse(0, 4095)  # use the entire range
+	assert(s.angleToPWM(0) == 0)
+	assert(s.angleToPWM(180) == 4095)
+	assert(s.angle == 90)
+	assert(s.channel == 10)
+
+	s.angle = 270  # limited to 0-180
+	assert(s.angle == 180)
+	s.angle = -10
+	assert(s.angle == 0)
+	
+
 if __name__ == "__main__":
-	test_servo()
+	cmd_servo()

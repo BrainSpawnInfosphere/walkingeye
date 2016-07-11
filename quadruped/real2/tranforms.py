@@ -84,6 +84,15 @@ def T(params, phi):
 	return t
 
 
+def test_t():
+	R = rot(0.0, 0.0, 0.0, 0.0)  # should be eye(4,4)
+	a = np.array([1., 2., 3., 1.])
+	b = np.dot(R, a)
+	# print(R)
+	# print(a,b)
+	assert(np.linalg.norm(a-b) == 0.0)
+
+
 def test_t_r():
 	# works for Crane's Book, p 41
 	ans = np.array([24.11197183, 20.11256511, 18.16670832, 1.])
@@ -105,4 +114,5 @@ def test_t_r():
 
 
 if __name__ == "__main__":
-	test_t_r()
+	# test_t_r()
+	test_t()
