@@ -14,6 +14,7 @@ import numpy as np
 import logging
 from math import cos, sin, sqrt
 from math import radians as d2r
+from Servo import Servo
 
 logging.getLogger("Adafruit_I2C").setLevel(logging.ERROR)
 
@@ -90,6 +91,7 @@ class CrawlGait(object):
 				self.eachLeg(legNum, i, cmd)  # move each leg appropriately
 			# self.eachLeg(0, i, cmd)
 			time.sleep(0.05)  # 20 Hz, not sure of value
+			time.sleep(1)
 
 	# def step(self, i, cmd):
 	# 	"""
@@ -100,9 +102,11 @@ class CrawlGait(object):
 	# 	# 	time.sleep(0.01)  # need some time to wait for servos to move
 	# 	self.eachLeg(0, i, cmd)
 
-	def pose(self, angles):
-		pts = self.robot.legs[0].fk(*angles)  # allows angles out of range
-		self.robot.moveFoot(0, pts)
+	def pose(self, angles, leg=0):
+		Servo.all_stop()
+		pts = self.robot.legs[leg].fk(*angles)  # allows angles out of range
+		# self.robot.moveFoot(leg, pts)
+		self.robot.legs[leg].move(*pts)
 		print('angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
 		print('pts: {:.2f} {:.2f} {:.2f}'.format(*pts))
 
@@ -123,11 +127,14 @@ class Quadruped(object):
 				)
 			)
 
+			# grab init data for servos from json data file
 			for s in range(0, 3):
-				if 'servoRangeAngles' in data:
+				if 'servoRangeAngles' in data:  # mapping of angles to pulses
 					self.legs[i].servos[s].setServoRangeAngle(*data['servoRangeAngles'][s])
-				if 'servoLimits' in data:
+				if 'servoLimits' in data:  # user defined limits to avoid servo issues
 					self.legs[i].servos[s].setServoLimits(*data['servoLimits'][s])
+				if 'servoRangePulse' in data:  # mapping of msec to pulses
+					raise Exception('servoRangePulse not implemented in json file yet ... bye')
 
 	def __del__(self):
 		"""
@@ -146,7 +153,8 @@ class Quadruped(object):
 if __name__ == "__main__":
 	# angles are always [min, max]
 	# S0 is mapped backwards because of servo orientation
-	# leg 4: [180, 0], [-90, 90], [0, -180]
+	# leg 1: [180, 0], [-90, 90], [0, -180]     [45, 0, -90]
+	# leg 2: [[0, 180], [-90, 90], [0, -180]]   [45,-20, -70]
 	test = {
 		'legLengths': {
 			'coxaLength': 17,
@@ -154,18 +162,29 @@ if __name__ == "__main__":
 			'tibiaLength': 63
 		},
 		'servoLimits': [[10, 170], [-80, 80], [-170, -10]],
-		'servoRangeAngles': [[180, 0], [-90, 90], [0, -180]]
+		'servoRangeAngles':
+			[[0, 180], [-90, 90], [0, -180]]
 	}
 	robot = Quadruped(test)
 	crawl = CrawlGait(robot)
-	if 1:  # walk
-		i = 5
-		while i:
-			print('step:', i)
-			crawl.command([50.0, 0.0, 0.0])  # x mm, y mm, theta degs
-			# time.sleep(1)
-			i -= 1
-	else:  # set leg to specific orientation
-		angles = [10, 0, -90]
-		crawl.pose(angles)
+
+	Servo.all_stop()
+
+	try:
+		if 1:  # walk
+			i = 5
+			while i:
+				print('step:', i)
+				crawl.command([50.0, 0.0, 0.0])  # x mm, y mm, theta degs
+				# time.sleep(1)
+				i -= 1
+		else:  # set leg to specific orientation
+			angles = [0, -20, -70]
+			crawl.pose(angles, 1)
+			time.sleep(2)
+			Servo.all_stop()
+			time.sleep(0.5)
+	except:
+		print('Crap!!!!')
+		Servo.all_stop()
 		time.sleep(1)

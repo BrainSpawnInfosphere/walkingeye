@@ -49,9 +49,6 @@ class PWM(object):
 		"""
 		global_pwm.set_all_pwm(0, 0x1000)
 
-	# def all_stop(self):  # FIXME: 20160702 can i stop individual servos too?
-	# 	self.pwm.set_all_pwm(0, 0x1000)
-
 	def stop(self):
 		"""
 		This stops an individual servo
@@ -169,7 +166,7 @@ class Servo(PWM):
 
 def cmd_servo():
 	Servo.all_stop()
-	s = Servo(0, [-85, 85])
+	s = Servo(15, [-85, 85])
 	time.sleep(.1)
 	print('neg')
 	s.angle = -90
@@ -188,6 +185,22 @@ def cmd_servo():
 	# assert(s.angle == 90 and s.channel == 10)
 
 
+def swing_servo():
+	Servo.all_stop()
+	s = Servo(15)
+	time.sleep(.01)
+	i = 3
+	while i:
+		for a in range(0, 180, 5):
+			s.angle = a
+			time.sleep(0.1)
+		time.sleep(1)
+		i -= 1
+	# Servo.all_stop()
+	s.angle = 90
+	Servo.all_stop()
+
+
 def test_servo():
 	Servo.all_stop()
 	s = Servo(10)
@@ -202,7 +215,8 @@ def test_servo():
 	assert(s.angle == 180)
 	s.angle = -10
 	assert(s.angle == 0)
-	
+
 
 if __name__ == "__main__":
-	cmd_servo()
+	# cmd_servo()
+	swing_servo()
