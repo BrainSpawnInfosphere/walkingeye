@@ -128,7 +128,7 @@ class Particle(object):
         self.w = w
 
     def __repr__(self):
-        return "({0:f}, {1:f}, w={2:f})".format(self.x, self.y, self.w)
+        return "(%f, %f, w=%f)" % (self.x, self.y, self.w)
 
     @property
     def xy(self):
@@ -192,7 +192,7 @@ class Robot(Particle):
         """
         while True:
             self.step_count += 1
-            if self.advance_by(self.speed, noisy=False,
+            if self.advance_by(self.speed, noisy=True,
                 checker=lambda r, dx, dy: maze.is_free(r.x+dx, r.y+dy)):
                 break
             # Bumped into something or too long in same direction,

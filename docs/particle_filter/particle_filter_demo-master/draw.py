@@ -58,7 +58,7 @@ class Maze(object):
         turtle.update()
 
     def weight_to_color(self, weight):
-        return "#{0:02x}00{1:02x}".format(int(weight * 255), int((1 - weight) * 255))
+        return "#%02x00%02x" % (int(weight * 255), int((1 - weight) * 255))
 
     def is_in(self, x, y):
         if x < 0 or y < 0 or x > self.width or y > self.height:
