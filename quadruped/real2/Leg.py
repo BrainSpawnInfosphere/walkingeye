@@ -141,14 +141,14 @@ class Leg(object):
 
 def test_fk_ik():
 	length = {
-		'coxaLength': 17,
+		'coxaLength': 30,
 		'femurLength': 45,
 		'tibiaLength': 63
 	}
 	channels = [10, 11, 12]
 	leg = Leg(length, channels)
 
-	angles = [0, -45, -90]
+	angles = [0, -70, -90]
 
 	pts = leg.fk(*angles)
 	angles2 = leg.ik(*pts)

@@ -42,6 +42,12 @@ class PWM(object):
 		self.channel = channel
 		self.logger = logging.getLogger(__name__)
 
+	def __del__(self):
+		"""
+		Shuts off servo on exit.
+		"""
+		self.stop()
+
 	@staticmethod
 	def all_stop():
 		"""
@@ -49,11 +55,15 @@ class PWM(object):
 		"""
 		global_pwm.set_all_pwm(0, 0x1000)
 
+	@staticmethod
+	def set_pwm_freq(f):
+		global_pwm.set_pwm_freq(f)
+
 	def stop(self):
 		"""
 		This stops an individual servo
 		"""
-		self.global_pwm.set_pwm(self.channel, 0, 0x1000)
+		self.pwm.set_pwm(self.channel, 0, 0x1000)
 
 	def setServoRangePulse(self, minp, maxp):
 		"""
@@ -164,7 +174,7 @@ class Servo(PWM):
 		"""
 		self.limitMaxAngle = maxAngle
 		self.limitMinAngle = minAngle
-		if maxAngle > self.maxAngle or minAngle < self.minAngle:
+		if maxAngle > self.maxAngle or minAngle < self.minAngle or minAngle > maxAngle:
 			raise Exception('setServoLimits(): your limits are outside of servo range (see setServoRangleAngle())')
 
 
@@ -220,6 +230,7 @@ def test_servo():
 	s.angle = -10
 	assert(s.angle == 0)
 
+
 def test_limits():
 	"""
 	switching order messing things up
@@ -247,12 +258,20 @@ def test_limits():
 	s.angle = -90; assert(s.angle == -90)
 	s.angle = -270; assert(s.angle == -90)
 
+
 from nose.tools import raises
 @raises(Exception)
 def test_fail():
 	s = Servo(15)
 	s.setServoRangeAngle(0, 180)
 	s.setServoLimits(-180, 90)  # this is outside of range, should fail
+
+
+@raises(Exception)
+def test_fail2():
+	s = Servo(15)
+	s.setServoRangeAngle(0, 180)
+	s.setServoLimits(180, 0)
 
 def checks():
 	check = lambda x, a, b: max(min(b, x), a)

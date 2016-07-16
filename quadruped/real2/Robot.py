@@ -42,7 +42,7 @@ class CrawlGait(object):
 
 	def __init__(self, robot):
 		# self.current_step = 0
-		self.legOffsets = [0, 6, 3, 9]
+		self.legOffset = [0, 6, 3, 9]
 		# self.i = 0
 		self.robot = robot
 
@@ -51,7 +51,7 @@ class CrawlGait(object):
 		robot paper
 		"""
 		phi = self.phi
-		offset = self.offset
+		offset = self.legOffset
 		z = self.z
 		# offset = [0, 6, 3, 9]
 		# phi = [9/9, 6/9, 3/9, 0/9, 1/9, 2/9, 3/9, 4/9, 5/9, 6/9, 7/9, 8/9]
