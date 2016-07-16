@@ -67,6 +67,8 @@ MyRos (need a better name)
 
 ## Software Development
 
-* flake8 - check for errors according to PEP8
-* Landscape.io - check code for errors
-* travis.ci - run unit tests on commit to github
+* flake8 - check for errors according to PEP8 (automatically done in my atom editor)
+* Landscape.io - on push, check code for errors
+* travis.ci - on push, run unit tests on commit to github
+* quantifiedcode - on push, check for errors and will submit auto fixes (pull requests) for simple errors
+* srcclr - check code and associated libraries for licenses 
