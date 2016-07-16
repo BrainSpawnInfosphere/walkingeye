@@ -72,6 +72,7 @@ class PWM(object):
 		"""
 		self.maxAngle = maxa
 		self.minAngle = mina
+		if mina >= maxa: raise Exception('setServoRangeAngle(): max > min')
 
 	def angleToPWM(self, angle):
 		"""
@@ -141,10 +142,11 @@ class Servo(PWM):
 		It also commands the servo to move.
 		"""
 		# check range of input
+		# FIXME: this doesn't work for all cases (negatives)!!!!
 		self._angle = max(min(self.limitMaxAngle, angle), self.limitMinAngle)
 		# self.move(self._angle)
 		# print('@angle.setter: {} {}'.format(angle, self._angle))
-		self.logger.debug('@angle.setter: {} {}'.format(angle, self._angle))
+		# self.logger.debug('@angle.setter: {} {}'.format(angle, self._angle))
 		pulse = self.angleToPWM(self._angle)
 		self.pwm.set_pwm(self.channel, 0, pulse)
 		# time.sleep(0.1/60*self._angle)  # 0.1 sec per 60 deg movement
@@ -162,6 +164,8 @@ class Servo(PWM):
 		"""
 		self.limitMaxAngle = maxAngle
 		self.limitMinAngle = minAngle
+		if maxAngle > self.maxAngle or minAngle < self.minAngle:
+			raise Exception('setServoLimits(): your limits are outside of servo range (see setServoRangleAngle())')
 
 
 def cmd_servo():
@@ -216,7 +220,65 @@ def test_servo():
 	s.angle = -10
 	assert(s.angle == 0)
 
+def test_limits():
+	"""
+	switching order messing things up
+	"""
+	s = Servo(15)
+	s.setServoRangeAngle(0, 180)
+	s.setServoLimits(0, 180)
+	s.angle = 0; assert(s.angle == 0)
+	s.angle = 45; assert(s.angle == 45)
+	s.angle = 90; assert(s.angle == 90)
+	s.angle = 180; assert(s.angle == 180)
+	s.angle = 270; assert(s.angle == 180)
+	s.angle = -45; assert(s.angle == 0)
+	s.angle = -90; assert(s.angle == 0)
+	s.angle = -270; assert(s.angle == 0)
+
+	s.setServoRangeAngle(-90, 90)
+	s.setServoLimits(-90, 90)
+	s.angle = 0; assert(s.angle == 0)
+	s.angle = 45; assert(s.angle == 45)
+	s.angle = 90; assert(s.angle == 90)
+	s.angle = 180; assert(s.angle == 90)
+	s.angle = 270; assert(s.angle == 90)
+	s.angle = -45; assert(s.angle == -45)
+	s.angle = -90; assert(s.angle == -90)
+	s.angle = -270; assert(s.angle == -90)
+
+from nose.tools import raises
+@raises(Exception)
+def test_fail():
+	s = Servo(15)
+	s.setServoRangeAngle(0, 180)
+	s.setServoLimits(-180, 90)  # this is outside of range, should fail
+
+def checks():
+	check = lambda x, a, b: max(min(b, x), a)
+	print('0 in [0,180]:', check(0, 0, 180))
+	print('90 in [0,180]:', check(90, 0, 180))
+	print('180 in [0,180]:', check(180, 0, 180))
+	print('-90 in [0,180]:', check(-90, 0, 180))
+	print('-180 in [0,180]:', check(-180, 0, 180))
+	print('--------------------')
+	print('0 in [180,0]:', check(0, 180, 0))
+	print('45 in [180,0]:', check(45, 180, 0))
+	print('90 in [180,0]:', check(90, 180, 0))
+	print('180 in [180,0]:', check(180, 180, 0))
+	print('-90 in [180,0]:', check(-90, 180, 0))
+	print('-180 in [180,0]:', check(-180, 180, 0))
+	print('--------------------')
+	print('0 in [-180,0]:', check(0, -180, 0))
+	print('90 in [-180,0]:', check(90, -180, 0))
+	print('180 in [-180,0]:', check(180, -180, 0))
+	print('-90 in [-180,0]:', check(-90, -180, 0))
+	print('-45 in [-180,0]:', check(-45, -180, 0))  # wrong: 135
+	print('-180 in [-180,0]:', check(-180, -180, 0))
+
 
 if __name__ == "__main__":
 	# cmd_servo()
-	swing_servo()
+	# swing_servo()
+	# test_limits()
+	checks()

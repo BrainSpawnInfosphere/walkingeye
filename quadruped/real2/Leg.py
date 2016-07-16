@@ -38,12 +38,6 @@ class Leg(object):
 		self.tibiaLength = lengths['tibiaLength']
 		self.femurLength = lengths['femurLength']
 
-		# initAngles = [-45, -20, -110]
-		initAngles = [45, 0, -90]
-
-
-		self.foot0 = self.fk(*initAngles)
-
 		# Create each servo and move it to the initial position
 		# servo arrange: coxa femur tibia
 		for i in range(0, 3):
@@ -51,10 +45,13 @@ class Leg(object):
 			if limits: lim = limits[i]
 			else: lim = None
 			self.servos.append(Servo(channels[i], lim))
-			self.servos[i].angle = initAngles[i]
-			print('servo {} angle {}'.format(channels[i], initAngles[i]))
+			# self.servos[i].angle = initAngles[i]
+			# print('servo {} angle {}'.format(channels[i], initAngles[i]))
 			# time.sleep(1)
 
+		# initAngles = [-45, -20, -110]
+		initAngles = [0, 0, -90]
+		self.foot0 = self.fk(*initAngles)
 		# self.servos[0].all_stop()
 
 	def __del__(self):
@@ -92,27 +89,31 @@ class Leg(object):
 		Reference (there are typos)
 		https://tote.readthedocs.io/en/latest/ik.html
 		"""
-		Lc = self.coxaLength
-		Lf = self.femurLength
-		Lt = self.tibiaLength
-		a = atan2(y, x)  # <---
-		# a = atan2(x, y)
-		f = sqrt(x**2 + y**2) - Lc
-		b1 = atan2(z, f)  # <---
-		# b1 = atan2(f, z)
-		d = sqrt(f**2 + z**2)  # <---
-		b2 = acos((Lf**2 + d**2 - Lt**2) / (2.0 * Lf * d))
-		b = b1 + b2
-		g = acos((Lf**2 + Lt**2 - d**2) / (2.0 * Lf * Lt))
+		try:
+			Lc = self.coxaLength
+			Lf = self.femurLength
+			Lt = self.tibiaLength
+			a = atan2(y, x)  # <---
+			# a = atan2(x, y)
+			f = sqrt(x**2 + y**2) - Lc
+			b1 = atan2(z, f)  # <---
+			# b1 = atan2(f, z)
+			d = sqrt(f**2 + z**2)  # <---
+			b2 = acos((Lf**2 + d**2 - Lt**2) / (2.0 * Lf * d))
+			b = b1 + b2
+			g = acos((Lf**2 + Lt**2 - d**2) / (2.0 * Lf * Lt))
 
-		#### FIXES ###################################
-		g -= pi  # fix to align fk and ik frames
-		##############################################
+			#### FIXES ###################################
+			g -= pi  # fix to align fk and ik frames
+			##############################################
 
-		# print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
+			# print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
 
-		# return a, b, g  # coxaAngle, femurAngle, tibiaAngle
-		return r2d(a), r2d(b), r2d(g)  # coxaAngle, femurAngle, tibiaAngle
+			# return a, b, g  # coxaAngle, femurAngle, tibiaAngle
+			return r2d(a), r2d(b), r2d(g)  # coxaAngle, femurAngle, tibiaAngle
+		except Exception as e:
+			print('ik error:', e)
+			raise e
 
 	def move(self, x, y, z):
 		"""
@@ -124,9 +125,9 @@ class Leg(object):
 			# print('angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
 			for i, servo in enumerate(self.servos):
 				# print('i, servo:', i, servo)
-				# angle = angles[i]
-				# if i == 2: angle += 90.0  # correct for tibia servo
-				servo.angle = angles[i]
+				angle = angles[i]
+				if i == 2: angle = -1*angle - 180   # correct for tibia servo backwards
+				servo.angle = angle
 
 		except Exception as e:
 			print (e)
@@ -147,7 +148,7 @@ def test_fk_ik():
 	channels = [10, 11, 12]
 	leg = Leg(length, channels)
 
-	angles = [80, -60, -60]
+	angles = [0, -45, -90]
 
 	pts = leg.fk(*angles)
 	angles2 = leg.ik(*pts)

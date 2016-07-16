@@ -12,7 +12,7 @@ import time
 import numpy as np
 # from tranforms import rotateAroundCenter, distance
 import logging
-from math import cos, sin, sqrt
+from math import cos, sin, sqrt, pi
 from math import radians as d2r
 from Servo import Servo
 
@@ -20,6 +20,12 @@ logging.getLogger("Adafruit_I2C").setLevel(logging.ERROR)
 
 ##########################
 
+def rot_z(t, c):
+	"""
+	t - theta [radians]
+	c - [x,y,z]
+	"""
+	return [c[0]*cos(t)-c[1]*sin(t), c[0]*sin(t)+c[1]*cos(t), c[2]]
 
 class CrawlGait(object):
 	"""
@@ -27,7 +33,7 @@ class CrawlGait(object):
 
 	This solution works but only allows 1 gait ... need to have multiple gaits
 	"""
-	offset = [0, 6, 3, 9]
+	# offset = [0, 6, 3, 9]
 	phi = [9/9, 6/9, 3/9, 0/9, 1/9, 2/9, 3/9, 4/9, 5/9, 6/9, 7/9, 8/9]
 	maxl = 0.50
 	minl = 0.25
@@ -35,7 +41,7 @@ class CrawlGait(object):
 	z = [minl, maxl, maxl, minl, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 	def __init__(self, robot):
-		self.current_step = 0
+		# self.current_step = 0
 		self.legOffsets = [0, 6, 3, 9]
 		# self.i = 0
 		self.robot = robot
@@ -86,9 +92,13 @@ class CrawlGait(object):
 		self.robot.moveFoot(legNum, newpos)
 
 	def command(self, cmd):
+		# frame rotations for each leg
+		frame = [pi/4, -pi/4, -3*pi/4, 3*pi/4]
+
 		for i in range(0, 12):
 			for legNum in [0, 2, 1, 3]:  # order them diagonally
-				self.eachLeg(legNum, i, cmd)  # move each leg appropriately
+				rcmd = rot_z(frame[legNum], cmd)
+				self.eachLeg(legNum, i, rcmd)  # move each leg appropriately
 			# self.eachLeg(0, i, cmd)
 			time.sleep(0.05)  # 20 Hz, not sure of value
 			time.sleep(1)
@@ -107,7 +117,8 @@ class CrawlGait(object):
 		pts = self.robot.legs[leg].fk(*angles)  # allows angles out of range
 		# self.robot.moveFoot(leg, pts)
 		self.robot.legs[leg].move(*pts)
-		print('angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
+		s = self.robot.legs[leg].servos
+		print('angles: {:.2f} {:.2f} {:.2f}'.format(s[0].angle, s[1].angle, s[2].angle))
 		print('pts: {:.2f} {:.2f} {:.2f}'.format(*pts))
 
 ##########################
@@ -131,8 +142,8 @@ class Quadruped(object):
 			for s in range(0, 3):
 				if 'servoRangeAngles' in data:  # mapping of angles to pulses
 					self.legs[i].servos[s].setServoRangeAngle(*data['servoRangeAngles'][s])
-				if 'servoLimits' in data:  # user defined limits to avoid servo issues
-					self.legs[i].servos[s].setServoLimits(*data['servoLimits'][s])
+				if 'legAngleLimits' in data:  # user defined limits to avoid servo issues
+					self.legs[i].servos[s].setServoLimits(*data['legAngleLimits'][s])
 				if 'servoRangePulse' in data:  # mapping of msec to pulses
 					raise Exception('servoRangePulse not implemented in json file yet ... bye')
 
@@ -157,13 +168,12 @@ if __name__ == "__main__":
 	# leg 2: [[0, 180], [-90, 90], [0, -180]]   [45,-20, -70]
 	test = {
 		'legLengths': {
-			'coxaLength': 17,
+			'coxaLength': 30,
 			'femurLength': 45,
 			'tibiaLength': 63
 		},
-		'servoLimits': [[10, 170], [-80, 80], [-170, -10]],
-		'servoRangeAngles':
-			[[0, 180], [-90, 90], [0, -180]]
+		'legAngleLimits': [[-80, 80], [-80, 80], [-170, -10]],
+		'servoRangeAngles': [[-90, 90], [-90, 90], [-180, 0]]
 	}
 	robot = Quadruped(test)
 	crawl = CrawlGait(robot)
@@ -175,16 +185,38 @@ if __name__ == "__main__":
 			i = 5
 			while i:
 				print('step:', i)
-				crawl.command([50.0, 0.0, 0.0])  # x mm, y mm, theta degs
+				crawl.command([50.0, 50.0, 0.0])  # x mm, y mm, theta degs
 				# time.sleep(1)
 				i -= 1
-		else:  # set leg to specific orientation
-			angles = [0, -20, -70]
+		elif 0:  # set leg to specific orientation
+			angles = [0, 10, -90]
 			crawl.pose(angles, 1)
 			time.sleep(2)
 			Servo.all_stop()
 			time.sleep(0.5)
-	except:
+		elif 0:
+			# Alpha:
+			# Beta: -60 to 90 is good
+			# Gamma: 0 to -180 is good
+			for i in range(-90, 90, 10):
+				angles = [i, 0, 0]
+				print('--------------------')
+				print('cmd angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
+				crawl.pose(angles, 1)
+				time.sleep(0.5)
+			Servo.all_stop()
+			time.sleep(0.5)
+		else:
+			angles = [0, 0, 0]
+			crawl.pose(angles, 0)
+			crawl.pose(angles, 1)
+			time.sleep(1)
+			Servo.all_stop()
+			time.sleep(0.1)
+
+	except Exception as e:
+		print(e)
 		print('Crap!!!!')
 		Servo.all_stop()
 		time.sleep(1)
+		raise
