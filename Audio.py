@@ -16,7 +16,7 @@ class SoundServer(mp.Process):
 	"""
 	"""
 	# def __init__(self, YAML_FILE, REAL, stdin=os.fdopen(os.dup(sys.stdin.fileno())), host="localhost", port=9200):
-	def __init__(self, YAML_FILE, host="localhost", port=9200):
+	def __init__(self, wit_token, host="localhost", port=9200):
 		mp.Process.__init__(self)
 		self.host = host
 		self.port = port
@@ -30,9 +30,9 @@ class SoundServer(mp.Process):
 		self.sub = zmq.Sub('wit-text', (host, str(port + 1)))
 
 		# maybe change this to an env variable ... do travis.ci?
-		db = fs.FileStorage()
-		db.readYaml(YAML_FILE)
-		wit_token = db.getKey('WIT_TOKEN')
+		# db = fs.FileStorage()
+		# db.readYaml(YAML_FILE)
+		# wit_token = db.getKey('WIT_TOKEN')
 
 		if wit_token is None:
 			self.logger.info('Need Wit.ai token, exiting now ...')
@@ -54,7 +54,7 @@ class SoundServer(mp.Process):
 		"""
 		self.logger.info(results, host, port, host, port + 1, len(self.modules))
 
-	def readPlugins(self, path="../plugins/"):
+	def readPlugins(self, path="./plugins/"):
 		"""
 		Clears the current modules and reads in all plugins located in path
 		in: path to plugins
@@ -64,7 +64,8 @@ class SoundServer(mp.Process):
 		sys.path.insert(0, path)
 		for f in os.listdir(path):
 			fname, ext = os.path.splitext(f)
-			if ext == '.py' and fname != 'Module':
+			if ext == '.py' and fname != 'Module' and fname != '__init__':
+				print('file:', fname, ext)
 				mod = __import__(fname)
 				m = mod.Plugin()
 				self.modules.append(m)
@@ -118,7 +119,8 @@ class SoundServer(mp.Process):
 			loop = True
 			while loop:
 				# get wit.ai json
-				result = self.input.listenPrompt('jarvis')
+				# result = self.input.listenPrompt()
+				result = self.input.listen()
 
 				txt = self.search(result)
 
@@ -139,6 +141,8 @@ class SoundServer(mp.Process):
 
 
 if __name__ == '__main__':
-	s = SoundServer('/Users/kevin/Dropbox/accounts.yaml')
+	# s = SoundServer('/Users/kevin/Dropbox/accounts.yaml')
+	token = os.getenv('WIT')
+	s = SoundServer(token)
 	s.start()
 	print('bye ...')
