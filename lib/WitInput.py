@@ -109,6 +109,9 @@ def main():
 
 	while True:
 		txt = raw_input(">> ")
+		if txt == 'exit':
+			print('bye ...')
+			break
 		resp = w.text(txt)
 		print('>>', resp)
 		print('listening')

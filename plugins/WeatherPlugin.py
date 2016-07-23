@@ -3,12 +3,19 @@
 import Module as mod
 import forecastio  # change to yahoo??
 import time
+import os
 
 
 class Plugin(mod.Module):
-	def __init__(self, API_KEY, geo):
+	def __init__(self, API_KEY=None, geo=None):
 		mod.Module.__init__(self, 'weather')
+		if API_KEY is None: API_KEY = os.getenv('FORECAST_IO')
 		api_key = API_KEY  # self.info['FORECAST_API_KEY']
+
+		if geo is None:
+			geo = {}
+			geo['latitude'] = os.getenv('FORECAST_LATITUDE')
+			geo['longitude'] = os.getenv('FORECAST_LONGITUDE')
 
 		# if api_key is None:
 		# 	self.logger.error('Need Forecast.io token, exiting now ...')
@@ -93,7 +100,6 @@ class Plugin(mod.Module):
 
 
 if __name__ == '__main__':
-	import os
 	geo = {
 		'latitude': 38.8,
 		'longitude': -104.8

@@ -14,7 +14,7 @@ class Plugin(mod.Module):
 
 	msglist = {}
 
-	def __init__(self, config_file='../config/responce.json'):
+	def __init__(self, config_file='./config/responce.json'):
 		mod.Module.__init__(self, ['greeting', 'feelings', 'error', 'joke', 'mean'])
 		fs = Fs.FileStorage()
 		fs.readJson(config_file)
