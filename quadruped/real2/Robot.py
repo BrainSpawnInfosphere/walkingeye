@@ -95,9 +95,15 @@ class CrawlGait(object):
 		# frame rotations for each leg
 		frame = [pi/4, -pi/4, -3*pi/4, 3*pi/4]
 
-		for i in range(0, 12):
+		# only calc this 4 times, not 12*4 times!
+		rot_cmd = []
+		for i in range(0, 4):
+			rot_cmd.append(rot_z(frame[i], cmd))
+
+		for i in range(0, 12):  # iteration, there are 12 steps in gait cycle
 			for legNum in [0, 2, 1, 3]:  # order them diagonally
-				rcmd = rot_z(frame[legNum], cmd)
+				# rcmd = rot_z(frame[legNum], cmd)
+				rcmd = rot_cmd[legNum]
 				self.eachLeg(legNum, i, rcmd)  # move each leg appropriately
 			# self.eachLeg(0, i, cmd)
 			time.sleep(0.05)  # 20 Hz, not sure of value
@@ -168,8 +174,8 @@ if __name__ == "__main__":
 	# leg 2: [[0, 180], [-90, 90], [0, -180]]   [45,-20, -70]
 	test = {
 		'legLengths': {
-			'coxaLength': 30,
-			'femurLength': 45,
+			'coxaLength': 26,
+			'femurLength': 42,
 			'tibiaLength': 63
 		},
 		'legAngleLimits': [[-80, 80], [-80, 80], [-170, -10]],
@@ -182,28 +188,42 @@ if __name__ == "__main__":
 
 	try:
 		if 1:  # walk
-			i = 5
+			i = 2
 			while i:
 				print('step:', i)
 				crawl.command([50.0, 50.0, 0.0])  # x mm, y mm, theta degs
 				# time.sleep(1)
 				i -= 1
 		elif 0:  # set leg to specific orientation
-			angles = [0, 10, -90]
-			crawl.pose(angles, 1)
-			time.sleep(2)
+			angles = [0, 0, -90]
+			crawl.pose(angles, 2)
+			time.sleep(1)
 			Servo.all_stop()
 			time.sleep(0.5)
 		elif 0:
 			# Alpha:
 			# Beta: -60 to 90 is good
 			# Gamma: 0 to -180 is good
+			leg = 1
+			dt = 0.1
 			for i in range(-90, 90, 10):
-				angles = [i, 0, 0]
+				angles = [i, 60, 0]
 				print('--------------------')
 				print('cmd angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
-				crawl.pose(angles, 1)
-				time.sleep(0.5)
+				crawl.pose(angles, leg)
+				time.sleep(dt)
+			for i in range(0, 90, 10):
+				angles = [0, i, 0]
+				print('--------------------')
+				print('cmd angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
+				crawl.pose(angles, leg)
+				time.sleep(dt)
+			for i in range(-160, -10, 10):
+				angles = [0, 60, i]
+				print('--------------------')
+				print('cmd angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
+				crawl.pose(angles, leg)
+				time.sleep(dt)
 			Servo.all_stop()
 			time.sleep(0.5)
 		else:

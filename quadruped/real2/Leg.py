@@ -28,7 +28,7 @@ class Leg(object):
 	def __init__(self, lengths, channels, limits=None):
 		"""
 		"""
-		if not len(channels) == 3: raise Exception('len(channels) = 3')
+		if not len(channels) == 3: raise Exception('len(channels) != 3')
 
 		self.servos = []
 		# self.footPosition = [0.0, 0.0, 0.0]
@@ -65,21 +65,32 @@ class Leg(object):
 		Lf = self.femurLength
 		Lt = self.tibiaLength
 
-		phi = a
-		theta2 = b
-		# theta3 = g - 90.0  # fix tibia servo range
-		theta3 = g
+		if 0:
+			phi = a
+			theta2 = b
+			theta3 = g
 
-		params = [
-			# a_ij alpha_ij  S_j  theta_j
-			[Lc,   d2r(90),   0,   d2r(theta2)],  # frame 12
-			[Lf,    d2r(0),   0,   d2r(theta3)]   # 23
-		]
+			params = [
+				# a_ij alpha_ij  S_j  theta_j
+				[Lc,   d2r(90.0),   0.0,   d2r(theta2)],  # frame 12
+				[Lf,    d2r(0.0),   0.0,   d2r(theta3)]   # frame 23
+			]
 
-		r = T(params, d2r(phi))
-		foot = r.dot(np.array([Lt, 0, 0, 1]))  # ok [ 37.4766594  37.4766594 -63. 1.]
+			r = T(params, d2r(phi))
+			foot = r.dot(np.array([Lt, 0.0, 0.0, 1.0]))
 
-		return foot[0:-1]  # DH return vector size 4, only grabe first 3 (x,y,z)
+			return foot[0:-1]  # DH return vector size 4, only grab (x,y,z) which are the 1st 3 elements
+		else:
+			a = d2r(a)
+			b = d2r(b)
+			g = d2r(g)
+			foot = [
+				Lc*cos(a) + Lf*cos(a)*cos(b) + Lt*(-sin(b)*sin(g)*cos(a) + cos(a)*cos(b)*cos(g)),
+				Lc*sin(a) + Lf*sin(a)*cos(b) + Lt*(-sin(a)*sin(b)*sin(g) + sin(a)*cos(b)*cos(g)),
+				Lf*sin(b) + Lt*(sin(b)*cos(g) + sin(g)*cos(b))
+			]
+
+			return np.array(foot)
 
 	def ik(self, x, y, z):
 		"""
@@ -127,6 +138,7 @@ class Leg(object):
 				# print('i, servo:', i, servo)
 				angle = angles[i]
 				if i == 2: angle = -1*angle - 180   # correct for tibia servo backwards
+				# print('servo {} angle {}'.format(i, angle))
 				servo.angle = angle
 
 		except Exception as e:
@@ -141,11 +153,11 @@ class Leg(object):
 
 def test_fk_ik():
 	length = {
-		'coxaLength': 30,
-		'femurLength': 45,
+		'coxaLength': 26,
+		'femurLength': 42,
 		'tibiaLength': 63
 	}
-	channels = [10, 11, 12]
+	channels = [0, 1, 2]
 	leg = Leg(length, channels)
 
 	angles = [0, -70, -90]
@@ -164,10 +176,63 @@ def test_fk_ik():
 	# assert(np.linalg.norm(np.array(angles) - np.array(angles2)) < 0.00001)
 
 
+def printError(pts, pts2, angles, angles2):
+	print('angles (orig):', angles)
+	print('angles2 from ik(pts): {:.2f} {:.2f} {:.2f}'.format(*angles2))
+	print('pts from fk(orig): {:.2f} {:.2f} {:.2f}'.format(*pts))
+	print('pts2 from fk(angle2): {:.2f} {:.2f} {:.2f}'.format(*pts2))
+	# print('diff:', np.linalg.norm(np.array(angles) - np.array(angles2)))
+	print('diff [mm]: {:.2f}'.format(np.linalg.norm(pts - pts2)))
+
+
+def test_full_fk_ik(c=[0, 1, 2]):
+	length = {
+		'coxaLength': 26,
+		'femurLength': 42,
+		'tibiaLength': 63
+	}
+	channels = c
+	leg = Leg(length, channels)
+
+	servorange = [[-90, 90], [-90, 90], [-180, 0]]
+	for s in range(0, 3):
+		leg.servos[s].setServoRangeAngle(*servorange[s])
+
+	for i in range(1, 3):
+		for a in range(-70, 70, 10):
+			angles = [0, 0, -10]
+			if i == 2: a -= 90
+			angles[i] = a
+			pts = leg.fk(*angles)
+			angles2 = leg.ik(*pts)
+			pts2 = leg.fk(*angles2)
+
+			angle_error = np.linalg.norm(np.array(angles) - np.array(angles2))
+			pos_error = np.linalg.norm(pts - pts2)
+			# print(angle_error, pos_error)
+
+			if angle_error > 0.0001:
+				print('Angle Error')
+				printError(pts, pts2, angles, angles2)
+				exit()
+
+			elif pos_error > 0.0001:
+				print('Position Error')
+				printError(pts, pts2, angles, angles2)
+				exit()
+
+			else:
+				print('Good: {} {} {}  error(deg,mm): {} {}'.format(angles[0], angles[1], angles[2], angle_error, pos_error))
+				leg.move(*pts)
+				time.sleep(0.1)
+
+	Servo.all_stop()
+
+
 def check_range():
 	length = {
-		'coxaLength': 17,
-		'femurLength': 45,
+		'coxaLength': 26,
+		'femurLength': 42,
 		'tibiaLength': 63
 	}
 
@@ -188,5 +253,9 @@ def check_range():
 
 
 if __name__ == "__main__":
-	test_fk_ik()
+	# test_fk_ik()
+	# test_full_fk_ik([0,1,2])
+	# test_full_fk_ik([4,5,6])
+	test_full_fk_ik([8,9,10])
+	# test_full_fk_ik([12,13,14])
 	# check_range()

@@ -281,6 +281,7 @@ def checks():
 	print('-90 in [0,180]:', check(-90, 0, 180))
 	print('-180 in [0,180]:', check(-180, 0, 180))
 	print('--------------------')
+	print('these are wrong! Cannot reverse order')
 	print('0 in [180,0]:', check(0, 180, 0))
 	print('45 in [180,0]:', check(45, 180, 0))
 	print('90 in [180,0]:', check(90, 180, 0))
@@ -292,7 +293,7 @@ def checks():
 	print('90 in [-180,0]:', check(90, -180, 0))
 	print('180 in [-180,0]:', check(180, -180, 0))
 	print('-90 in [-180,0]:', check(-90, -180, 0))
-	print('-45 in [-180,0]:', check(-45, -180, 0))  # wrong: 135
+	print('-45 in [-180,0]:', check(-45, -180, 0))
 	print('-180 in [-180,0]:', check(-180, -180, 0))
 
 
