@@ -83,10 +83,10 @@ class CrawlGait(object):
 		])
 		newpos = rest + move
 
-		if legNum == 0:
+		if legNum in [0]:
 			# print('Rot [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, rot[0], rot[1], rot[2]))
 			# print('Move [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, move[0], move[1], move[2]))
-			print('Newpos [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, newpos[0], newpos[1], newpos[2]))
+			print('leg {} Newpos [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(legNum, i, newpos[0], newpos[1], newpos[2]))
 
 		# now move leg/servos
 		self.robot.moveFoot(legNum, newpos)
@@ -98,7 +98,9 @@ class CrawlGait(object):
 		# only calc this 4 times, not 12*4 times!
 		rot_cmd = []
 		for i in range(0, 4):
-			rot_cmd.append(rot_z(frame[i], cmd))
+			rc = rot_z(frame[i], cmd)
+			rot_cmd.append(rc)
+			print('cmd[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rc[0], rc[1], rc[2]))
 
 		for i in range(0, 12):  # iteration, there are 12 steps in gait cycle
 			for legNum in [0, 2, 1, 3]:  # order them diagonally
@@ -188,10 +190,10 @@ if __name__ == "__main__":
 
 	try:
 		if 1:  # walk
-			i = 2
+			i = 1
 			while i:
 				print('step:', i)
-				crawl.command([50.0, 50.0, 0.0])  # x mm, y mm, theta degs
+				crawl.command([50.0, 0.0, 0.0])  # x mm, y mm, theta degs
 				# time.sleep(1)
 				i -= 1
 		elif 0:  # set leg to specific orientation

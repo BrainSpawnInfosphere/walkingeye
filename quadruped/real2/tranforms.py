@@ -19,32 +19,32 @@ This file is needed by gait Trot class
 
 # FIXME: 20160625 add euler -> quaternion transform and reverse
 
-# def axis_angle(vec, axis, theta):
-# 	"""
-# 	https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Conversion_to_and_from_the_matrix_representation
-# 	Quaternion (axis/angle) to rotation matrix
-#
-# 	in:
-# 		vec - point to rotate
-# 		axis - axis of rotation
-# 		theta - angle of rotation (degrees)
-# 	out: rotated vector/point
-# 	"""
-# 	theta = d2r(theta)
-# 	axis = np.array([0, 0, 1])
-# 	# axis = axis / sqrt(np.dot(axis, axis))  # normalizing axis
-# 	a = cos(theta / 2.0)
-# 	b, c, d = axis * sin(theta / 2.0)
-# 	aa, bb, cc, dd = a * a, b * b, c * c, d * d
-# 	bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
-# 	rot = np.array([
-# 		[aa+bb-cc-dd, 2.0*(bc-ad), 2.0*(bd+ac)],
-# 		[2.0*(bc+ad), aa-bb+cc-dd, 2.0*(cd-ab)],
-# 		[2.0*(bd-ac), 2.0*(cd+ab), aa-bb-cc+dd]
-# 	])
-# 	# print('rotateAroundCenter', np.dot(rot, vec))
-#
-# 	return np.dot(rot, vec)
+def axis_angle(vec, axis, theta):
+	"""
+	https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Conversion_to_and_from_the_matrix_representation
+	Quaternion (axis/angle) to rotation matrix
+
+	in:
+		vec - point to rotate
+		axis - axis of rotation
+		theta - angle of rotation (degrees)
+	out: rotated vector/point
+	"""
+	theta = d2r(theta)
+	axis = np.array([0, 0, 1])
+	# axis = axis / sqrt(np.dot(axis, axis))  # normalizing axis
+	a = cos(theta / 2.0)
+	b, c, d = axis * sin(theta / 2.0)
+	aa, bb, cc, dd = a * a, b * b, c * c, d * d
+	bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
+	rot = np.array([
+		[aa+bb-cc-dd, 2.0*(bc-ad), 2.0*(bd+ac)],
+		[2.0*(bc+ad), aa-bb+cc-dd, 2.0*(cd-ab)],
+		[2.0*(bd-ac), 2.0*(cd+ab), aa-bb-cc+dd]
+	])
+	# print('rotateAroundCenter', np.dot(rot, vec))
+
+	return np.dot(rot, vec)
 
 
 def rot(a, alpha, S, theta):

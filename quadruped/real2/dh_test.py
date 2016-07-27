@@ -12,24 +12,25 @@ from sympy import symbols, sin, cos, pi
 a, b, g = symbols('a b g')
 Lc, Lf, Lt = symbols('Lc Lf Lt')
 
+a1, a2, t1, t2 = symbols('a1 a2 t1 t2')
 
 def rot(a, alpha, S, theta):
 	"""
 	Creates a DH rotation matrix for forward kinematics.
 	"""
-	return np.array([  # eqn 3.7 pg 36
-		[cos(theta), -sin(theta), 0, a],
-		[sin(theta) * cos(alpha), cos(theta) * cos(alpha), -sin(alpha), -sin(alpha) * S],
-		[sin(theta) * sin(alpha), cos(theta) * sin(alpha), cos(alpha), cos(alpha) * S],
+	# return np.array([  # eqn 3.7 pg 36
+	# 	[cos(theta), -sin(theta), 0.0, a],
+	# 	[sin(theta) * cos(alpha), cos(theta) * cos(alpha), -sin(alpha), -sin(alpha) * S],
+	# 	[sin(theta) * sin(alpha), cos(theta) * sin(alpha), cos(alpha), cos(alpha) * S],
+	# 	[0.0, 0.0, 0.0, 1.0]
+	# ])
+
+	return np.array([  # inverse of above ?? spong text
+		[cos(theta), -sin(theta) * cos(alpha), sin(theta) * sin(alpha), cos(theta) * a],
+		[sin(theta), cos(theta) * cos(alpha), -cos(theta) * sin(alpha), sin(theta) * a],
+		[0, sin(alpha), cos(alpha), S],
 		[0, 0, 0, 1]
 	])
-
-	# return np.array([  # inverse of above ??
-	# 	[cos(theta), sin(theta) * cos(alpha), sin(theta) * sin(alpha), -cos(theta) * a],
-	# 	[-sin(theta), cos(theta) * cos(alpha), cos(theta) * sin(alpha), sin(theta) * a],
-	# 	[0, -sin(alpha), cos(alpha), -S],
-	# 	[0, 0, 0, 1]
-	# ])
 
 
 def T(params, phi):
@@ -40,15 +41,31 @@ def T(params, phi):
 	"""
 	# handle the base frame, eqn 3.9, p36
 	t = np.array([
-		[cos(phi), -sin(phi), 0, 0],
-		[sin(phi), cos(phi), 0, 0],
-		[0, 0, 1, 0],
-		[0, 0, 0, 1]
+		[cos(phi), -sin(phi), 0.0, 0.0],
+		[sin(phi), cos(phi), 0.0, 0.0],
+		[0.0, 0.0, 1.0, 0.0],
+		[0.0, 0.0, 0.0, 1.0]
 	])
 	for i, p in enumerate(params):
 		t = t.dot(rot(*p))
 	return t
 
+def T2(params):
+	"""
+	Creates a transform from the leg frame to the foot.
+
+	params = [[a, alpha, S, theta],[a, alpha, S, theta],...]
+	"""
+	# handle the base frame, eqn 3.9, p36
+	t = np.array([
+		[1.0, 0.0, 0.0, 0.0],
+		[0.0, 1.0, 0.0, 0.0],
+		[0.0, 0.0, 1.0, 0.0],
+		[0.0, 0.0, 0.0, 1.0]
+	])
+	for i, p in enumerate(params):
+		t = t.dot(rot(*p))
+	return t
 
 def fk(a, b, g):
 	params = [
@@ -71,11 +88,29 @@ def eval(f, inputs):
 	return h
 
 
-kine = fk(a, b, g)
+# kine = fk(a, b, g)
+# print('Forward Kinematics')
+# print(kine)
+# print('----------------------------')
+# # inputs = {a: -pi/4, b: 0.0, g: -pi/2, Lc: 26, Lf: 42, Lt: 63}
+# inputs = {a: d2r(0.0), b: 0.0, g: d2r(-90.0), Lc: 26, Lf: 42, Lt: 63}
+# print('for:', inputs)
+# print(eval(kine, inputs))
+
+params = [
+	# a_ij alpha_ij  S_j  theta_j
+	[a1,    0.0,   0.0,   t1],  # frame 12
+	[a2,    0.0,   0.0,   t2]   # 23
+]
+
+
+print(rot(*params[0]))
+print(rot(*params[1]))
+r = T2(params)
 print('Forward Kinematics')
-print(kine)
+print(r)
 print('----------------------------')
 # inputs = {a: -pi/4, b: 0.0, g: -pi/2, Lc: 26, Lf: 42, Lt: 63}
-inputs = {a: d2r(0.0), b: 0.0, g: d2r(-90.0), Lc: 26, Lf: 42, Lt: 63}
-print('for:', inputs)
-print(eval(kine, inputs))
+# inputs = {a: d2r(0.0), b: 0.0, g: d2r(-90.0), Lc: 26, Lf: 42, Lt: 63}
+# print('for:', inputs)
+# print(eval(kine, inputs))
