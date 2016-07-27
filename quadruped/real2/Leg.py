@@ -50,7 +50,7 @@ class Leg(object):
 			# time.sleep(1)
 
 		# initAngles = [-45, -20, -110]
-		initAngles = [0, 0, -90]
+		initAngles = [0, 0, -110]
 		self.foot0 = self.fk(*initAngles)
 		# self.servos[0].all_stop()
 

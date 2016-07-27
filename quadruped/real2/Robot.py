@@ -20,12 +20,14 @@ logging.getLogger("Adafruit_I2C").setLevel(logging.ERROR)
 
 ##########################
 
+# move to transforms?
 def rot_z(t, c):
 	"""
 	t - theta [radians]
 	c - [x,y,z]
 	"""
 	return [c[0]*cos(t)-c[1]*sin(t), c[0]*sin(t)+c[1]*cos(t), c[2]]
+
 
 class CrawlGait(object):
 	"""
@@ -109,7 +111,7 @@ class CrawlGait(object):
 				self.eachLeg(legNum, i, rcmd)  # move each leg appropriately
 			# self.eachLeg(0, i, cmd)
 			time.sleep(0.05)  # 20 Hz, not sure of value
-			time.sleep(1)
+			# time.sleep(0.5)
 
 	# def step(self, i, cmd):
 	# 	"""
@@ -190,10 +192,10 @@ if __name__ == "__main__":
 
 	try:
 		if 1:  # walk
-			i = 1
+			i = 5
 			while i:
 				print('step:', i)
-				crawl.command([50.0, 0.0, 0.0])  # x mm, y mm, theta degs
+				crawl.command([100.0, 0.0, 0.0])  # x mm, y mm, theta degs
 				# time.sleep(1)
 				i -= 1
 		elif 0:  # set leg to specific orientation
