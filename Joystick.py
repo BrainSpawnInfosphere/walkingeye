@@ -11,7 +11,7 @@ from __future__ import print_function
 import sdl2
 import time  # sleep ... why?
 import argparse
-import zmqclass as zmq
+#import lib.zmqclass as zmq
 
 
 class Joystick(object):
@@ -21,7 +21,7 @@ class Joystick(object):
 	"""
 	def __init__(self, host, port):
 		# self.pub = zmq.Pub('tcp://' + str(host) + ':' + str(port))
-		self.pub = zmq.Pub((host, port))
+#		self.pub = zmq.Pub((host, port))
 
 		# init SDL2 and grab joystick
 		sdl2.SDL_Init(sdl2.SDL_INIT_JOYSTICK)
@@ -120,7 +120,7 @@ class Joystick(object):
 				if verbose:
 					print(ps4)
 
-				self.pub.pub('js', self.formatCmd(ps4))
+#				self.pub.pub('js', self.formatCmd(ps4))
 
 				time.sleep(0.1)
 
