@@ -111,7 +111,7 @@ class CrawlGait(object):
 				self.eachLeg(legNum, i, rcmd)  # move each leg appropriately
 			# self.eachLeg(0, i, cmd)
 			time.sleep(0.05)  # 20 Hz, not sure of value
-			# time.sleep(0.5)
+			time.sleep(0.5)
 
 	# def step(self, i, cmd):
 	# 	"""
@@ -193,6 +193,7 @@ if __name__ == "__main__":
 	try:
 		if 1:  # walk
 			i = 5
+			time.sleep(3)
 			while i:
 				print('step:', i)
 				crawl.command([100.0, 0.0, 0.0])  # x mm, y mm, theta degs
