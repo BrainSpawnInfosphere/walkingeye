@@ -42,6 +42,12 @@ class Base(object):  # FIXME: 20160525 move printing statements to logging inste
 		self.ctx.term()
 		print('[<] shutting down', msg)
 
+	def getAddress(self, hp):
+		if hp[0] == 'localhost':  # do I need to do this?
+			hp = (Socket.gethostbyname(Socket.gethostname()), hp[1])
+		addr = 'tcp://{}:{}'.format(*hp)
+		return addr
+
 
 class Pub(Base):
 	"""
@@ -49,9 +55,10 @@ class Pub(Base):
 	"""
 	def __init__(self, bind_to=('localhost', 9000)):
 		Base.__init__(self)
-		if bind_to[0] == 'localhost':  # do I need to do this?
-			bind_to = (Socket.gethostbyname(Socket.gethostname()), bind_to[1])
-		self.bind_to = 'tcp://' + bind_to[0] + ':' + str(bind_to[1])
+		# if bind_to[0] == 'localhost':  # do I need to do this?
+		# 	bind_to = (Socket.gethostbyname(Socket.gethostname()), bind_to[1])
+		# self.bind_to = 'tcp://' + bind_to[0] + ':' + str(bind_to[1])
+		self.bind_to = self.getAddress(bind_to)
 
 		try:
 			self.socket = self.ctx.socket(zmq.PUB)
@@ -86,7 +93,8 @@ class Sub(Base):
 	"""
 	def __init__(self, topics=None, connect_to=('localhost', 9000), poll_time=0.01):
 		Base.__init__(self)
-		self.connect_to = 'tcp://' + connect_to[0] + ':' + str(connect_to[1])
+		# self.connect_to = 'tcp://' + connect_to[0] + ':' + str(connect_to[1])
+		self.connect_to = self.getAddress(connect_to)
 		self.poll_time = poll_time
 		try:
 			self.socket = self.ctx.socket(zmq.SUB)
@@ -98,7 +106,7 @@ class Sub(Base):
 				print("Receiving messages on ALL topics...")
 				self.socket.setsockopt(zmq.SUBSCRIBE, '')
 			else:
-				print("Receiving messages on topics: {0!s} ...".format(topics))
+				print("{}:{} receiving messages on topics: {} ...".format(connect_to[0], connect_to[1], topics))
 				for t in topics:
 					self.socket.setsockopt(zmq.SUBSCRIBE, t)
 
@@ -206,7 +214,8 @@ class ServiceProvider(Base):
 	def __init__(self, bind_to):
 		Base.__init__(self)
 		self.socket = self.ctx.socket(zmq.REP)
-		tcp = 'tcp://' + bind_to[0] + ':' + str(bind_to[1])
+		# tcp = 'tcp://' + bind_to[0] + ':' + str(bind_to[1])
+		tcp = self.getAddress(bind_to)
 		self.socket.bind(tcp)
 
 	def __del__(self):
@@ -232,7 +241,8 @@ class ServiceClient(Base):
 	def __init__(self, bind_to):
 		Base.__init__(self)
 		self.socket = self.ctx.socket(zmq.REQ)
-		tcp = 'tcp://' + bind_to[0] + ':' + str(bind_to[1])
+		# tcp = 'tcp://' + bind_to[0] + ':' + str(bind_to[1])
+		tcp = self.getAddress(bind_to)
 		self.socket.connect(tcp)
 
 	def __del__(self):

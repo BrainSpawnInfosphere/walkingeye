@@ -5,7 +5,6 @@ import os
 import sys
 import multiprocessing as mp
 sys.path.insert(0, os.path.abspath('..'))
-
 import lib.zmqclass as zmq
 
 
@@ -20,6 +19,7 @@ def test_pub_sub():
 
 		if msg:
 			assert msg == tmsg
+			assert topic == 'test'
 			break
 
 

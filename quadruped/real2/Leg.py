@@ -15,7 +15,7 @@ from tranforms import rot, T
 # from Interfaces import PCA9685
 import logging
 from Servo import Servo
-import time
+# import time
 
 # logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.ERROR)
@@ -50,8 +50,12 @@ class Leg(object):
 			# time.sleep(1)
 
 		# initAngles = [-45, -20, -110]
-		initAngles = [0, -20, -90]
+		# initAngles = [0, -20, -90]
+		# initAngles = [0, 45, -135]  # [x,y,z] = [55.7, 0, -33.3] mm
+		initAngles = [0, 45, -150]  # [x,y,z] = [55.7, 0, -33.3] mm
 		self.foot0 = self.fk(*initAngles)
+		# print('init foot0', self.foot0)
+		# exit()
 		# self.servos[0].all_stop()
 
 	def __del__(self):
@@ -146,7 +150,8 @@ class Leg(object):
 			raise
 
 	def reset(self):
-		self.angles = self.resting_position
+		# self.angles = self.resting_position
+		self.move(*self.foot0)
 
 ################################################################
 
