@@ -18,19 +18,19 @@ def rot(a, alpha, S, theta):
 	"""
 	Creates a DH rotation matrix for forward kinematics.
 	"""
-	# return np.array([  # eqn 3.7 pg 36
-	# 	[cos(theta), -sin(theta), 0.0, a],
-	# 	[sin(theta) * cos(alpha), cos(theta) * cos(alpha), -sin(alpha), -sin(alpha) * S],
-	# 	[sin(theta) * sin(alpha), cos(theta) * sin(alpha), cos(alpha), cos(alpha) * S],
-	# 	[0.0, 0.0, 0.0, 1.0]
-	# ])
-
-	return np.array([  # inverse of above ?? spong text
-		[cos(theta), -sin(theta) * cos(alpha), sin(theta) * sin(alpha), cos(theta) * a],
-		[sin(theta), cos(theta) * cos(alpha), -cos(theta) * sin(alpha), sin(theta) * a],
-		[0, sin(alpha), cos(alpha), S],
-		[0, 0, 0, 1]
+	return np.array([  # eqn 3.7 pg 36
+		[cos(theta), -sin(theta), 0.0, a],
+		[sin(theta) * cos(alpha), cos(theta) * cos(alpha), -sin(alpha), -sin(alpha) * S],
+		[sin(theta) * sin(alpha), cos(theta) * sin(alpha), cos(alpha), cos(alpha) * S],
+		[0.0, 0.0, 0.0, 1.0]
 	])
+
+	# return np.array([  # inverse of above ?? spong text
+	# 	[cos(theta), -sin(theta) * cos(alpha), sin(theta) * sin(alpha), cos(theta) * a],
+	# 	[sin(theta), cos(theta) * cos(alpha), -cos(theta) * sin(alpha), sin(theta) * a],
+	# 	[0, sin(alpha), cos(alpha), S],
+	# 	[0, 0, 0, 1]
+	# ])
 
 
 def T(params, phi):
@@ -97,20 +97,37 @@ def eval(f, inputs):
 # print('for:', inputs)
 # print(eval(kine, inputs))
 
+# not sure what this is???
+# params = [
+# 	# a_ij alpha_ij  S_j  theta_j
+# 	[a1,    0.0,   0.0,   t1],  # frame 12
+# 	[a2,    0.0,   0.0,   t2]   # 23
+# ]
+
 params = [
 	# a_ij alpha_ij  S_j  theta_j
-	[a1,    0.0,   0.0,   t1],  # frame 12
-	[a2,    0.0,   0.0,   t2]   # 23
+	[Lc, pi/2,   0.0,  b],  # frame 12
+	[Lf, 0.0,   0.0,   g]   # frame 23
 ]
 
-
-print(rot(*params[0]))
-print(rot(*params[1]))
-r = T2(params)
+# print(rot(*params[0]))
+# print(rot(*params[1]))
+print("Crane")
+r = T(params, a)
 print('Forward Kinematics')
-print(r)
+print(r.dot(np.array([Lt, 0, 0, 1])))  # crane
 print('----------------------------')
 # inputs = {a: -pi/4, b: 0.0, g: -pi/2, Lc: 26, Lf: 42, Lt: 63}
 # inputs = {a: d2r(0.0), b: 0.0, g: d2r(-90.0), Lc: 26, Lf: 42, Lt: 63}
 # print('for:', inputs)
 # print(eval(kine, inputs))
+
+# print("DH")
+# params = [
+# 	# a_ij alpha_ij  S_j  theta_j
+# 	[Lc, pi/2, 0.0,   b],  # frame 12
+# 	[Lf, 0.0,  0.0,   g],  # frame 23
+# 	[Lt, 0.0,  0.0, 0.0]
+# ]
+# r = T2(r)
+# print(r)
