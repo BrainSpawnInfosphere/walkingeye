@@ -1,7 +1,7 @@
 from __future__ import division
 from __future__ import print_function
 
-from math import sin, cos, pi, sqrt
+from math import sin, cos, pi, sqrt, fabs
 from math import radians as d2r
 import time
 from robot import robotData
@@ -32,6 +32,123 @@ def rot_z(t, c):
 	"""
 	return [c[0]*cos(t)-c[1]*sin(t), c[0]*sin(t)+c[1]*cos(t), c[2]]
 
+
+class newTrotGait(Gait):
+	phi = [9/9, 6/9, 3/9, 0/9, 1/9, 2/9, 3/9, 4/9, 5/9, 6/9, 7/9, 8/9]
+	maxl = 0.2
+	minl = 0.1
+	E = [0/9, 3/9, 6/9, 9/9, 6/9, 3/9, 0/9, -3/9, -6/9, -9/9, -6/9, -3/9]
+	z = [minl, maxl, maxl, minl, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+	def __init__(self, robot):
+		Gait.__init__(self, robot)
+
+		self.legOffset = [0, 6, 3, 9]
+		self.legs = [
+			robot.legs['front_left'],
+			robot.legs['front_right'],
+			robot.legs['rear_right'],
+			robot.legs['rear_left']
+		]
+		self.i = 0
+
+	def eachLeg(self, legNum, index, cmd):
+		"""
+		robot paper
+		"""
+		phi = self.phi
+		offset = self.legOffset
+		z = self.z
+		E = self.E
+		zrot = d2r(float(cmd[2]))
+
+		rests = robotData.legs_resting_positions
+		rest = rests[legNum]
+		# print('rest[{}]:'.format(legNum), rest)
+
+		i = (index + offset[legNum]) % 12  # len(self.z)
+
+		# get rotation distance: dist = rot_z(angle, rest) - rest
+		# this just reduces the function calls and math
+		c = cos(zrot)
+		s = sin(zrot)
+		rot = [
+			c*rest[0] - s*rest[1] - rest[0],
+			s*rest[0] + c*rest[1] - rest[1],
+			0.0  # need this for subtraction
+		]
+
+		# rot -= rest  # make rot a delta rotation
+
+		# rot = [0,0]
+
+		# combine delta move and delta rotation (add vectors)
+		# delta is the length of the step
+		# add together the linear distance and rotation distance
+		# FIXME: there needs to be a limit (max length) otherwise you can command too much
+		xx = cmd[0] + rot[0]
+		yy = cmd[1] + rot[1]
+
+		# create new move command
+		move = np.array([
+			# xx/2 - phi[i]*xx,
+			# yy/2 - phi[i]*yy,
+			xx/2 - phi[i]*xx + xx*E[i]/3,
+			yy/2 - phi[i]*yy + yy*E[i]/3,
+			-rest[2]*z[i]
+		])
+
+		# new foot position: newpos = rest + move
+		newpos = rest + move
+
+		if legNum in [0]:
+			# print('Rot [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, rot[0], rot[1], rot[2]))
+			# print('Move [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, move[0], move[1], move[2]))
+			print('leg {} Newpos [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(legNum, i, newpos[0], newpos[1], newpos[2]))
+
+		# now move leg/servos
+		# self.robot.moveFoot(legNum, newpos)
+		# print('newpos[{}]:'.format(legNum), newpos)
+		self.legs[legNum].move_to_pos(*newpos)
+
+	def iterate(self, linear_speed, angular_speed):
+		"""
+		This gets called once then an update to vrep is called, can't do all
+		12 steps here
+		"""
+		cmd = [linear_speed[0], linear_speed[1], angular_speed[2]]
+		# frame rotations for each leg
+		# frame = [pi/4, -pi/4, -3*pi/4, 3*pi/4]
+		# VRep frame is not rotated like mine!!!!!!!!!
+		# frame = [0, 0, 0, 0]
+
+		# only calc this 4 times, not 12*4 times!
+		# rot_cmd = []
+		# for i in range(0, 4):
+		# 	rc = rot_z(frame[i], cmd)
+		# 	rot_cmd.append(rc)
+			# print('cmd[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rc[0], rc[1], rc[2]))
+
+		# for i in range(0, 12):  # iteration, there are 12 steps in gait cycle
+		# 	for legNum in [0, 2, 1, 3]:  # order them diagonally
+		# 		# rcmd = rot_z(frame[legNum], cmd)
+		# 		rcmd = rot_cmd[legNum]
+		# 		self.eachLeg(legNum, i, rcmd)  # move each leg appropriately
+		# 	# self.eachLeg(0, i, cmd)
+		# 	# time.sleep(0.05)  # 20 Hz, not sure of value
+		# 	# time.sleep(0.5)
+		i = self.i
+		for legNum in [0, 2, 1, 3]:  # order them diagonally
+			# rcmd = rot_z(frame[legNum], cmd)
+			# rcmd = rot_cmd[legNum]
+			rcmd = cmd
+			self.eachLeg(legNum, i, rcmd)  # move each leg appropriately
+		self.i = (i + 1)%12
+		# time.sleep(0.25)
+		# time.sleep(0.25)
+
+##########################################################################
+##########################################################################
 
 class TrotGait(Gait):
 

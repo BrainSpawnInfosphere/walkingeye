@@ -1,5 +1,5 @@
 import time
-from robot.gaits import TrotGait, TrotGait2
+from robot.gaits import TrotGait, TrotGait2, newTrotGait
 
 __author__ = 'will'
 
@@ -16,13 +16,13 @@ class RobotController():
         self.joystick = None
         self.robot = robot
         self.dx = 0
-        self.dy = 0
+        self.dy = 100
         self.dz = 0
-        self.drot = [0, 0, -10]
+        self.drot = [0, 0, 0]
 
 #         self.keyListener = KeyListener()
         self.startTime = time.time()
-        self.trotgait = TrotGait(self.robot)
+        self.trotgait = newTrotGait(self.robot)
         self.trotgait.reset()
 
     def keep_feet_horizontal(self):
