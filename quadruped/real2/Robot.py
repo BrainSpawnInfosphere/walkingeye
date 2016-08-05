@@ -97,8 +97,8 @@ class CrawlGait(object):
 		move = np.array([
 			xx/2 - phi[i]*xx,
 			yy/2 - phi[i]*yy,
-			# xx/2 - phi[i]*xx - xx*E[i]/3,  # these don't work
-			# yy/2 - phi[i]*yy - yy*E[i]/3,
+			# xx/2 - phi[i]*xx + xx*E[i]/3,  # these don't work
+			# yy/2 - phi[i]*yy + yy*E[i]/3,
 			-rest[2]*z[i]  # this will subtract off the height -> raise leg
 		])
 
@@ -114,6 +114,7 @@ class CrawlGait(object):
 		# now move leg/servos
 		self.robot.moveFoot(legNum, newpos)
 		# time.sleep(0.25)
+		time.sleep(0.01)
 
 	def command(self, cmd):
 		# handle no movement command ... do else where?
