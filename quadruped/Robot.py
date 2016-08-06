@@ -14,11 +14,11 @@ import numpy as np
 import logging
 from math import cos, sin, sqrt, pi
 from math import radians as d2r
-from Servo import Servo
+from lib.Servo import Servo
 import sys
 import os
-sys.path.insert(0, os.path.abspath('../..'))
-from lib.zmqclass import Sub as zmqSub
+sys.path.insert(0, os.path.abspath('..'))
+from chi.lib.zmqclass import Sub as zmqSub
 
 logging.getLogger("Adafruit_I2C").setLevel(logging.ERROR)
 

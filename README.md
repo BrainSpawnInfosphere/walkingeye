@@ -5,7 +5,7 @@
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/walchko/soccer2/master/MIT_License.txt)
 [![Code Issues](https://www.quantifiedcode.com/api/v1/project/8b181dffb58d46c4bc6e7919209a1ae7/badge.svg)](https://www.quantifiedcode.com/app/project/8b181dffb58d46c4bc6e7919209a1ae7)
 
-This is the second version of my soccer robot.
+My robot software.
 
 * Doesn't use [ROS](http://ros.org), ROS is a pain to install and maintain on OSX and various linux systems
 	* Uses some of the same ideas, but not RPC-XML
@@ -13,7 +13,7 @@ This is the second version of my soccer robot.
 * Uses my PS4 controller with PySDL2
 * Uses [wit.ai](http://wit.ai) for speech-to-text
 * Uses OpenCV to process on-board or stream video off-board to remote
-* All of this runs on [Raspberry Pi B+](http://www.raspberrypi.org)
+* All of this runs on [Raspberry Pi3](http://www.raspberrypi.org)
 
 **Note:** This re-write is still very early and not fully running yet, just parts.
 
@@ -23,7 +23,6 @@ Documentation is on the [wiki](https://github.com/walchko/soccer2/wiki)
 
 ## Layout of software
 
-* config - config files
 * docs - various PDFs, latex, or whatever for background
 * lib - my ros alternative core libraries
 * pics - pictures
@@ -32,7 +31,7 @@ Documentation is on the [wiki](https://github.com/walchko/soccer2/wiki)
 * soccer - nonholonomic robot code
 * sounds - sound clips for the speech/audio capabilities
 * test - nose test scripts
-* tmp - various things I am testing that may or may not work or make it to my robot
+* tmp - various things I am testing that may or may not work or make it to my robots
 * tools - tools for my ros alternative
 	* topic - publish/subscribe to a topic
 	* bag - save messages for a topic to a file
@@ -47,7 +46,7 @@ Need to organize everything in the main directory
 
 If I think it is useful, I might break the infrastructure out into its own thing:
 
-MyRos (need a better name)
+Chi (need a better name)
 
 * Core
 	* Pub/Sub/Service
@@ -71,4 +70,4 @@ MyRos (need a better name)
 * Landscape.io - on push, check code for errors
 * travis.ci - on push, run unit tests on commit to github
 * quantifiedcode - on push, check for errors and will submit auto fixes (pull requests) for simple errors
-* srcclr - check code and associated libraries for licenses 
+* srcclr - check code and associated libraries for licenses

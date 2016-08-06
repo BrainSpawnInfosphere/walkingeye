@@ -11,10 +11,10 @@ import numpy as np
 from math import sin, cos, acos, atan2, sqrt, pi
 from math import radians as d2r
 from math import degrees as r2d
-from tranforms import T
+from lib.kinematics import T
 # from Interfaces import PCA9685
 import logging
-from Servo import Servo
+from lib.Servo import Servo
 # import time
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -44,6 +44,7 @@ class Leg(object):
 			# print('leg channels', channels)
 			if limits: lim = limits[i]
 			else: lim = None
+			
 			self.servos.append(Servo(channels[i], lim))
 			# self.servos[i].angle = initAngles[i]
 			# print('servo {} angle {}'.format(channels[i], initAngles[i]))
