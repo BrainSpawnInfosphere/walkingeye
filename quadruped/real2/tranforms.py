@@ -11,7 +11,7 @@ import numpy as np
 # import math
 from math import sin, cos, acos, atan2, sqrt, pi
 from math import radians as d2r
-from math import degrees as r2d
+# from math import degrees as r2d
 
 """
 This file is needed by gait Trot class

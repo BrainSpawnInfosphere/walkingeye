@@ -28,10 +28,24 @@ logging.getLogger("Adafruit_I2C").setLevel(logging.ERROR)
 def rot_z(t, c):
 	"""
 	t - theta [radians]
-	c - [x,y,z]
+	c - [x,y,z] or [x,y] ... the function detects 2D or 3D vector
 	"""
-	return np.array([c[0]*cos(t)-c[1]*sin(t), c[0]*sin(t)+c[1]*cos(t), c[2]])
+	if len(c) == 3:
+		ans = np.array([
+			c[0]*cos(t)-c[1]*sin(t),
+			c[0]*sin(t)+c[1]*cos(t),
+			c[2]
+		])
+	else:
+		ans = np.array([
+			c[0]*cos(t)-c[1]*sin(t),
+			c[0]*sin(t)+c[1]*cos(t)
+		])
 
+	return ans
+
+class Gait(object):
+	def command(self): pass
 
 class CrawlGait(object):
 	"""
@@ -43,21 +57,10 @@ class CrawlGait(object):
 	maxl = 0.2
 	minl = 0.1
 	z = [minl, maxl, maxl, minl, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # leg height
-	# E = [0/9, 3/9, 6/9, 9/9, 6/9, 3/9, 0/9, -3/9, -6/9, -9/9, -6/9, -3/9]  # sway - doesn't work
 
 	def __init__(self, robot):
 		self.legOffset = [0, 6, 3, 9]
 		self.robot = robot
-
-	def __del__(self):
-		"""
-		This is harsh, I just throw the leg up into a storage position. Should
-		be more graceful ... oh well.
-		"""
-		angles = [0, 90, 0]
-		# angles = [0, 45, -135]
-		for leg in range(0, 4): self.pose(angles, leg)
-		time.sleep(1)
 
 	def eachLeg(self, legNum, index, cmd):
 		"""
@@ -109,9 +112,10 @@ class CrawlGait(object):
 
 	def calcRotatedOffset(self, cmd):
 		"""
-		calculate the foot offsets for each leg
+		calculate the foot offsets for each leg and delta linear/rotational
 		in - cmd(x,y,z_rotation)
 		out - array(leg0, leg1, ...)
+			where leg0 = {'linear': [x,y], 'rotational': [x,y], 'angle': zrotation(rads)}
 		"""
 		# frame rotations for each leg
 		frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # opposite of paper
@@ -128,29 +132,10 @@ class CrawlGait(object):
 			# get rotation distance: dist = rot_z(angle, rest) - rest
 			# this just reduces the function calls and math
 			zrot = d2r(float(cmd[2]))  # should I assume this is always radians? save conversion
-			# c = cos(zrot)
-			# s = sin(zrot)
-			# rot = [
-			# 	c*rest[0] - s*rest[1] - rest[0],
-			# 	s*rest[0] + c*rest[1] - rest[1]
-			# ]
+
 			fromcenter = rest + np.array([72.12, 0, 0])
-			# rot2 = rot_z(zrot, fromcenter)
-			# rot = rot_z(zrot, fromcenter) - fromcenter
-			# if zrot >= 0:
-			# 	rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
-			# else:
-			# 	rot = rot_z(-zrot/2, fromcenter) - rot_z(zrot/2, fromcenter)
+
 			rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
-
-			# print('fromcenter[{}]: {:.2f} {:.2f} {:.2f}'.format(i, fromcenter[0], fromcenter[1], fromcenter[2]))
-			# print('rot2[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rot2[0], rot2[1], rot2[2]))
-
-			# xx = rc[0] + rot[0]
-			# yy = rc[1] + rot[1]
-
-			# xx = rot[0]
-			# yy = rot[1]
 
 			ans = {'linear': rc, 'rotational': rot, 'angle': zrot}
 
@@ -158,59 +143,10 @@ class CrawlGait(object):
 
 		return rot_cmd
 
-	# def calcRotatedOffset(self, cmd):
-	# 	"""
-	# 	calculate the foot offsets for each leg
-	# 	in - cmd(x,y,z_rotation)
-	# 	out - array(leg0, leg1, ...)
-	# 	"""
-	# 	# frame rotations for each leg
-	# 	frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # opposite of paper
-	#
-	# 	# only calc this 4 times, not 12*4 times!
-	# 	rot_cmd = []  # (xx, yy) for each leg
-	# 	for i in range(0, 4):
-	# 		# I could do the same here as I do below for rotation
-	# 		rc = rot_z(frame[i], cmd)
-	# 		rest = self.robot.getFoot0(i)
-	# 		# rot_cmd.append(rc)
-	# 		# print('cmd[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rc[0], rc[1], rc[2]))
-	#
-	# 		# get rotation distance: dist = rot_z(angle, rest) - rest
-	# 		# this just reduces the function calls and math
-	# 		zrot = d2r(float(cmd[2]))  # should I assume this is always radians? save conversion
-	# 		# c = cos(zrot)
-	# 		# s = sin(zrot)
-	# 		# rot = [
-	# 		# 	c*rest[0] - s*rest[1] - rest[0],
-	# 		# 	s*rest[0] + c*rest[1] - rest[1]
-	# 		# ]
-	# 		fromcenter = rest + np.array([72.12, 0, 0])
-	# 		rot2 = rot_z(zrot, fromcenter)
-	# 		# rot = rot_z(zrot, fromcenter) - fromcenter
-	# 		# if zrot >= 0:
-	# 		# 	rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
-	# 		# else:
-	# 		# 	rot = rot_z(-zrot/2, fromcenter) - rot_z(zrot/2, fromcenter)
-	# 		rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
-	# 		print('fromcenter[{}]: {:.2f} {:.2f} {:.2f}'.format(i, fromcenter[0], fromcenter[1], fromcenter[2]))
-	# 		print('rot2[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rot2[0], rot2[1], rot2[2]))
-	#
-	# 		# xx = rc[0] + rot[0]
-	# 		# yy = rc[1] + rot[1]
-	#
-	# 		xx = rot[0]
-	# 		yy = rot[1]
-	#
-	# 		rot_cmd.append((xx, yy))
-	#
-	# 	return rot_cmd
-
 	def command(self, cmd):
 		# handle no movement command ... do else where?
 		if sqrt(cmd[0]**2 + cmd[1]**2 + cmd[2]**2) < 0.001:
 			for leg in range(0, 4): self.robot.legs[leg].reset()
-			# time.sleep(0.005)
 			return
 
 		# print('cmd[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rc[0], rc[1], rc[2]))
@@ -221,25 +157,23 @@ class CrawlGait(object):
 			for legNum in [0, 2, 1, 3]:  # order them diagonally
 				rcmd = rot_cmd[legNum]
 				self.eachLeg(legNum, i, rcmd)  # move each leg appropriately
-			# time.sleep(0.005)
-			# time.sleep(0.1)
 
-	def pose(self, angles, leg=0):
-		# Servo.all_stop()
-		pts = self.robot.legs[leg].fk(*angles)  # allows angles out of range
-		# self.robot.moveFoot(leg, pts)
-		self.robot.legs[leg].move(*pts)
-		# s = self.robot.legs[leg].servos
-		# print('angles: {:.2f} {:.2f} {:.2f}'.format(s[0].angle, s[1].angle, s[2].angle))
-		# print('pts: {:.2f} {:.2f} {:.2f}'.format(*pts))
 
 ##########################
 
+class Robot(object):
+	def __init__(self):
+		pass
 
 class Quadruped(object):
 	"""
+	This is the low level driver
 	"""
 	def __init__(self, data):
+		"""
+		Sets up alll 4 legs and servos. Also setups limits for angles and servo
+		pulses.
+		"""
 		self.legs = []
 		for i in range(0, 4):
 			channel = i*4
@@ -262,6 +196,25 @@ class Quadruped(object):
 	def __del__(self):
 		"""
 		Leg kills all servos on exit
+
+		This is harsh, I just throw the leg up into a storage position. Should
+		be more graceful ... oh well.
+		"""
+		angles = [0, 90, 0]
+		# angles = [0, 45, -135]
+		# for leg in range(0, 4): self.pose(angles, leg)
+		self.moveFootAngles(angles)
+		time.sleep(1)
+
+	def sit(self):
+		"""
+		sequence to sit down nicely
+		"""
+		pass
+
+	def stand(self):
+		"""
+		sequence to stand up nicely
 		"""
 		pass
 
@@ -269,8 +222,75 @@ class Quadruped(object):
 		return self.legs[i].foot0
 
 	def moveFoot(self, i, pos):
+		"""
+		moveFoot -> moveFootPosition ?
+
+		Moves the foot of leg i to a position (x,y,z)
+		"""
 		# if i == 0: print('Leg 0 ------------------------------')
 		self.legs[i].move(*pos)
+
+	def moveFootAngles(self, angles, leg=None):
+		"""
+		Sets servos of a leg, or all legs if no leg identified, to given angles.
+		"""
+		if leg is None:
+			for i in range(0, 4):
+				pts = self.legs[i].fk(*angles)  # allows angles out of range
+				self.legs[i].move(*pts)
+		else:
+			pts = self.legs[leg].fk(*angles)  # allows angles out of range
+			self.legs[leg].move(*pts)
+
+
+class TestQuadruped(Quadruped):
+	def __init__(self, data):
+		Quadruped.__init__(self, data)
+
+		Servo.all_stop()
+
+		robot = Quadruped(test)
+		self.crawl = CrawlGait(robot)
+
+	def run(self):
+		sub = zmqSub('js', ('localhost', '9000'))
+		while True:
+			topic, msg = sub.recv()
+
+			# msg values range between (-1, 1)
+			if msg and topic == 'js':
+				# print('msg:', msg)
+				# continue
+
+				x = msg['cmd']['linear']['x']
+				y = msg['cmd']['linear']['y']
+				rz = msg['cmd']['angular']['z']
+				cmd = [100*x, 100*y, 40*rz]
+				print('***********************************')
+				print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x, y, rz))
+				print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
+				print('***********************************')
+				self.crawl.command(cmd)
+			time.sleep(0.01)
+
+
+def run():
+	# angles are always [min, max]
+	# S0 is mapped backwards because of servo orientation
+	# leg 1: [180, 0], [-90, 90], [0, -180]     [45, 0, -90]
+	# leg 2: [[0, 180], [-90, 90], [0, -180]]   [45,-20, -70]
+	test = {
+		'legLengths': {
+			'coxaLength': 26,
+			'femurLength': 42,
+			'tibiaLength': 63
+		},
+		'legAngleLimits': [[-80, 80], [-80, 90], [-170, 0]],
+		'servoRangeAngles': [[-90, 90], [-90, 90], [-180, 0]]
+	}
+
+	robot = TestQuadruped(test)
+	robot.run()
 
 
 if __name__ == "__main__":

@@ -61,10 +61,13 @@ class Joystick(object):
 
 		return cmd
 
-	def run(self, verbose=False):
+	def run(self, verbose, rate):
 		js = self.js
+		dt = 1.0/float(rate)
 
 		# Data structure holding the PS4 info
+		# axis: {left: {x,y}, right: {x,y}, }
+		# buttons: { r1: v, r2:v, l1:v, l2:v, x:v, o:v, s:v, t:v,}
 		ps4 = {
 			'la': {'x': 0, 'y': 0},  # left axis
 			'ra': {'x': 0, 'y': 0},
@@ -133,7 +136,7 @@ class Joystick(object):
 
 				self.pub.pub('js', cmd)
 
-				time.sleep(1.0)
+				time.sleep(dt)
 
 			except (IOError, EOFError):
 				print('[-] Connection gone .... bye')
@@ -153,6 +156,7 @@ def handleArgs():
 	parser = argparse.ArgumentParser(description='A simple zero MQ publisher for joystick messages')
 	parser.add_argument('publish', nargs=2, help='publish messages to addr:port, ex. js 10.1.1.1 9000')
 	parser.add_argument('-v', '--verbose', help='display info to screen', action='store_true')
+	parser.add_argument('-r', '--rate', help='publish rate in Hz, default is 1.0 Hz', default=1.0)
 	args = vars(parser.parse_args())
 	return args
 
@@ -160,7 +164,7 @@ def handleArgs():
 def main():
 	args = handleArgs()
 	js = Joystick(args['publish'][0], args['publish'][1])
-	js.run(args['verbose'])
+	js.run(args['verbose'], args['rate'])
 
 if __name__ == "__main__":
 	main()

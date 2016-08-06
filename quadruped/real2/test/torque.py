@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 from __future__ import division
-import numpy as np
+# import numpy as np
 from math import cos, sin, sqrt
 from math import radians as d2r
 
@@ -44,13 +44,15 @@ def calcTorque(foot):
 	|
 	    torque balance:  s + s = r W/3
 	the servos are at location s, the center mass is at CM, the weight is W
-	and r is the distance from the foot to CM
+	and r is the distance from the foot to CM. The shoulder servo works perpendicular
+	to this plane and doesn't help to lift.
 	"""
 	Lc = 0.026  # mm
 	Lf = 0.042
 	Lt = 0.063
 
 	servo = 0.15  # TG9e servo torque in Nm
+	# servo = 0.39  # XL-320 servo torque in Nm
 
 	x = foot[0]
 	# r = dist_from_CM + foot_pos[x]
