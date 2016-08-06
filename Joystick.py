@@ -133,7 +133,7 @@ class Joystick(object):
 
 				self.pub.pub('js', cmd)
 
-				time.sleep(0.5)
+				time.sleep(1.0)
 
 			except (IOError, EOFError):
 				print('[-] Connection gone .... bye')

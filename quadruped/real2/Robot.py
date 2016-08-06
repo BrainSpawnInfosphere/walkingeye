@@ -30,7 +30,7 @@ def rot_z(t, c):
 	t - theta [radians]
 	c - [x,y,z]
 	"""
-	return [c[0]*cos(t)-c[1]*sin(t), c[0]*sin(t)+c[1]*cos(t), c[2]]
+	return np.array([c[0]*cos(t)-c[1]*sin(t), c[0]*sin(t)+c[1]*cos(t), c[2]])
 
 
 class CrawlGait(object):
@@ -43,12 +43,10 @@ class CrawlGait(object):
 	maxl = 0.2
 	minl = 0.1
 	z = [minl, maxl, maxl, minl, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # leg height
-	E = [0/9, 3/9, 6/9, 9/9, 6/9, 3/9, 0/9, -3/9, -6/9, -9/9, -6/9, -3/9]  # sway
+	# E = [0/9, 3/9, 6/9, 9/9, 6/9, 3/9, 0/9, -3/9, -6/9, -9/9, -6/9, -3/9]  # sway - doesn't work
 
 	def __init__(self, robot):
-		# self.current_step = 0
 		self.legOffset = [0, 6, 3, 9]
-		# self.i = 0
 		self.robot = robot
 
 	def __del__(self):
@@ -63,47 +61,41 @@ class CrawlGait(object):
 
 	def eachLeg(self, legNum, index, cmd):
 		"""
-		robot paper
+		interpolates
 		"""
-		phi = self.phi
-		offset = self.legOffset
-		z = self.z
-		E = self.E
-		zrot = d2r(float(cmd[2]))
+		phi = self.phi           # phase
+		offset = self.legOffset  # where in the gait is leg legNum
+		z = self.z               # leg height
 		rest = self.robot.getFoot0(legNum)
-		# print('rest', rest)
-
 		i = (index + offset[legNum]) % 12  # len(self.z)
 
-		# get rotation distance: dist = rot_z(angle, rest) - rest
-		# this just reduces the function calls and math
-		c = cos(zrot)
-		s = sin(zrot)
-		rot = [
-			c*rest[0] - s*rest[1] - rest[0],
-			s*rest[0] + c*rest[1] - rest[1]
-		]
+		# rotational commands -----------------------------------------------
+		rest_rot = rot_z(-cmd['angle']/2, rest)
+		rotational = cmd['rotational']
+		xx = rotational[0]
+		yy = rotational[1]
 
-		# combine delta move and delta rotation (add vectors)
-		# delta is the length of the step
-		# add together the linear distance and rotation distance
-		# FIXME: there needs to be a limit (max length) otherwise you can command too much
-		xx = cmd[0] + rot[0]
-		yy = cmd[1] + rot[1]
-		# xx = cmd[0]
-		# yy = cmd[1]
+		# create new move command
+		turn = np.array([
+			xx/2 - phi[i]*xx,
+			yy/2 - phi[i]*yy,
+			0  # linear handles leg raising
+		])
+
+		# linear commands ----------------------------------------------------
+		linear = cmd['linear']
+		xx = linear[0]
+		yy = linear[1]
 
 		# create new move command
 		move = np.array([
 			xx/2 - phi[i]*xx,
 			yy/2 - phi[i]*yy,
-			# xx/2 - phi[i]*xx + xx*E[i]/3,  # these don't work
-			# yy/2 - phi[i]*yy + yy*E[i]/3,
 			-rest[2]*z[i]  # this will subtract off the height -> raise leg
 		])
 
-		# new foot position: newpos = rest + move
-		newpos = rest + move
+		# new foot position: newpos = rest + move ----------------------------
+		newpos = rest_rot + move + turn
 
 		#
 		# if legNum in [0]:
@@ -113,35 +105,124 @@ class CrawlGait(object):
 
 		# now move leg/servos
 		self.robot.moveFoot(legNum, newpos)
-		# time.sleep(0.25)
-		time.sleep(0.01)
+		time.sleep(0.01)  # 4 legs * 12 steps each * 0.01 sec = 0.48 sec for one complete cycle
+
+	def calcRotatedOffset(self, cmd):
+		"""
+		calculate the foot offsets for each leg
+		in - cmd(x,y,z_rotation)
+		out - array(leg0, leg1, ...)
+		"""
+		# frame rotations for each leg
+		frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # opposite of paper
+
+		# only calc this 4 times, not 12*4 times!
+		rot_cmd = []  # (xx, yy) for each leg
+		for i in range(0, 4):
+			# I could do the same here as I do below for rotation
+			rc = rot_z(frame[i], cmd)
+			rest = self.robot.getFoot0(i)
+			# rot_cmd.append(rc)
+			# print('cmd[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rc[0], rc[1], rc[2]))
+
+			# get rotation distance: dist = rot_z(angle, rest) - rest
+			# this just reduces the function calls and math
+			zrot = d2r(float(cmd[2]))  # should I assume this is always radians? save conversion
+			# c = cos(zrot)
+			# s = sin(zrot)
+			# rot = [
+			# 	c*rest[0] - s*rest[1] - rest[0],
+			# 	s*rest[0] + c*rest[1] - rest[1]
+			# ]
+			fromcenter = rest + np.array([72.12, 0, 0])
+			# rot2 = rot_z(zrot, fromcenter)
+			# rot = rot_z(zrot, fromcenter) - fromcenter
+			# if zrot >= 0:
+			# 	rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
+			# else:
+			# 	rot = rot_z(-zrot/2, fromcenter) - rot_z(zrot/2, fromcenter)
+			rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
+
+			# print('fromcenter[{}]: {:.2f} {:.2f} {:.2f}'.format(i, fromcenter[0], fromcenter[1], fromcenter[2]))
+			# print('rot2[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rot2[0], rot2[1], rot2[2]))
+
+			# xx = rc[0] + rot[0]
+			# yy = rc[1] + rot[1]
+
+			# xx = rot[0]
+			# yy = rot[1]
+
+			ans = {'linear': rc, 'rotational': rot, 'angle': zrot}
+
+			rot_cmd.append(ans)
+
+		return rot_cmd
+
+	# def calcRotatedOffset(self, cmd):
+	# 	"""
+	# 	calculate the foot offsets for each leg
+	# 	in - cmd(x,y,z_rotation)
+	# 	out - array(leg0, leg1, ...)
+	# 	"""
+	# 	# frame rotations for each leg
+	# 	frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # opposite of paper
+	#
+	# 	# only calc this 4 times, not 12*4 times!
+	# 	rot_cmd = []  # (xx, yy) for each leg
+	# 	for i in range(0, 4):
+	# 		# I could do the same here as I do below for rotation
+	# 		rc = rot_z(frame[i], cmd)
+	# 		rest = self.robot.getFoot0(i)
+	# 		# rot_cmd.append(rc)
+	# 		# print('cmd[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rc[0], rc[1], rc[2]))
+	#
+	# 		# get rotation distance: dist = rot_z(angle, rest) - rest
+	# 		# this just reduces the function calls and math
+	# 		zrot = d2r(float(cmd[2]))  # should I assume this is always radians? save conversion
+	# 		# c = cos(zrot)
+	# 		# s = sin(zrot)
+	# 		# rot = [
+	# 		# 	c*rest[0] - s*rest[1] - rest[0],
+	# 		# 	s*rest[0] + c*rest[1] - rest[1]
+	# 		# ]
+	# 		fromcenter = rest + np.array([72.12, 0, 0])
+	# 		rot2 = rot_z(zrot, fromcenter)
+	# 		# rot = rot_z(zrot, fromcenter) - fromcenter
+	# 		# if zrot >= 0:
+	# 		# 	rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
+	# 		# else:
+	# 		# 	rot = rot_z(-zrot/2, fromcenter) - rot_z(zrot/2, fromcenter)
+	# 		rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
+	# 		print('fromcenter[{}]: {:.2f} {:.2f} {:.2f}'.format(i, fromcenter[0], fromcenter[1], fromcenter[2]))
+	# 		print('rot2[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rot2[0], rot2[1], rot2[2]))
+	#
+	# 		# xx = rc[0] + rot[0]
+	# 		# yy = rc[1] + rot[1]
+	#
+	# 		xx = rot[0]
+	# 		yy = rot[1]
+	#
+	# 		rot_cmd.append((xx, yy))
+	#
+	# 	return rot_cmd
 
 	def command(self, cmd):
 		# handle no movement command ... do else where?
 		if sqrt(cmd[0]**2 + cmd[1]**2 + cmd[2]**2) < 0.001:
 			for leg in range(0, 4): self.robot.legs[leg].reset()
-			time.sleep(0.005)
+			# time.sleep(0.005)
 			return
 
-		# frame rotations for each leg
-		# frame = [pi/4, -pi/4, -3*pi/4, 3*pi/4]
-		frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # opposite of paper
+		# print('cmd[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rc[0], rc[1], rc[2]))
 
-		# only calc this 4 times, not 12*4 times!
-		rot_cmd = []
-		for i in range(0, 4):
-			rc = rot_z(frame[i], cmd)
-			rot_cmd.append(rc)
-			print('cmd[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rc[0], rc[1], rc[2]))
+		rot_cmd = self.calcRotatedOffset(cmd)
 
 		for i in range(0, 12):  # iteration, there are 12 steps in gait cycle
 			for legNum in [0, 2, 1, 3]:  # order them diagonally
-				# rcmd = rot_z(frame[legNum], cmd)
 				rcmd = rot_cmd[legNum]
 				self.eachLeg(legNum, i, rcmd)  # move each leg appropriately
-			# self.eachLeg(0, i, cmd)
-			# time.sleep(0.05)  # 20 Hz, not sure of value
-			time.sleep(0.005)
+			# time.sleep(0.005)
+			# time.sleep(0.1)
 
 	def pose(self, angles, leg=0):
 		# Servo.all_stop()
@@ -225,7 +306,7 @@ if __name__ == "__main__":
 					x = msg['cmd']['linear']['x']
 					y = msg['cmd']['linear']['y']
 					rz = msg['cmd']['angular']['z']
-					cmd = [100*x, 100*y, 100*rz]
+					cmd = [100*x, 100*y, 40*rz]
 					print('***********************************')
 					print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x,y,rz))
 					print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
