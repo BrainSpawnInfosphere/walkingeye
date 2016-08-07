@@ -4,22 +4,11 @@ from __future__ import print_function
 from __future__ import division
 # import argparse
 import time
-# import datetime as dtm
-# import math
 import logging
 import multiprocessing as mp
 import lib.Messages as Msg
 import lib.zmqclass as Zmq
-
-# import platform
-# if platform.system().lower() == 'linux':
-from lib.BNO055 import BNO055
-# else:
-# 	class BNO055(object):
-# 		def __init__(self, a): pass
-# 		def begin(self): pass
-# 		def get_system_status(self): return 1, 0x0F, 0
-# 		def read_euler(self): return 0, 0, 0
+from otherLibs.BNO055 import BNO055
 
 
 class IMUError(Exception):

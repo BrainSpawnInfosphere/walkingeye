@@ -2,7 +2,7 @@
 from __future__ import division
 from __future__ import print_function
 import yaml
-import json
+import simplejson as json
 
 
 class FileStorageError(Exception):

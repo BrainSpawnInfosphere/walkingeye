@@ -5,9 +5,6 @@
 
 from __future__ import print_function
 from __future__ import division
-# import sys
-# import time
-# import json
 import lib.zmqclass as zmq
 import multiprocessing as mp
 import logging

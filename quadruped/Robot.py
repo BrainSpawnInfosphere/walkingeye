@@ -24,7 +24,7 @@ logging.getLogger("Adafruit_I2C").setLevel(logging.ERROR)
 
 ##########################
 
-# move to transforms?
+# move to kinematics?
 def rot_z(t, c):
 	"""
 	t - theta [radians]
@@ -44,8 +44,11 @@ def rot_z(t, c):
 
 	return ans
 
+
 class Gait(object):
-	def command(self): pass
+	def command(self):
+		pass
+
 
 class CrawlGait(object):
 	"""
@@ -165,6 +168,7 @@ class Robot(object):
 	def __init__(self):
 		pass
 
+
 class Quadruped(object):
 	"""
 	This is the low level driver
@@ -249,22 +253,29 @@ class TestQuadruped(Quadruped):
 
 		Servo.all_stop()
 
-		robot = Quadruped(test)
+		robot = Quadruped(data)
 		self.crawl = CrawlGait(robot)
 
 	def run(self):
 		sub = zmqSub('js', ('localhost', '9000'))
+
+		print('Press <share> on PS4 controller to exit')
+
 		while True:
-			topic, msg = sub.recv()
+			topic, ps4 = sub.recv()
 
 			# msg values range between (-1, 1)
-			if msg and topic == 'js':
-				# print('msg:', msg)
+			if ps4 and topic == 'js':
+				# print('ps4:', ps4)
 				# continue
 
-				x = msg['cmd']['linear']['x']
-				y = msg['cmd']['linear']['y']
-				rz = msg['cmd']['angular']['z']
+				x, y = ps4['axes']['leftStick']
+				mm, rz = ps4['axes']['rightStick']
+
+				if ps4['buttons']['share']:
+					print('You hit <share> ... bye!')
+					exit()
+
 				cmd = [100*x, 100*y, 40*rz]
 				print('***********************************')
 				print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x, y, rz))
@@ -294,106 +305,107 @@ def run():
 
 
 if __name__ == "__main__":
+	run()
 	# angles are always [min, max]
 	# S0 is mapped backwards because of servo orientation
 	# leg 1: [180, 0], [-90, 90], [0, -180]     [45, 0, -90]
 	# leg 2: [[0, 180], [-90, 90], [0, -180]]   [45,-20, -70]
-	test = {
-		'legLengths': {
-			'coxaLength': 26,
-			'femurLength': 42,
-			'tibiaLength': 63
-		},
-		'legAngleLimits': [[-80, 80], [-80, 90], [-170, 0]],
-		'servoRangeAngles': [[-90, 90], [-90, 90], [-180, 0]]
-	}
-	robot = Quadruped(test)
-	crawl = CrawlGait(robot)
-
-	Servo.all_stop()
-
-	try:
-		if 1:  # ps4 drives
-			sub = zmqSub('js', ('localhost', '9000'))
-			while True:
-				topic, msg = sub.recv()
-
-				# msg values range between (-1, 1)
-				if msg and topic == 'js':
-					# print('msg:', msg)
-					# continue
-
-					x = msg['cmd']['linear']['x']
-					y = msg['cmd']['linear']['y']
-					rz = msg['cmd']['angular']['z']
-					cmd = [100*x, 100*y, 40*rz]
-					print('***********************************')
-					print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x,y,rz))
-					print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
-					print('***********************************')
-					crawl.command(cmd)
-				time.sleep(0.01)
-		elif 0:  # walk
-			i = 5
-			time.sleep(3)
-			while i:
-				print('step:', i)
-				crawl.command([100.0, 0.0, 0.0])  # x mm, y mm, theta degs
-				# time.sleep(1)
-				i -= 1
-		elif 0:  # set leg to specific orientation
-			angles = [0, 0, -90]
-			crawl.pose(angles, 2)
-			time.sleep(1)
-			Servo.all_stop()
-			time.sleep(0.5)
-
-		elif 0:  # set all 4 lgs to angles
-			angles = [0, 90, 0]
-			for leg in range(0, 4): crawl.pose(angles, leg)
-			time.sleep(1)
-			angles = [0, 45, -150]
-			for leg in range(0, 4): crawl.pose(angles, leg)
-			time.sleep(1)
-			Servo.all_stop()
-
-		elif 0:
-			# Alpha:
-			# Beta: -60 to 90 is good
-			# Gamma: 0 to -180 is good
-			leg = 1
-			dt = 0.1
-			for i in range(-90, 90, 10):
-				angles = [i, 60, 0]
-				print('--------------------')
-				print('cmd angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
-				crawl.pose(angles, leg)
-				time.sleep(dt)
-			for i in range(0, 90, 10):
-				angles = [0, i, 0]
-				print('--------------------')
-				print('cmd angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
-				crawl.pose(angles, leg)
-				time.sleep(dt)
-			for i in range(-160, -10, 10):
-				angles = [0, 60, i]
-				print('--------------------')
-				print('cmd angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
-				crawl.pose(angles, leg)
-				time.sleep(dt)
-			Servo.all_stop()
-			time.sleep(0.5)
-		else:
-			angles = [0, 0, 0]
-			crawl.pose(angles, 0)
-			crawl.pose(angles, 1)
-			time.sleep(1)
-			Servo.all_stop()
-			time.sleep(0.1)
-
-	except Exception as e:
-		print(e)
-		print('Crap!!!!')
-		Servo.all_stop()
-		time.sleep(1)
-		raise
+	# test = {
+	# 	'legLengths': {
+	# 		'coxaLength': 26,
+	# 		'femurLength': 42,
+	# 		'tibiaLength': 63
+	# 	},
+	# 	'legAngleLimits': [[-80, 80], [-80, 90], [-170, 0]],
+	# 	'servoRangeAngles': [[-90, 90], [-90, 90], [-180, 0]]
+	# }
+	# robot = Quadruped(test)
+	# crawl = CrawlGait(robot)
+	#
+	# Servo.all_stop()
+	#
+	# try:
+	# 	if 1:  # ps4 drives
+	# 		sub = zmqSub('js', ('localhost', '9000'))
+	# 		while True:
+	# 			topic, msg = sub.recv()
+	#
+	# 			# msg values range between (-1, 1)
+	# 			if msg and topic == 'js':
+	# 				# print('msg:', msg)
+	# 				# continue
+	#
+	# 				x = msg['cmd']['linear']['x']
+	# 				y = msg['cmd']['linear']['y']
+	# 				rz = msg['cmd']['angular']['z']
+	# 				cmd = [100*x, 100*y, 40*rz]
+	# 				print('***********************************')
+	# 				print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x,y,rz))
+	# 				print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
+	# 				print('***********************************')
+	# 				crawl.command(cmd)
+	# 			time.sleep(0.01)
+	# 	elif 0:  # walk
+	# 		i = 5
+	# 		time.sleep(3)
+	# 		while i:
+	# 			print('step:', i)
+	# 			crawl.command([100.0, 0.0, 0.0])  # x mm, y mm, theta degs
+	# 			# time.sleep(1)
+	# 			i -= 1
+	# 	elif 0:  # set leg to specific orientation
+	# 		angles = [0, 0, -90]
+	# 		crawl.pose(angles, 2)
+	# 		time.sleep(1)
+	# 		Servo.all_stop()
+	# 		time.sleep(0.5)
+	#
+	# 	elif 0:  # set all 4 lgs to angles
+	# 		angles = [0, 90, 0]
+	# 		for leg in range(0, 4): crawl.pose(angles, leg)
+	# 		time.sleep(1)
+	# 		angles = [0, 45, -150]
+	# 		for leg in range(0, 4): crawl.pose(angles, leg)
+	# 		time.sleep(1)
+	# 		Servo.all_stop()
+	#
+	# 	elif 0:
+	# 		# Alpha:
+	# 		# Beta: -60 to 90 is good
+	# 		# Gamma: 0 to -180 is good
+	# 		leg = 1
+	# 		dt = 0.1
+	# 		for i in range(-90, 90, 10):
+	# 			angles = [i, 60, 0]
+	# 			print('--------------------')
+	# 			print('cmd angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
+	# 			crawl.pose(angles, leg)
+	# 			time.sleep(dt)
+	# 		for i in range(0, 90, 10):
+	# 			angles = [0, i, 0]
+	# 			print('--------------------')
+	# 			print('cmd angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
+	# 			crawl.pose(angles, leg)
+	# 			time.sleep(dt)
+	# 		for i in range(-160, -10, 10):
+	# 			angles = [0, 60, i]
+	# 			print('--------------------')
+	# 			print('cmd angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
+	# 			crawl.pose(angles, leg)
+	# 			time.sleep(dt)
+	# 		Servo.all_stop()
+	# 		time.sleep(0.5)
+	# 	else:
+	# 		angles = [0, 0, 0]
+	# 		crawl.pose(angles, 0)
+	# 		crawl.pose(angles, 1)
+	# 		time.sleep(1)
+	# 		Servo.all_stop()
+	# 		time.sleep(0.1)
+	#
+	# except Exception as e:
+	# 	print(e)
+	# 	print('Crap!!!!')
+	# 	Servo.all_stop()
+	# 	time.sleep(1)
+	# 	raise

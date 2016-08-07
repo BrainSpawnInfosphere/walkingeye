@@ -194,7 +194,8 @@ class Text(Message):
 		dict.update(self, stamp=time.time())
 		dict.update(self, message='')
 
-class JoyStick(Message):
+
+class Joystick(Message):
 	def __init__(self):
 		# Message.__init__(self)
 		Message.__init__(self)
@@ -210,6 +211,9 @@ class JoyStick(Message):
 
 	@staticmethod
 	def str(js):
+		return js.__str__()
+
+	def __str__(self):
 		s = '--------------------------------------------------\n'
 		ps4 = js['buttons']
 		s += 'Triangle {} Square {} X {} O {}\n'.format(
@@ -253,8 +257,8 @@ if __name__ == '__main__':
 	i = IMU()
 	print i
 
-	j = JoyStick()
-	print JoyStick.str(j)
+	j = Joystick()
+	print Joystick.str(j)
 	# j.update(tom='hi')
 	# print j
 	# j['bob'] = 25

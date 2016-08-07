@@ -12,6 +12,7 @@ import sdl2
 import time  # sleep ... why?
 import argparse
 import lib.zmqclass as zmq
+import lib.Messages as Msg
 
 
 class Joystick(object):
@@ -64,105 +65,48 @@ class Joystick(object):
 		print('   publishing: {}:{}'.format(host, port))
 		print('==========================================')
 
-	def formatCmd(self, ps4):
-		"""
-		useful?
-
-		This is a formatter ... could just send raw and have subscriber handle
-		it?
-		"""
-		# command template to be sent
-		cmd = {'cmd':
-			{
-				'linear': {'x': 0, 'y': 0},
-				'angular': {'x': 0, 'y': 0, 'z': 0},
-			}
-		}
-
-		cmd['cmd']['linear']['x'] = ps4['la']['x']
-		cmd['cmd']['linear']['y'] = ps4['la']['y']
-
-		cmd['cmd']['angular']['z'] = ps4['ra']['x']
-
-		# print cmd
-
-		return cmd
-
 	def run(self, verbose, rate):
 		js = self.js
 		dt = 1.0/float(rate)
-
-		# Data structure holding the PS4 info
-		# axis: {left: {x,y}, right: {x,y}, }
-		# buttons: { r1: v, r2:v, l1:v, l2:v, x:v, o:v, s:v, t:v,}
-		ps4 = {
-			'la': {'x': 0, 'y': 0},  # left axis
-			'ra': {'x': 0, 'y': 0},
-			'lt1': 0,  # left trigger 1
-			'rt1': 0,
-			'lt2': 0,  # left trigger 2
-			'rt2': 0,
-			'circle': 0,
-			'triangle': 0,
-			'square': 0,
-			'x': 0,
-			'hat': 0,
-		}
+		ps4 = Msg.Joystick()
 
 		while True:
 			try:
 				sdl2.SDL_JoystickUpdate()
 
 				# left axis
-				ps4['la']['x'] = sdl2.SDL_JoystickGetAxis(js, 0) / 32768
-				ps4['la']['y'] = sdl2.SDL_JoystickGetAxis(js, 1) / 32768
+				x = sdl2.SDL_JoystickGetAxis(js, 0) / 32768
+				y = sdl2.SDL_JoystickGetAxis(js, 1) / 32768
+				ps4['axes']['leftStick'] = [x, y]
 
 				# right axis
-				ps4['ra']['x'] = sdl2.SDL_JoystickGetAxis(js, 2) / 32768
-				ps4['ra']['y'] = sdl2.SDL_JoystickGetAxis(js, 5) / 32768
+				x = sdl2.SDL_JoystickGetAxis(js, 2) / 32768
+				y = sdl2.SDL_JoystickGetAxis(js, 5) / 32768
+				ps4['axes']['rightStick'] = [x, y]
 
-				# left trigger axis and button
-				ps4['lt2'] = sdl2.SDL_JoystickGetAxis(js, 3) / 32768  # L2
-				ps4['lt1'] = sdl2.SDL_JoystickGetButton(js, 4)  # L1
-
-				# right trigger axis and button
-				ps4['rt2'] = sdl2.SDL_JoystickGetAxis(js, 4) / 32768
-				ps4['rt1'] = sdl2.SDL_JoystickGetButton(js, 5)
+				# other axes
+				ps4['axes']['L2'] = sdl2.SDL_JoystickGetAxis(js, 3) / 32768
+				ps4['axes']['R2'] = sdl2.SDL_JoystickGetAxis(js, 4) / 32768
 
 				# get buttons
-				ps4['square'] = sdl2.SDL_JoystickGetButton(js, 0)
-				ps4['x'] = sdl2.SDL_JoystickGetButton(js, 1)
-				ps4['circle'] = sdl2.SDL_JoystickGetButton(js, 2)
-				ps4['triangle'] = sdl2.SDL_JoystickGetButton(js, 3)
-
-				# use share button as a quit
-				# quit = sdl2.SDL_JoystickGetButton(js, 8)
+				ps4['buttons']['s'] = sdl2.SDL_JoystickGetButton(js, 0)
+				ps4['buttons']['x'] = sdl2.SDL_JoystickGetButton(js, 1)
+				ps4['buttons']['o'] = sdl2.SDL_JoystickGetButton(js, 2)
+				ps4['buttons']['t'] = sdl2.SDL_JoystickGetButton(js, 3)
+				ps4['buttons']['L1'] = sdl2.SDL_JoystickGetButton(js, 4)
+				ps4['buttons']['R1'] = sdl2.SDL_JoystickGetButton(js, 5)
+				print('button 6', sdl2.SDL_JoystickGetButton(js, 6))
+				print('button 7', sdl2.SDL_JoystickGetButton(js, 7))
+				# ps4['buttons']['option'] = sdl2.SDL_JoystickGetButton(js, ?)
+				ps4['buttons']['share'] = sdl2.SDL_JoystickGetButton(js, 8)
+				# print('button 7', sdl2.SDL_JoystickGetButton(js, 7))
 
 				# get hat
-				ps4['hat'] = sdl2.SDL_JoystickGetHat(js, 0)
+				# ps4['hat'] = sdl2.SDL_JoystickGetHat(js, 0)
 
-				cmd = self.formatCmd(ps4)
+				if verbose: print(ps4)
 
-				if verbose:
-					# print(ps4)
-					print(cmd)
-					# print('Buttons: Triangle {} Square {} X {} Circle {}'.format(
-					# 		ps4['triangle'],
-					# 		ps4['square'],
-					# 		ps4['x'],
-					# 		ps4['circle']
-					# 	)
-					# )
-					# print('Left Analog {:.3f}, {:.3f}	Right Analog {:.3f}, {:.3f}'.format(
-					# 		ps4['la']['x'],
-					# 		ps4['la']['y'],
-					# 		ps4['ra']['x'],
-					# 		ps4['ra']['y'],
-					# 	)
-					# )
-
-				self.pub.pub('js', cmd)
-
+				self.pub.pub('js', ps4)
 				time.sleep(dt)
 
 			except (IOError, EOFError):

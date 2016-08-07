@@ -1,5 +1,10 @@
 # Quadraped
 
+This is the driver for a quadruped using RC servos.
+
+
+# References
+
 A lot of good info comes from:
 
 * [Tote RTD](http://tote.readthedocs.io/en/latest/ik.html)
@@ -15,7 +20,7 @@ Typically used at slow speeds (e.g., creeping).
   * Large robot: with larger/heavier robots, you need to also track the zero-moment
   point (ZMP). The ZMP is a shifted off the CM (to account for inertia) and
   you need to keep the ZMP inside the AoS.
-2. **Dynamic Gait**: Unstable, but you rely on the fact it takes time for the 
+2. **Dynamic Gait**: Unstable, but you rely on the fact it takes time for the
 robot to fall. These cannot be interrupted like stable gaits and are typically
 executed faster than stable gaits (e.g., trot).
 

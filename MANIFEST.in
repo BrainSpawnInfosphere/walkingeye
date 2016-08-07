@@ -1,0 +1,10 @@
+# MANIFEST.in
+#
+# This tells distutils what files to distribute.
+
+include MIT_License.txt
+include README.rst
+include MANIFEST.in
+
+# Main
+recursive-include chi *.py

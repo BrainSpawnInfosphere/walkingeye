@@ -35,6 +35,7 @@ def footPos(b, g):
 	]
 	return pos
 
+
 def calcTorque(foot):
 	"""
 	s     s
@@ -51,8 +52,8 @@ def calcTorque(foot):
 	Lf = 0.042
 	Lt = 0.063
 
-	servo = 0.15  # TG9e servo torque in Nm
-	# servo = 0.39  # XL-320 servo torque in Nm
+	# servo = 0.15  # TG9e servo torque in Nm
+	servo = 0.39  # XL-320 servo torque in Nm
 
 	x = foot[0]
 	# r = dist_from_CM + foot_pos[x]

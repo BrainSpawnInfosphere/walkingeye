@@ -2,7 +2,8 @@
 tmp/*
 old/*
 **/old/*
-otherLibs/*
+chi/otherLibs/*
 test/*
-quadruped/vrep/*
+**/test/*
+quadruped/W4lker-master/*
 docs/*

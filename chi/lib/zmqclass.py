@@ -7,7 +7,7 @@
 from __future__ import print_function
 from __future__ import division
 import zmq
-import json
+import simplejson as json
 import numpy
 import datetime as dt
 import base64

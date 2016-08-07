@@ -4,11 +4,7 @@ from __future__ import print_function
 from __future__ import division
 import numpy as np
 import cv2
-# import argparse
-# import video
-# import time
 import datetime as dtm
-# import math
 import logging
 import multiprocessing as mp
 import lib.Messages as Msg
