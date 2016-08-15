@@ -59,8 +59,8 @@ class Vector(Message):
 		dict.update(self, default)
 		if kw: dict.update(self, kw)
 
-	# def __str__(self):  # pretty up the print statement
-	# 	return 'Vector[x,y,z]: {:.4f} {:.4f} {:.4f}'.format(self.get('x'), self.get('y'), self.get('z'))
+	def __str__(self):  # pretty up the print statement
+		return 'Vector[x,y,z]: {:.4f} {:.4f} {:.4f}'.format(self.get('x'), self.get('y'), self.get('z'))
 
 	def norm(self):
 		m = self.values()
