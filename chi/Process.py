@@ -20,6 +20,9 @@ class Process(mp.Process):
 		logging.basicConfig(level=loglevel)
 		self.logger = logging.getLogger(__name__)
 
+	def __del__(self):
+		self.logger.info('{} is shutting down', __name__)
+
 	def run(self):
 		self.logger.error('{} needs to redefine Process.run()', __name__)
 
