@@ -23,6 +23,7 @@ topic_echo
 topic_pub
 """
 
+
 class TopicPub(mp.Process):
 	def __init__(self, topic, msg, rate=1, port=9000):
 		mp.Process.__init__(self)
