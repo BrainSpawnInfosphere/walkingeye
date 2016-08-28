@@ -5,16 +5,20 @@
 
 from __future__ import print_function
 from __future__ import division
-import time
+# import time
 import multiprocessing as mp
 import logging
 import datetime as dt
 # import argparse
 import numpy as np
-from math import sin, cos, sqrt, pow
+from math import sin, cos, sqrt
 from pyrk import RK4
 import lib.zmqclass as zmq
 import lib.Messages as msg
+from numpy import dot, cross
+from numpy.linalg import inv
+# from pyrk import RK4
+import numdifftools as nd
 # import lib.FileStorage as fs
 
 
@@ -30,9 +34,11 @@ def ecef(lat, lon, H):
 	z = (rm + H) * sin(lat)
 	return x, y, z
 
+
 def normalizeQuaternion(w, x, y, z):
 	m = sqrt(w**2 + x**2 + y**2 + z**2)
 	return w/m, x/m, y/m, z/m
+
 
 class EOM(object):
 	"""
@@ -98,9 +104,6 @@ class EOM(object):
 		self.epoch = dt.datetime.now()
 		return X
 
-from numpy import dot
-from pyrk import RK4
-import numdifftools as nd
 
 class EKF(object):
 	"""
@@ -121,12 +124,12 @@ class EKF(object):
 		# self.x = x  # init state
 		# self.rk = RK4(f)
 		self.dt = dt
-		self.F = eye(dim_x)
+		self.F = np.eye(dim_x)
 		self.H = 0
-		self.P = eye(dim_x)
-		self.R = eye(dim_z)
-		self.Q = eye(dim_x)
-		self.I = eye(dim_x)
+		self.P = np.eye(dim_x)
+		self.R = np.eye(dim_z)
+		self.Q = np.eye(dim_x)
+		self.I = np.eye(dim_x)
 
 	def init(self, x, f, r, q):
 		"""
@@ -198,8 +201,12 @@ def kf_eqns(t, x, u):
 		dea - attitude error
 		return [dev, dep, dea]
 	"""
+	err_v = x[0:3]
+	err_p = x[3:6]
+	err_a = x[6:]
 	w_b = u[3:]   # gyros
 	s_b = u[0:3]  # accel
+	Reb = np.eye(3)
 	wie = np.array([0, 0, 7.292115E-15])  # earth's rotation rate in ECEF
 	web = Reb.dot(w_b)  # gyros in ECEF
 	se = skew(Reb.dot(s_b))  # accels in ECEF
@@ -222,7 +229,8 @@ class Navigation(mp.Process):
 		self.port = port
 		# self.sub = Sub('/cmd','tcp://%s:%s'%(host,port))
 		# logging.basicConfig(level=logging.INFO)
-		self.logger = logging.getLogger(__name__)
+		mp.log_to_stderr()
+		self.logger = mp.getLogger()
 		# self.kf = KF()
 		self.eom = EOM()
 
@@ -241,11 +249,11 @@ class Navigation(mp.Process):
 
 		self.epoch = dt.datetime.now()
 
-		x_init = np.array([1, 1])
+		# x_init = np.array([1, 1])
 		ekf = EKF(1, 1)
 		Q = np.diag([1, 2, 3, 4, 5, 6])
 		R = np.diag([1, 2, 3, 4, 5, 6])
-		ekf.init(x, kf_eqns, R, Q)
+		ekf.init(X, kf_eqns, R, Q)
 
 		def printX(x, q):
 			print('------------------------------------------------')
@@ -255,7 +263,7 @@ class Navigation(mp.Process):
 			print('qu2: {:.2f} {:.2f} {:.2f} {:.2f}'.format(*q))
 
 		try:
-			ans = {}
+			# ans = {}
 			while True:
 				topic, imu = sub_imu.recv()
 				if imu:

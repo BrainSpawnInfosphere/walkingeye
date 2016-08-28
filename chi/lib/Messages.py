@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import time
-import json
+import simplejson as json  # supposed to be better than json
 import math
 
 
@@ -217,21 +217,21 @@ class Joystick(Message):
 		s = '--------------------------------------------------\n'
 		ps4 = js['buttons']
 		s += 'Triangle {} Square {} X {} O {}\n'.format(
-				ps4['t'],
-				ps4['s'],
-				ps4['x'],
-				ps4['o']
-			)
+			ps4['t'],
+			ps4['s'],
+			ps4['x'],
+			ps4['o']
+		)
 
 		s += 'Share {}    Options {}\n'.format(ps4['share'], ps4['options'])
 
 		ps4 = js['axes']
 		s += 'Left Analog {:.3f}, {:.3f}	 Right Analog {:.3f}, {:.3f}\n'.format(
-				ps4['leftStick'][0],
-				ps4['leftStick'][1],
-				ps4['rightStick'][0],
-				ps4['rightStick'][1],
-			)
+			ps4['leftStick'][0],
+			ps4['leftStick'][1],
+			ps4['rightStick'][0],
+			ps4['rightStick'][1],
+		)
 
 		ps4 = js['buttons']
 		s += 'L1 {}                         R1 {}\n'.format(ps4['L1'], ps4['R1'])
@@ -241,7 +241,6 @@ class Joystick(Message):
 		s += 'L3 {}                         R3 {}\n'.format(ps4['L3'], ps4['R3'])
 
 		return s
-
 
 
 if __name__ == '__main__':

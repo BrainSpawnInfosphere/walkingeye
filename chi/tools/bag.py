@@ -9,7 +9,7 @@ from __future__ import print_function
 import os
 import sys
 import logging
-import argparse
+# import argparse
 import gzip  # compression
 import multiprocessing as mp
 import time  # filename date/time
