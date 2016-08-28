@@ -5,31 +5,35 @@
 #
 # Basically a rostopic
 
+from __future__ import division, print_function
 import time
 import os
 import sys
 import logging
 import argparse
-import json
-import socket
 import multiprocessing as mp
-sys.path.insert(0, os.path.abspath('..'))
 
+sys.path.insert(0, os.path.abspath('..'))
 import lib.zmqclass as Zmq
 import lib.Messages as Msg
 
+"""
+i should probably break this out like i did bag and have:
+topic_echo
+topic_pub
+"""
 
 class TopicPub(mp.Process):
 	def __init__(self, topic, msg, rate=1, port=9000):
 		mp.Process.__init__(self)
-		self.host = socket.gethostbyname(socket.gethostname())
+		self.host = 'localhost'
 		self.port = port
 		self.topic = topic
 		self.msg = msg
 		self.rate = rate
 
-		logging.basicConfig(level=logging.INFO)
-		self.logger = logging.getLogger('robot')
+		# logging.basicConfig(level=logging.INFO)
+		self.logger = logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 	def run(self):
 		tcp = (self.host, self.port)
@@ -40,32 +44,36 @@ class TopicPub(mp.Process):
 		if self.rate != 0:
 			dt = 1.0 / self.rate
 
+		print('Pub[{}] @ {} Hz: {}'.format(topic, self.rate, msg))
+
 		try:
+			count = 0
 			while True:
+				count += 1
 				pub.pub(topic, msg)
-				print '[>]', topic, ':', msg
+				if count % 100 == 0:
+					print('Sent {} msgs'.format(count))
+				# print '[>]', topic, ':', msg
 				time.sleep(dt)  # 1/2 second sleep
 
 		except (IOError, EOFError):
-			print '[-] Connection gone .... bye'
+			self.logger.error('[-] Connection gone .... bye')
 			return
 
 		except KeyboardInterrupt:
-			print '[-] User hit Ctrl-C keyboard .... bye'
-			exit()  # not cleanly exiting
+			self.logger.info('[-] User hit Ctrl-C keyboard .... bye')
+			return  # not cleanly exiting
 
 
 class TopicSub(mp.Process):
-	def __init__(self, topic, port=9000, host=None):
+	def __init__(self, topic, port=9000, host='localhost'):
 		mp.Process.__init__(self)
 
-		if host is None:
-			host = socket.gethostbyname(socket.gethostname())
 		self.host = host
 		self.port = port
 		self.topic = topic
-		logging.basicConfig(level=logging.INFO)
-		self.logger = logging.getLogger('robot')
+		# logging.basicConfig(level=logging.INFO)
+		self.logger = logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 	def run(self):
 		tcp = (self.host, self.port)
@@ -73,13 +81,11 @@ class TopicSub(mp.Process):
 
 		try:
 			while True:
-				# pub.pub(topic, msg)
 				topic, msg = sub.recv()
-				if msg: print '[<]', topic, ':', msg
-				# time.sleep(0.5)  # 1/2 second sleep
+				if msg: print('[<]', topic, ':', msg)
 
 		except (IOError, EOFError):
-			print '[-] Connection gone .... bye'
+			self.logger.info('[-] Connection gone .... bye')
 			return
 
 
@@ -110,16 +116,10 @@ def handleArgs():
 
 def main():
 	args = handleArgs()
-	print args
-	#
-	# msg = json.loads('{"hi": 100}')
-	#
-	# t = TopicPub('hi',msg,1,9000)
-	# t.start()
 
 	if args['type'] == 'pub':
 		msg = args['message']
-		rate = args['rate']
+		rate = int(args['rate'])
 		topic = args['info'][1]
 		port = args['info'][0]
 
@@ -128,16 +128,22 @@ def main():
 			rate = 1
 
 		if msg is None:
-			print 'You must supply a message for pub ... bye!'
+			print('You must supply a message for pub ... bye!')
 			exit(1)
 		try:
-			msg = json.loads(msg)
+			# json doesn't like strings with ''
+			msg = msg.replace("'", '"')
+			# msg = json.loads(msg)
+			msg = Msg.deserialize(msg)  # convert string to dict
+
 		except:
-			print 'Error converting your message to a dictionary for publishing ... bye'
+			print('Error converting your message to a dictionary for publishing ... bye')
 			exit(1)
 
 		t = TopicPub(topic, msg, rate, port)
 		t.start()
+		t.join()
+
 	elif args['type'] == 'echo':  # FIXME 20160528 handle hosts other than localhost
 		rate = args['rate']
 		topic = args['info'][1]
@@ -149,9 +155,10 @@ def main():
 
 		t = TopicSub(topic, port)
 		t.start()
+		t.join()
 
 	else:
-		print 'Error: only pub or sub are support ... bye'
+		print('Error: only pub or sub are support ... bye')
 		exit(1)
 
 

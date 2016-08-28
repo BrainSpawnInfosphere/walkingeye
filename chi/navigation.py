@@ -12,7 +12,7 @@ import datetime as dt
 # import argparse
 import numpy as np
 from math import sin, cos, sqrt, pow
-from pyrk.pyrk import RK4
+from pyrk import RK4
 import lib.zmqclass as zmq
 import lib.Messages as msg
 # import lib.FileStorage as fs
@@ -21,7 +21,7 @@ import lib.Messages as msg
 def ecef(lat, lon, H):
 	# phi = lat
 	# lambda = lon
-	e = 1
+	e = 1.0
 	re = 6378137.0  # m
 	rm = re * (1.0 - e**2) / pow(1.0 - e**2 * sin(lat)**2, 3.0 / 2.0)
 	rn = re / sqrt(1.0 - e**2 * sin(lat)**2)
@@ -39,20 +39,6 @@ class EOM(object):
 	EoM for navigation
 	"""
 	def __init__(self):
-		# move these to init()?
-		# wie = 7.292115E-15		  # earth rotation
-		# oe_ie = np.array([(0, -wie, 0), (wie, 0, 0), (0, 0, 0)])
-		# Q = updateQ(10, 10, 10)	   # Attitude
-		# A = np.zeros([10, 10])	   # state transition matrix
-		# fillMatrix(A, oe_ie, 3, 3)
-		# fillMatrix(A, -oe_ie * oe_ie, 3, 3, 0, 3)
-		# fillMatrix(A, np.eye(3, 3), 3, 3, 3, 0)
-		# fillMatrix(A, Q, 4, 4, 6, 6)
-		# g = np.array([(0, 0, 9.78, 0, 0, 0)])  # gravity model
-
-		# self.A = A
-		# self.B = B
-		# self.dt = dt
 		self.t = 0.0
 		self.rk = RK4(self.eom)
 		self.epoch = dt.datetime.now()
@@ -102,7 +88,7 @@ class EOM(object):
 		X = self.rk.step(X, u, t, delta)
 
 		# fix q
-		w,x,y,z = normalizeQuaternion(*X[6:])
+		w, x, y, z = normalizeQuaternion(*X[6:])
 		X[6] = w
 		X[7] = x
 		X[8] = y
@@ -112,24 +98,118 @@ class EOM(object):
 		self.epoch = dt.datetime.now()
 		return X
 
+from numpy import dot
+from pyrk import RK4
+import numdifftools as nd
 
-# class KF(object):
-# 	"""
-# 	Kalman filter correction
-# 	"""
-# 	def __init__(self):
-# 		nQ = np.diag([1, 2, 3, 4, 5, 6])  # process noise
-# 		nR = np.diag([1, 2, 3, 4, 5, 6])  # measurement noise
-# 		self.kalman = cv2.KalmanFilter(4, 2)
-# 		# self.kalman.measurementMatrix = C  # np.array([[1,0,0,0],[0,1,0,0]],np.float32)
-# 		self.kalman.transitionMatrix = A   # np.array([[1,0,1,0],[0,1,0,1],[0,0,1,0],[0,0,0,1]],np.float32)
-# 		self.kalman.processNoiseCov = Q   # np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],np.float32) * 0.03
-# 		# self.epoch = dt.datetime.now()
-#
-# 	def step(self, z):
-# 		self.kalman.correct(z)
-# 		xhat = self.kalman.predict()
-# 		return xhat
+class EKF(object):
+	"""
+	Extended Kalman Filter (EKF)
+
+	def func(time, x, u):
+		some nonlinear eqns
+		return dx
+
+	ekf = EKF(size_x,size_z)
+	ekf.init(x, func, R, Q)
+
+	while True:
+		ekf.predict(u)
+		x_hat = ekf.update(z)
+	"""
+	def __init__(self, dim_x, dim_z):
+		# self.x = x  # init state
+		# self.rk = RK4(f)
+		self.dt = dt
+		self.F = eye(dim_x)
+		self.H = 0
+		self.P = eye(dim_x)
+		self.R = eye(dim_z)
+		self.Q = eye(dim_x)
+		self.I = eye(dim_x)
+
+	def init(self, x, f, r, q):
+		"""
+		f - dx = f(x, u)
+		r -
+		q -
+		"""
+		self.x = x
+		self.rk = RK4(f)
+		self.jacob = nd.Jacobian(f)
+		self.R = r
+		self.Q = q
+		self.time = 0.0
+
+	def something(self, u):
+		rk = self.rk
+		dt = self.dt
+		t = self.time
+		x = self.x
+
+		y = rk.step(x, u, t, dt)
+		self.F = self.jacob(y)
+
+		self.time = t+dt
+		self.x = y
+
+		return y
+
+	def predict(self, u):
+		self.x = self.something(u)
+
+		F = self.F
+		Q = self.Q
+		P = self.P
+
+		self.P = dot(F, dot(P, F.T)) + Q
+
+	def update(self, z):
+		H = self.H
+		R = self.R
+		I = self.I
+		P = self.P
+		x = self.x
+
+		K = dot(P, dot(H.T, inv(dot(H, dot(P, H.T)) + R)))
+		x = x + K.dot(z-H)
+		p = (I - K.dot(H)).dot(P)
+
+		self.x = x
+		self.P = p
+
+		return x
+
+
+def skew(a):
+	return a
+
+
+def kf_eqns(t, x, u):
+	"""
+	Calculates navigation corrections
+	input:
+		t - time
+		x - state
+		u - [s_b(accel) w_b(gyros)]
+	output:
+		dev - dot error velocity or acceleration error
+		dep - velocity error
+		dea - attitude error
+		return [dev, dep, dea]
+	"""
+	w_b = u[3:]   # gyros
+	s_b = u[0:3]  # accel
+	wie = np.array([0, 0, 7.292115E-15])  # earth's rotation rate in ECEF
+	web = Reb.dot(w_b)  # gyros in ECEF
+	se = skew(Reb.dot(s_b))  # accels in ECEF
+
+	dev = -2.0*cross(wie, err_v) + cross(wie, cross(wie, err_p)) + cross(se, err_a) + Reb.dot(err_s)
+	dep = err_v
+	dea = cross(web, err_a) - web
+
+	return np.hstack((dev, dep, dea))
+
 
 class Navigation(mp.Process):
 	"""
@@ -161,7 +241,13 @@ class Navigation(mp.Process):
 
 		self.epoch = dt.datetime.now()
 
-		def printX(x,q):
+		x_init = np.array([1, 1])
+		ekf = EKF(1, 1)
+		Q = np.diag([1, 2, 3, 4, 5, 6])
+		R = np.diag([1, 2, 3, 4, 5, 6])
+		ekf.init(x, kf_eqns, R, Q)
+
+		def printX(x, q):
 			print('------------------------------------------------')
 			print('pos: {:.2f} {:.2f} {:.2f}'.format(*x[0:3]))
 			print('vel: {:.2f} {:.2f} {:.2f}'.format(*x[3:6]))
@@ -178,28 +264,36 @@ class Navigation(mp.Process):
 					x = imu['linear_acceleration']['x']
 					y = imu['linear_acceleration']['y']
 					z = imu['linear_acceleration']['z']
-					f = np.array([x,y,z])
+					f = np.array([x, y, z])
 
 					x = imu['angular_velocity']['x']
 					y = imu['angular_velocity']['y']
 					z = imu['angular_velocity']['z']
-					w = np.array([x,y,z])
+					w = np.array([x, y, z])
 
 					qw = imu['orientation']['w']
 					qx = imu['orientation']['x']
 					qy = imu['orientation']['y']
 					qz = imu['orientation']['z']
 
+					# integrate navigation EoM
 					u = np.hstack((f, w))
 					X = self.eom.step(X, u)
-					printX(X, [qw,qx,qy,qz])
+					printX(X, [qw, qx, qy, qz])
 
 				topic, vo = sub_vo.recv()
 				if vo:
 					# self.kf.predict()
 					# self.kf.??
 					print('wtf ... not implemented yet')
+				else:
+					vo = None
 
+				if 0:
+					u = np.array([0, 0])
+					z = np.array([0, 0])
+					ekf.predict(u)
+					ekf.update(z)
 				# xar.append(X[3])
 				# yar.append(X[4])
 				# plot(fig, li, xx, yy)
@@ -211,13 +305,16 @@ class Navigation(mp.Process):
 				odom['position']['position']['x'] = X[3]
 				odom['position']['position']['y'] = X[4]
 				odom['position']['position']['z'] = X[5]
+
 				odom['position']['orientation']['x'] = X[6]
 				odom['position']['orientation']['y'] = X[7]
 				odom['position']['orientation']['z'] = X[8]
 				odom['position']['orientation']['z'] = X[9]
+
 				odom['velocity']['linear']['x'] = X[0]
 				odom['velocity']['linear']['y'] = X[1]
 				odom['velocity']['linear']['z'] = X[2]
+
 				odom['velocity']['angular']['x'] = w[0]
 				odom['velocity']['angular']['y'] = w[1]
 				odom['velocity']['angular']['z'] = w[2]
