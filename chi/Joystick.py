@@ -88,6 +88,18 @@ class Joystick(object):
 				ps4['axes']['L2'] = sdl2.SDL_JoystickGetAxis(js, 3) / 32768
 				ps4['axes']['R2'] = sdl2.SDL_JoystickGetAxis(js, 4) / 32768
 
+				# accels
+				x = sdl2.SDL_JoystickGetAxis(js, 6) / 32768
+				y = sdl2.SDL_JoystickGetAxis(js, 7) / 32768
+				z = sdl2.SDL_JoystickGetAxis(js, 8) / 32768
+				ps4['axes']['accels'] = [x, y, z]
+
+				# gyros
+				x = sdl2.SDL_JoystickGetAxis(js, 9) / 32768
+				y = sdl2.SDL_JoystickGetAxis(js, 10) / 32768
+				z = sdl2.SDL_JoystickGetAxis(js, 11) / 32768
+				ps4['axes']['gyros'] = [x, y, z]
+
 				# get buttons
 				ps4['buttons']['s'] = sdl2.SDL_JoystickGetButton(js, 0)
 				ps4['buttons']['x'] = sdl2.SDL_JoystickGetButton(js, 1)
@@ -95,16 +107,23 @@ class Joystick(object):
 				ps4['buttons']['t'] = sdl2.SDL_JoystickGetButton(js, 3)
 				ps4['buttons']['L1'] = sdl2.SDL_JoystickGetButton(js, 4)
 				ps4['buttons']['R1'] = sdl2.SDL_JoystickGetButton(js, 5)
-				print('button 6', sdl2.SDL_JoystickGetButton(js, 6))
-				print('button 7', sdl2.SDL_JoystickGetButton(js, 7))
-				# ps4['buttons']['option'] = sdl2.SDL_JoystickGetButton(js, ?)
+				ps4['buttons']['L2'] = sdl2.SDL_JoystickGetButton(js, 6)
+				ps4['buttons']['R2'] = sdl2.SDL_JoystickGetButton(js, 7)
 				ps4['buttons']['share'] = sdl2.SDL_JoystickGetButton(js, 8)
-				# print('button 7', sdl2.SDL_JoystickGetButton(js, 7))
+				ps4['buttons']['options'] = sdl2.SDL_JoystickGetButton(js, 9)
+				ps4['buttons']['L3'] = sdl2.SDL_JoystickGetButton(js, 10)
+				ps4['buttons']['R3'] = sdl2.SDL_JoystickGetButton(js, 11)
+				ps4['buttons']['ps'] = sdl2.SDL_JoystickGetButton(js, 12)
+				ps4['buttons']['pad'] = sdl2.SDL_JoystickGetButton(js, 13)
 
 				# get hat
-				# ps4['hat'] = sdl2.SDL_JoystickGetHat(js, 0)
+				# [up right down left] = [1 2 4 8]
+				ps4['buttons']['hat'] = sdl2.SDL_JoystickGetHat(js, 0)
 
-				if verbose: print(ps4)
+				# print('b 12', sdl2.SDL_JoystickGetButton(js, 12))
+				# print('b 13', sdl2.SDL_JoystickGetButton(js, 13))
+
+				if verbose: print(Msg.Joystick.screen(ps4))
 
 				self.pub.pub('js', ps4)
 				time.sleep(dt)
@@ -112,8 +131,8 @@ class Joystick(object):
 			except (IOError, EOFError):
 				print('[-] Connection gone .... bye')
 				break
-			except Exception as e:
-				print('Ooops:', e)
+			# except Exception as e:
+			# 	print('Ooops:', e)
 			# else:
 			# 	raise Exception('Joystick: Something bad happened!')
 

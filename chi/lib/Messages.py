@@ -210,10 +210,10 @@ class Joystick(Message):
 	# 		raise KeyError('{} not permitted in message'.format(key))
 
 	@staticmethod
-	def str(js):
-		return js.__str__()
-
-	def __str__(self):
+	def screen(js):
+	# 	return js.__str__()
+	#
+	# def __str__(self):
 		s = '--------------------------------------------------\n'
 		ps4 = js['buttons']
 		s += 'Triangle {} Square {} X {} O {}\n'.format(
@@ -232,13 +232,21 @@ class Joystick(Message):
 				ps4['rightStick'][0],
 				ps4['rightStick'][1],
 			)
+		s += 'L2 {:.3f}                     R2 {:.3f}\n'.format(ps4['L2'], ps4['R2'])
 
+		h = js['buttons']['hat']
+		if h == 0: hat = ''
+		elif h == 1: hat = 'UP'
+		elif h == 2: hat = 'RIGHT'
+		elif h == 4: hat = 'DOWN'
+		elif h == 8: hat = 'LEFT'
+		else: hat = 'UNKNOWN'
+		s += 'Hat {}                        Touch Pad {}\n'.format(hat, js['buttons']['pad'])
 		ps4 = js['buttons']
+		s += 'Options {}                    Share {}\n'.format(ps4['options'], ps4['share'])
 		s += 'L1 {}                         R1 {}\n'.format(ps4['L1'], ps4['R1'])
-		ps4 = js['axes']
-		s += 'L2 {:.3f}                         R1 {:.3f}\n'.format(ps4['L2'], ps4['R2'])
-		ps4 = js['buttons']
-		s += 'L3 {}                         R3 {}\n'.format(ps4['L3'], ps4['R3'])
+		s += 'L2 {}                         R2 {}\n'.format(ps4['L2'], ps4['R2'])
+		s += 'L3 {}       PS {}             R3 {}\n'.format(ps4['L3'], ps4['ps'], ps4['R3'])
 
 		return s
 
