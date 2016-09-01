@@ -1,8 +1,18 @@
 #!/usr/bin/env python
+#
+#
+# Change log:
+#    2016-08-16  init
 
 from __future__ import print_function
-import serial					 # we need to import the pySerial stuff to use
+import serial
 from time import sleep
+
+"""
+This code uses:
+http://support.robotis.com/en/product/dynamixel_pro/communication/instruction_status_packet.htm
+"""
+
 
 crc_table = [
 	0x0000, 0x8005, 0x800F, 0x000A, 0x801B, 0x001E, 0x0014, 0x8011,
@@ -39,7 +49,12 @@ crc_table = [
 	0x8213, 0x0216, 0x021C, 0x8219, 0x0208, 0x820D, 0x8207, 0x0202
 ]
 
+
 def crc16(data_blk):
+	"""
+	This is addapted from:
+	http://support.robotis.com/en/product/dynamixel_pro/communication/crc.htm
+	"""
 	data_blk_size = len(data_blk)
 	crc_accum = 0
 	for j in range(data_blk_size):
@@ -52,12 +67,14 @@ def crc16(data_blk):
 
 	return crc_accum
 
+
 def le(h):
 	"""
 	Little-endian, takes a 16b number and returns
 	"""
 	# return [h % 256, h >> 8]
 	return [h & 0xff, (h >> 8) & 0xff]
+
 
 # [0xFF, 0xFF, 0xFD, 0x00, ID, LEN_L, LEN_H, INST, PARAM 1, PARAM 2, ..., PARAM N, CRC_L, CRC_H]
 def makeWritePacket(ID, reg, values):
@@ -94,26 +111,6 @@ def makeWritePacket(ID, reg, values):
 
 	return pkt
 
-# def makeWritePacket(ID, reg, values):
-# 	"""
-# 	little-endian so 7 hex is 0x07 0x00 (L H)
-# 	"""
-# 	header = chr(0xFF)+chr(0xFF)+chr(0xFD)
-# 	reserved = chr(0x00)
-# 	pkt = header + reserved + chr(ID)
-# 	write_instr = chr(0x03)
-#
-# 	if values:
-# 		length = le(len(values) + 3)  # calc length and put into little endian
-# 		pkt += length + write_instr
-# 		for v in values:
-# 			pkt += v
-# 	else:
-# 		length = chr(0x00)+chr(0x00)
-# 		pkt += length + write_instr
-#
-# 	crc = crc16(pkt)
-# 	pkt += le(crc)
 
 # [0xFF, 0xFF, 0xFD, 0x00, ID, LEN_L, LEN_H, INST, PARAM 1, PARAM 2, ..., PARAM N, CRC_L, CRC_H]
 def makeReset(ID):
@@ -131,22 +128,14 @@ def makeReset(ID):
 
 	return pkt
 
-s = serial.Serial()			   # create a serial port object
-s.baudrate = 1000000			  # baud rate, in bits/second
-s.port = "/dev/tty.usbserial-A5004Flb"		   # this is whatever port your are using
-s.open()
-s.setRTS(False)
 
-# pkt = makeWritePacket(0xfe, 0x30, le(512))  # move servo 1 to middle position
+def moveServo(ID, angle):
+	if not (0.0 < angle < 300.0):
+		raise Exception('moveServo(), angle out of bounds: {}'.format(angle))
+	val = int(angle/300*1024)
+	pkt = makeWritePacket(ID, 0x30, le(val))
+	return pkt
 
-pkt = makeReset(0xfe)
-
-s.flushInput()
-s.flushOutput()
-s.setRTS(False)
-pkt = bytearray(pkt)  # use to prep for transmition
-s.write(pkt)
-print(pkt)
 
 # http://forums.trossenrobotics.com/showthread.php?7489-Hard-Can-anyone-give-me-a-sample-packet-by-running-function-quot-Reading-Current-Position-quot-for-Dynamixel-Pro-Motors
 # [0xFF, 0xFF, 0xFD, 0x00, ID, LEN_L, LEN_H, INST, PARAM 1, PARAM 2, ..., PARAM N, CRC_L, CRC_H]
@@ -171,6 +160,95 @@ print(pkt)
 # b=le(ans)
 # print('new L 0x1B H 0xF9', hex(b[0]), hex(b[1]))
 # print('new L 27 H 159', b[0], b[1])
+
+def test_crc16():
+	# http://forums.trossenrobotics.com/showthread.php?7489-Hard-Can-anyone-give-me-a-sample-packet-by-running-function-quot-Reading-Current-Position-quot-for-Dynamixel-Pro-Motors
+	# [0xFF, 0xFF, 0xFD, 0x00, ID, LEN_L, LEN_H, INST, PARAM 1, PARAM 2, ..., PARAM N, CRC_L, CRC_H]
+	# ----headers------
+	# 0xff 0xff 0xfd 0x00
+	# ----ID----
+	# 0x01
+	# ----Length----
+	# 0x07 0x00
+	# ----INST=READ----
+	# 0x02
+	# ----Address----
+	# 0x63 0x02
+	# ----Data Length---
+	# 0x04 0x00
+	# ----CRC_L -> CRC_H-----
+	# 0x1B 0xF9
+	# pro: current position is reg: 611 = (0x02<<8)+0x63 and is 4 bytes long
+	#     [ header       | res|  ID | len      | inst |  param1   | param 2  ]
+	buf = [0xff,0xff,0xfd,0x00, 0x01, 0x07,0x00,  0x02,  0x63,0x02, 0x04,0x00]
+	ans = crc16(buf)
+	b = le(ans)
+	assert b[0] == 0x1B and b[1] == 0xF9
+
+
+class DynamixelSerial(object):
+	DD_WRITE = False  # data direction set to write
+	DD_READ = True    # data direction set to read
+	SLEEP_TIME = 0.0001
+
+	def __init__(self, port):
+		self.serial = serial.Serial()
+		self.serial.baudrate = 1000000
+		self.serial.port = port
+
+	def __del__(self):
+		self.serial.close()
+
+	def open(self):
+		self.serial.open()
+		self.serial.setRTS(self.DD_WRITE)
+		serial.time.sleep(self.SLEEP_TIME)
+
+	def read(self):
+		self.serial.setRTS(self.DD_READ)
+		serial.time.sleep(self.SLEEP_TIME)
+		data = self.serial.read()
+		return data
+
+	def write(self, data):
+		self.serial.setRTS(self.DD_WRITE)
+		serial.time.sleep(self.SLEEP_TIME)
+		self.serial.write(data)
+		# self.serial.flushOutput()
+
+	def close(self):
+		self.serial.close()
+
+
+def main():
+	s = serial.Serial()
+	s.baudrate = 1000000
+	s.port = "/dev/tty.usbserial-A5004Flb"
+	s.open()
+	s.setRTS(False)
+
+	# pkt = makeWritePacket(0xfe, 0x30, le(512))  # move servo 1 to middle position
+	pkt = moveServo(0xfe, 150)
+	# pkt = makeReset(0xfe)
+
+	s.flushInput()
+	s.flushOutput()
+	s.setRTS(False)
+	pkt = bytearray(pkt)  # use to prep for transmition
+	s.write(pkt)
+	print(pkt)
+
+
+if __name__ == '__main__':
+	main()
+
+
+
+
+
+
+
+
 
 
 ##########################################################
