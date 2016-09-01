@@ -3,21 +3,24 @@
 #
 # copyright Kevin Walchko
 #
-# Basically a rosbag
+# Basically a rosbag library
 
-# import time
+from __future__ import print_function
 import os
 import sys
 import logging
-import argparse
-# import json
-import socket
-import gzip
+# import argparse
+import gzip  # compression
 import multiprocessing as mp
+import time  # filename date/time
+import six  # Py2/3 is a string
 
 sys.path.insert(0, os.path.abspath('..'))
 import lib.zmqclass as Zmq
-import lib.Messages as Msg
+import lib.Messages as Msg  # deserialize topics
+
+# useful to turn off for debugging
+use_compression = True
 
 
 class Bag(object):
@@ -28,9 +31,6 @@ class Bag(object):
 	"""
 	def __init__(self, buffer_size=100):
 		"""
-		in:
-			topic - name of topic to capture
-			path - path to save file to, default is ./
 		"""
 		self.buffer = []
 		self.serialize = Msg.serialize
@@ -49,9 +49,11 @@ class Bag(object):
 			self.writeToFile()
 
 	def open(self, topic, path='./'):
-		filen = path + topic + '.bag'
-		self.fd = gzip.open(filen, "w")
-		# self.fd = open(file, "w")
+		if topic.rfind('.bag') > 0: filen = path + topic
+		else: filen = path + topic + '.bag'
+
+		if use_compression: self.fd = gzip.open(filen, "w")
+		else: self.fd = open(filen, "w")
 
 	def close(self):
 		self.flush()
@@ -59,16 +61,17 @@ class Bag(object):
 
 	def push(self, msg):
 		"""
-		Push another message to the buffer
+		Push another message to the buffer and grab time stamp for play back
 		"""
-		self.buffer.append(msg)
+		dmsg = {'ts': time.time(), 'msg': msg}
+		self.buffer.append(dmsg)
 
 		if len(self.buffer) >= self.buffer_size:
 			self.writeToFile()
 
 	def writeToFile(self):
 		if self.fd is None:
-			print 'Error: please open file first'
+			print('Error: please open file first')
 			return
 
 		for m in self.buffer:
@@ -81,77 +84,135 @@ class Bag(object):
 	def readFromFile(file):
 		ans = []
 		try:
-			with gzip.open(file, 'r') as f:
-			# with open(file, 'r') as f:
-				for line in f:
-					# print '>', line
-					m = Msg.deserialize(line)
-					ans.append(m)
+			if use_compression:
+				with gzip.open(file, 'r') as f:
+					for line in f:
+						# print('>', line)
+						m = Msg.deserialize(line)
+						ans.append(m)
+			else:
+				with open(file, 'r') as f:
+					for line in f:
+						# print('>', line)
+						m = Msg.deserialize(line)
+						ans.append(m)
 			# print 'Read {} files from {}'.format(len(ans), file)
 		except:
-			print 'Could not read file: {}'.format(file)
+			print('Could not read file: {}'.format(file))
+			raise
 
 		return ans
 
 
-class BagServer(mp.Process):
-	def __init__(self, topic, port=9000, host=None):
-		mp.Process.__init__(self)
+# not sure if these should be object or mp.Process
+class Record(object):
+	def __init__(self):
+		# mp.Process.__init__(self)
 
-		if host is None:
-			host = socket.gethostbyname(socket.gethostname())
-		self.host = host
-		self.port = port
-		self.topic = topic
-		logging.basicConfig(level=logging.INFO)
-		self.logger = logging.getLogger('robot')
+		# if host is None:
+			# host = socket.gethostbyname(socket.gethostname())
+		# self.host = host
+		# self.port = port
+		# self.topic = topic
+		# logging.basicConfig(level=logging.INFO)
+		self.logger = logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-	def run(self):
-		tcp = (self.host, self.port)
-		sub = Zmq.Sub(self.topic, tcp)
+	def run(self, topic, port=9000, host='localhost', path=None):
+		tcp = (host, port)
+		sub = Zmq.Sub(topic, tcp)
+
+		# make sure path is a good file name ending in .bag
+		if not path or not isinstance(path, six.string_types):
+			t = time.ctime().replace(' ', '_')
+			filename = './' + topic + t + '.bag'
+		elif path.rfind('.bag') == -1 and isinstance(path, six.string_types):
+			filename = path + '.bag'
+		else:
+			filename = path
 
 		bag = Bag()
-		bag.open(self.topic)
+		bag.open(filename)
+		count = 0
 
 		try:
 			while True:
-				# pub.pub(topic, msg)
 				topic, msg = sub.recv()
-				if msg: bag.push(msg)
-				# time.sleep(0.5)  # 1/2 second sleep
+				if msg:
+					bag.push(msg)
+					count += 1
+					if count % 100 == 0:
+						print('Recorded {} message'.format(count))
 
 		except (IOError, EOFError):
-			print '[-] Connection gone .... bye'
+			print('[-] Connection gone .... bye')
 			return
 
 
-def handleArgs():
-	parser = argparse.ArgumentParser(description="""
-	A simple zero MQ message tool. It will either publish messages on a specified
-	topic or subscribe to a topic and print the messages.
+class Play(object):
+	def __init__(self):
+		# mp.Process.__init__(self)
 
-	Format:
-	- topic pub port topic message -r|-once
-	- topic echo port topic
+		# self.tcp = ('localhost', self.port)
+		# self.topic = topic
+		# self.bag = bag
+		# logging.basicConfig(level=logging.INFO)
+		self.logger = logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-	Examples:
-		bag 'imu' -p '../save_stuff'
-	""")
+	def run(self, filename, topic, port=9000, loop=True):
+		tcp = ('localhost', port)
+		pub = Zmq.Pub(tcp)
 
-	parser.add_argument('info', nargs=3, help='address port topic, ex. 1.1.1.1 9000 imu')
-	# parser.add_argument('-v', '--verbose', help='display info to screen', action='store_true')
-	parser.add_argument('-p', '--path', help='path to same topic bag file to', default='./')
-	args = vars(parser.parse_args())
-	return args
+		msgs = []
+		bag = Bag()
+		try:
+			msgs = bag.readFromFile(filename)
+		except Exception as e:
+			self.logger.error('[-] Could not open file {}'.format(filename))
+			raise
 
+		try:
+			length = len(msgs)
+			print('Found {} msgs in {}'.format(length, filename))
 
-def main():
-	args = handleArgs()
-	print args
-	info = args['info']
-	srv = BagServer(info[2], info[1], info[0])
-	srv.start()
+			# set it up to run
+			save_msg = msgs[0]
+			old_time = save_msg['ts']
+			msg_time = old_time
+			msg = save_msg['msg']
+			index = 1
+
+			# FIXME: 20160827 - this doesn't loop correctly, it crashes when it gets to the end
+			while True:
+				time.sleep(msg_time - old_time)
+
+				# fix time stamp in message
+				if 'stamp' in msg:
+					msg['stamp'] = time.time()
+
+				pub.pub(topic, msg)
+				# print('pub:', msg)
+				# print('msgs[0]:', msgs[0])
+				save_msg = msgs[index]
+
+				# setup times for sleep
+				old_time = msg_time
+				msg_time = save_msg['ts']
+				msg = save_msg['msg']
+
+				index += 1
+				if index == length:
+					if loop:
+						print("Loop!!")
+						index = 0
+					else:
+						self.logger.info('End of File')
+						return
+
+		except Exception as e:
+			self.logger.error(e)
+			bag.close()
+			raise
 
 
 if __name__ == '__main__':
-	main()
+	print('hello cowboy')

@@ -20,13 +20,31 @@ from lib.Servo import Servo
 # logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.ERROR)
 
+"""
+ \      /           ^ y
+  \    /            |
+   ----             |
+  |    |     <------+
+   ----      x
+  /    \
+ /      \
+
++x forward
+-x reverse
+
+
+  /\     /\
+ /  -----  \
+/           \
+
+"""
 
 class Leg(object):
 	"""
 	"""
-
 	def __init__(self, lengths, channels, limits=None):
 		"""
+		Each leg has 3 servos/channels
 		"""
 		if not len(channels) == 3: raise Exception('len(channels) != 3')
 
@@ -44,7 +62,7 @@ class Leg(object):
 			# print('leg channels', channels)
 			if limits: lim = limits[i]
 			else: lim = None
-			
+
 			self.servos.append(Servo(channels[i], lim))
 			# self.servos[i].angle = initAngles[i]
 			# print('servo {} angle {}'.format(channels[i], initAngles[i]))
@@ -114,11 +132,9 @@ class Leg(object):
 			Lc = self.coxaLength
 			Lf = self.femurLength
 			Lt = self.tibiaLength
-			a = atan2(y, x)  # <---
-			# a = atan2(x, y)
+			a = atan2(y, x)
 			f = sqrt(x**2 + y**2) - Lc
-			b1 = atan2(z, f)  # <---
-			# b1 = atan2(f, z)
+			b1 = atan2(z, f)
 			d = sqrt(f**2 + z**2)  # <---
 			b2 = acos((Lf**2 + d**2 - Lt**2) / (2.0 * Lf * d))
 			b = b1 + b2
@@ -130,7 +146,6 @@ class Leg(object):
 
 			# print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
 
-			# return a, b, g  # coxaAngle, femurAngle, tibiaAngle
 			return r2d(a), r2d(b), r2d(g)  # coxaAngle, femurAngle, tibiaAngle
 		except Exception as e:
 			print('ik error:', e)

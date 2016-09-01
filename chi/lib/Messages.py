@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import time
-import json
+import simplejson as json  # supposed to be better than json
 import math
 
 
@@ -59,8 +59,8 @@ class Vector(Message):
 		dict.update(self, default)
 		if kw: dict.update(self, kw)
 
-	# def __str__(self):  # pretty up the print statement
-	# 	return 'Vector[x,y,z]: {:.4f} {:.4f} {:.4f}'.format(self.get('x'), self.get('y'), self.get('z'))
+	def __str__(self):  # pretty up the print statement
+		return 'Vector[x,y,z]: {:.4f} {:.4f} {:.4f}'.format(self.get('x'), self.get('y'), self.get('z'))
 
 	def norm(self):
 		m = self.values()
@@ -217,16 +217,17 @@ class Joystick(Message):
 		s = '--------------------------------------------------\n'
 		ps4 = js['buttons']
 		s += 'Triangle {} Square {} X {} O {}\n'.format(
-				ps4['t'],
-				ps4['s'],
-				ps4['x'],
-				ps4['o']
-			)
+			ps4['t'],
+			ps4['s'],
+			ps4['x'],
+			ps4['o']
+		)
 
 		s += 'Share {}    Options {}\n'.format(ps4['share'], ps4['options'])
 
 		ps4 = js['axes']
 		s += 'Left Analog {:.3f}, {:.3f}	 Right Analog {:.3f}, {:.3f}\n'.format(
+# <<<<<<< HEAD
 				ps4['leftStick'][0],
 				ps4['leftStick'][1],
 				ps4['rightStick'][0],
@@ -242,6 +243,14 @@ class Joystick(Message):
 		elif h == 8: hat = 'LEFT'
 		else: hat = 'UNKNOWN'
 		s += 'Hat {}                        Touch Pad {}\n'.format(hat, js['buttons']['pad'])
+# =======
+# 			ps4['leftStick'][0],
+# 			ps4['leftStick'][1],
+# 			ps4['rightStick'][0],
+# 			ps4['rightStick'][1],
+# 		)
+# 
+# >>>>>>> abbbd6bd530e06acf46cae5eb25d4c14731fcea9
 		ps4 = js['buttons']
 		s += 'Options {}                    Share {}\n'.format(ps4['options'], ps4['share'])
 		s += 'L1 {}                         R1 {}\n'.format(ps4['L1'], ps4['R1'])
@@ -249,7 +258,6 @@ class Joystick(Message):
 		s += 'L3 {}       PS {}             R3 {}\n'.format(ps4['L3'], ps4['ps'], ps4['R3'])
 
 		return s
-
 
 
 if __name__ == '__main__':
@@ -266,7 +274,7 @@ if __name__ == '__main__':
 	print i
 
 	j = Joystick()
-	print Joystick.str(j)
+	print Joystick.screen(j)
 	# j.update(tom='hi')
 	# print j
 	# j['bob'] = 25
