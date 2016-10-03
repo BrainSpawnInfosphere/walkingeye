@@ -57,10 +57,6 @@ Chi (need a better name)
 	* Image View
 	* Video
 	* Video Save
-* Motion
-	* Holonomic
-	* Non-Holonomic
-	* Quadraped
 * Tools
 	* Topic
 
@@ -71,3 +67,8 @@ Chi (need a better name)
 * travis.ci - on push, run unit tests on commit to github
 * quantifiedcode - on push, check for errors and will submit auto fixes (pull requests) for simple errors
 * srcclr - check code and associated libraries for licenses
+
+# History
+
+pyGecko comes from my previous robotics software work that I have been working
+on for years.

@@ -1,4 +1,0 @@
-pyzmq
-pyyaml
-python-forecastio
-simplejson
