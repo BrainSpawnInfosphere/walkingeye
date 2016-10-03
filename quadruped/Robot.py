@@ -111,7 +111,7 @@ class CrawlGait(object):
 
 		# now move leg/servos
 		self.robot.moveFoot(legNum, newpos)
-		time.sleep(0.01)  # 4 legs * 12 steps each * 0.01 sec = 0.48 sec for one complete cycle
+		#time.sleep(0.01)  # 4 legs * 12 steps each * 0.01 sec = 0.48 sec for one complete cycle
 
 	def calcRotatedOffset(self, cmd):
 		"""
@@ -270,19 +270,19 @@ class TestQuadruped(Quadruped):
 				# continue
 
 				x, y = ps4['axes']['leftStick']
-				mm, rz = ps4['axes']['rightStick']
+				rz, mm = ps4['axes']['rightStick']
 
 				if ps4['buttons']['share']:
 					print('You hit <share> ... bye!')
 					exit()
 
 				cmd = [100*x, 100*y, 40*rz]
-				print('***********************************')
-				print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x, y, rz))
-				print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
-				print('***********************************')
+				#print('***********************************')
+				#print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x, y, rz))
+				#print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
+				#print('***********************************')
 				self.crawl.command(cmd)
-			time.sleep(0.01)
+			#time.sleep(0.01)
 
 
 def run():

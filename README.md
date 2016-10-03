@@ -3,7 +3,7 @@
 [![Travis](https://img.shields.io/travis/walchko/soccer2.svg)](https://travis-ci.org/walchko/soccer2)
 [![Code Health](https://landscape.io/github/walchko/soccer2/master/landscape.svg?style=flat)](https://landscape.io/github/walchko/soccer2/master)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/walchko/soccer2/master/MIT_License.txt)
-[![Code Issues](https://www.quantifiedcode.com/api/v1/project/8b181dffb58d46c4bc6e7919209a1ae7/badge.svg)](https://www.quantifiedcode.com/app/project/8b181dffb58d46c4bc6e7919209a1ae7)
+
 
 My robot software.
 
