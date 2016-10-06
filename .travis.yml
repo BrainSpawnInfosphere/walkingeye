@@ -4,11 +4,11 @@ python:
   - "2.7"
 # command to install dependencies
 # https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
-addons:
-    apt:
-        packages:
-            - libzmq3-dev
-            - sox
-install: pip install -r requirements.txt
+# addons:
+#     apt:
+#         packages:
+#             - libzmq3-dev
+#             - sox
+install: pip install pyxl320
 # command to run tests
 script: nosetests -v -w test/
