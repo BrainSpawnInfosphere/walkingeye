@@ -16,6 +16,7 @@ This file is needed by gait Trot class
 """
 
 # FIXME: 20160625 add euler -> quaternion transform and reverse
+# FIXME 2016-10-09 look at using pip's quaternion package
 
 def axis_angle(vec, axis, theta):
 	"""
@@ -87,4 +88,5 @@ def T(params, phi):
 
 if __name__ == "__main__":
 	# test_t_r()
-	test_t()
+	# test_t()
+	pass

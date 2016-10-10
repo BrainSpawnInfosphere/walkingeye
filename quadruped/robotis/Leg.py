@@ -11,11 +11,11 @@ import numpy as np
 from math import sin, cos, acos, atan2, sqrt, pi
 from math import radians as d2r
 from math import degrees as r2d
-from lib.kinematics import T
-# from Interfaces import PCA9685
+from kinematics import T
 import logging
-from lib.Servo import Servo
-# import time
+from Servo import Servo
+# from pyxl320 import ServoSerial
+# from pyxl320 import DummySerial
 
 # logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.ERROR)
@@ -42,15 +42,14 @@ logging.basicConfig(level=logging.ERROR)
 class Leg(object):
 	"""
 	"""
-	def __init__(self, lengths, channels, limits=None):
+	def __init__(self, lengths, channels, ser, limits=None):
 		"""
 		Each leg has 3 servos/channels
 		"""
-		if not len(channels) == 3: raise Exception('len(channels) != 3')
+		if not len(channels) == 3:
+			raise Exception('len(channels) != 3')
 
 		self.servos = []
-		# self.footPosition = [0.0, 0.0, 0.0]
-		# self.angles = [0.0, 0.0, 0.0]
 
 		self.coxaLength = lengths['coxaLength']
 		self.tibiaLength = lengths['tibiaLength']
@@ -59,31 +58,15 @@ class Leg(object):
 		# Create each servo and move it to the initial position
 		# servo arrange: coxa femur tibia
 		for i in range(0, 3):
-			# print('leg channels', channels)
 			if limits: lim = limits[i]
 			else: lim = None
+			self.servos.append(Servo(channels[i], ser, lim))
 
-			self.servos.append(Servo(channels[i], lim))
-			# self.servos[i].angle = initAngles[i]
-			# print('servo {} angle {}'.format(channels[i], initAngles[i]))
-			# time.sleep(1)
-
-		# initAngles = [-45, -20, -110]
-		# initAngles = [0, -20, -90]
-		# initAngles = [0, 45, -135]  # [x,y,z] = [55.7, 0, -33.3] mm
 		initAngles = [0, 45, -150]  # [x,y,z] = [55.7, 0, -33.3] mm
 		self.foot0 = self.fk(*initAngles)
-		# print('init foot0', self.foot0)
-		# exit()
-		# self.servos[0].all_stop()
 
 	def __del__(self):
-		"""
-		Turn off servos associated with this leg
-		"""
-		self.servos[0].stop()
-		self.servos[1].stop()
-		self.servos[2].stop()
+		pass
 
 	def fk(self, a, b, g):
 		"""
@@ -175,13 +158,5 @@ class Leg(object):
 		self.move(*self.foot0)
 
 
-
-
 if __name__ == "__main__":
-	# test_fk_ik()
-	# test_full_fk_ik([0,1,2])
-	# test_full_fk_ik([4,5,6])
-	# test_full_fk_ik([8,9,10])
-	# test_full_fk_ik([12,13,14])
-	# check_range()
 	print('Hello cowboy!')

@@ -2,6 +2,16 @@
 
 This is my second one after the RC version, which didn't work as nicely as I wanted it too.
 
+## Software
+
+* Robot - pyGecko driver
+* Quadruped - quadruped driver, if you want to use your own high level software
+* Leg - forward/reverse kinematics
+* lib
+
+	* Servo - servo interface
+	* kinematics
+
 ## Hardware
 
 ### Raspberry Pi
@@ -10,7 +20,7 @@ This is my second one after the RC version, which didn't work as nicely as I wan
 
 I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/products/3055) (ARMv8) as the main board running the lite version of Raspbian. It has on-board:
 
-* 802.11n Wifi 
+* 802.11n Wifi
 * Bluetooth 4.1 BLE
 
 ### Camera Interface (CSI)
@@ -23,7 +33,7 @@ I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/produc
 
 ## Cost
 
-Here is a parts list of **key components** that I am using. I am not listing wires, bread boards, cables, etc. Also note, 
+Here is a parts list of **key components** that I am using. I am not listing wires, bread boards, cables, etc. Also note,
 I have rounded up the costs (i.e., $4.95 => $5). Also, lot of the body is 3d printed, the costs for that are not shown here.
 
 | Part | Source | Number | Item Cost | Sum | Notes |

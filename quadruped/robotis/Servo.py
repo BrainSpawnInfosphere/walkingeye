@@ -8,20 +8,33 @@
 from __future__ import print_function
 from __future__ import division
 import logging
-from pyxl320 import Packet, ServoSerial, xl320
-from pyxl320 import DummySerial
+from pyxl320 import Packet, xl320
+# from pyxl320 import ServoSerial
+# from pyxl320 import DummySerial
 # logging.basicConfig(level=logging.DEBUG)
 # logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
+# FIXME 2016-10-09 move RC and Robotis servo code to pygecko?
+# FIXME 2016-10-09 clean up global serial port
 # global serial
-ser = ServoSerial('/dev/tty.usbserial-A5004Flb')
+# # ser = ServoSerial('/dev/tty.usbserial-A5004Flb')
 # ser = DummySerial('test_port')
-ser.open()
+# ser.open()
 
 
-def fix(lb, hb):
-	return (hb << 8) + lb
+# def fix(lb, hb):
+# 	return (hb << 8) + lb
+
+
+# class Base(object):
+# 	def __init__(self, dummy=False):
+# 		self.ser = None
+# 		if dummy:
+# 			self.ser = DummySerial('test_port')
+# 		else:
+# 			self.ser = ServoSerial('/dev/tty.usbserial-A5004Flb')
+
 
 class Servo(object):
 	"""
@@ -40,16 +53,17 @@ class Servo(object):
 	"""
 	_angle = 0.0  # current angle
 
-	def __init__(self, ID, limits=None):
+	def __init__(self, ID, serialObj, limits=None):
 		"""
 		limits [angle, angle] - [optional] set the angular limits of the servo to avoid collision
 		"""
 		self.ID = ID
+		self.ser = serialObj
 
 		# get current location
 		pkt = Packet.makeReadPacket(self.ID, xl320.XL320_PRESENT_POSITION, [2])
-		ser.write(pkt)
-		ret = ser.read()
+		self.ser.write(pkt)
+		ret = self.ser.read()
 
 		# servos are centered at 150 deg
 		# angle = fix(*ret[6:8])  # FIXME
@@ -80,7 +94,7 @@ class Servo(object):
 			angle += 150.0
 			self._angle = angle
 			pkt = Packet.makeServoPacket(self.ID, angle)
-			ser.sendPkt(pkt)
+			self.ser.sendPkt(pkt)
 
 	def setServoLimits(self, minAngle, maxAngle):
 		"""
@@ -107,9 +121,9 @@ class Servo(object):
 		# # ser.read()
 
 		pkt = Packet.makeServoMinLimitPacket(self.ID, minAngle)
-		ser.sendPkt(pkt)
+		self.ser.sendPkt(pkt)
 		pkt = Packet.makeServoMaxLimitPacket(self.ID, maxAngle)
-		ser.sendPkt(pkt)
+		self.ser.sendPkt(pkt)
 
 	def stop(self):
 		pass
