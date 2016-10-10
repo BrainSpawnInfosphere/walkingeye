@@ -14,8 +14,6 @@ from math import degrees as r2d
 from kinematics import T
 import logging
 from Servo import Servo
-# from pyxl320 import ServoSerial
-# from pyxl320 import DummySerial
 
 # logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.ERROR)

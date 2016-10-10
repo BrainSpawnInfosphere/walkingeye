@@ -9,31 +9,7 @@ from __future__ import print_function
 from __future__ import division
 import logging
 from pyxl320 import Packet, xl320
-# from pyxl320 import ServoSerial
-# from pyxl320 import DummySerial
-# logging.basicConfig(level=logging.DEBUG)
-# logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
-
-# FIXME 2016-10-09 move RC and Robotis servo code to pygecko?
-# FIXME 2016-10-09 clean up global serial port
-# global serial
-# # ser = ServoSerial('/dev/tty.usbserial-A5004Flb')
-# ser = DummySerial('test_port')
-# ser.open()
-
-
-# def fix(lb, hb):
-# 	return (hb << 8) + lb
-
-
-# class Base(object):
-# 	def __init__(self, dummy=False):
-# 		self.ser = None
-# 		if dummy:
-# 			self.ser = DummySerial('test_port')
-# 		else:
-# 			self.ser = ServoSerial('/dev/tty.usbserial-A5004Flb')
 
 
 class Servo(object):
@@ -61,9 +37,9 @@ class Servo(object):
 		self.ser = serialObj
 
 		# get current location
-		pkt = Packet.makeReadPacket(self.ID, xl320.XL320_PRESENT_POSITION, [2])
-		self.ser.write(pkt)
-		ret = self.ser.read()
+		# pkt = Packet.makeReadPacket(self.ID, xl320.XL320_PRESENT_POSITION, [2])
+		# self.ser.write(pkt)
+		# ret = self.ser.read()
 
 		# servos are centered at 150 deg
 		# angle = fix(*ret[6:8])  # FIXME
@@ -125,17 +101,6 @@ class Servo(object):
 		pkt = Packet.makeServoMaxLimitPacket(self.ID, maxAngle)
 		self.ser.sendPkt(pkt)
 
-	def stop(self):
-		pass
-
-	@staticmethod
-	def all_stop():  # this serves no purpose ... remove in RC also
-		pass
-
 
 if __name__ == "__main__":
-	# cmd_servo()
-	# swing_servo()
-	# test_limits()
-	# checks()
 	print('Hello space cowboy!')

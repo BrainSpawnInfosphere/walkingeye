@@ -85,8 +85,5 @@ def T(params, phi):
 	return t
 
 
-
 if __name__ == "__main__":
-	# test_t_r()
-	# test_t()
 	pass

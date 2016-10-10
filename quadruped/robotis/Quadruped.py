@@ -14,7 +14,6 @@ import numpy as np
 # import logging
 from math import cos, sin, sqrt, pi
 from math import radians as d2r
-# from lib.Servo import Servo
 from pyxl320 import ServoSerial
 from pyxl320 import DummySerial
 
@@ -100,10 +99,10 @@ class CrawlGait(object):
 		newpos = rest_rot + move + turn
 
 		#
-		# if legNum in [0]:
-		# 	print('Rot [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, rot[0], rot[1], rot[2]))
-		# 	print('Move [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, move[0], move[1], move[2]))
-		# 	print('leg {} Newpos [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(legNum, i, newpos[0], newpos[1], newpos[2]))
+		if legNum in [0]:
+			# print('Rot [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, rot[0], rot[1], rot[2]))
+			# print('Move [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, move[0], move[1], move[2]))
+			print('New  [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, newpos[0], newpos[1], newpos[2]))
 
 		# now move leg/servos
 		self.robot.moveFoot(legNum, newpos)
@@ -117,7 +116,7 @@ class CrawlGait(object):
 			where leg0 = {'linear': [x,y], 'rotational': [x,y], 'angle': zrotation(rads)}
 		"""
 		# frame rotations for each leg
-		frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # opposite of paper
+		frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]
 
 		# only calc this 4 times, not 12*4 times!
 		rot_cmd = []  # (xx, yy) for each leg
@@ -145,7 +144,8 @@ class CrawlGait(object):
 	def command(self, cmd):
 		# handle no movement command ... do else where?
 		if sqrt(cmd[0]**2 + cmd[1]**2 + cmd[2]**2) < 0.001:
-			for leg in range(0, 4): self.robot.legs[leg].reset()
+			for leg in range(0, 4):
+				self.robot.legs[leg].reset()
 			return
 
 		# print('cmd[{}]: {:.2f} {:.2f} {:.2f}'.format(i, rc[0], rc[1], rc[2]))
@@ -175,7 +175,6 @@ class Quadruped(object):
 		pulses.
 		"""
 		if port:
-			# self.ser = ServoSerial('/dev/tty.usbserial-A5004Flb')
 			self.ser = ServoSerial(port)
 		else:
 			self.ser = DummySerial('test_port')
@@ -201,11 +200,12 @@ class Quadruped(object):
 		This is harsh, I just throw the leg up into a storage position. Should
 		be more graceful ... oh well.
 		"""
-		angles = [0, 90, 0]
-		# angles = [0, 45, -135]
-		# for leg in range(0, 4): self.pose(angles, leg)
-		self.moveFootAngles(angles)
-		time.sleep(1)
+		# angles = [0, 90, 0]
+		# # angles = [0, 45, -135]
+		# # for leg in range(0, 4): self.pose(angles, leg)
+		# self.moveFootAngles(angles)
+		# time.sleep(1)
+		pass
 
 	def sit(self):
 		"""
