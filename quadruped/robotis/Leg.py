@@ -93,10 +93,16 @@ class Leg(object):
 		a = d2r(a)
 		b = d2r(b)
 		g = d2r(g)
+		# foot = [
+		# 	Lc*cos(a) + Lf*cos(a)*cos(b) + Lt*(-sin(b)*sin(g)*cos(a) + cos(a)*cos(b)*cos(g)),
+		# 	Lc*sin(a) + Lf*sin(a)*cos(b) + Lt*(-sin(a)*sin(b)*sin(g) + sin(a)*cos(b)*cos(g)),
+		# 	Lf*sin(b) + Lt*(sin(b)*cos(g) + sin(g)*cos(b))
+		# ]
+
 		foot = [
-			Lc*cos(a) + Lf*cos(a)*cos(b) + Lt*(-sin(b)*sin(g)*cos(a) + cos(a)*cos(b)*cos(g)),
-			Lc*sin(a) + Lf*sin(a)*cos(b) + Lt*(-sin(a)*sin(b)*sin(g) + sin(a)*cos(b)*cos(g)),
-			Lf*sin(b) + Lt*(sin(b)*cos(g) + sin(g)*cos(b))
+			(Lc + Lf*cos(b) + Lt*cos(b + g))*cos(a),
+			(Lc + Lf*cos(b) + Lt*cos(b + g))*sin(a),
+			Lf*sin(b) + Lt*sin(b + g)
 		]
 
 		return np.array(foot)

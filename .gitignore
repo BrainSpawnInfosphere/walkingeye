@@ -18,3 +18,4 @@ node_modules
 tmp/*.wav
 ._*
 *.bag
+.ipynb_checkpoints
