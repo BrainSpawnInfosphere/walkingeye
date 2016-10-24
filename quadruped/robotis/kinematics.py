@@ -46,43 +46,63 @@ def axis_angle(vec, axis, theta):
 	return np.dot(rot, vec)
 
 
-def rot(a, alpha, S, theta):
-	"""
-	Creates a DH rotation matrix for forward kinematics.
-	"""
-	return np.array([  # eqn 3.7 pg 36
-		[cos(theta), -sin(theta), 0, a],
-		[sin(theta) * cos(alpha), cos(theta) * cos(alpha), -sin(alpha), -sin(alpha) * S],
-		[sin(theta) * sin(alpha), cos(theta) * sin(alpha), cos(alpha), cos(alpha) * S],
-		[0, 0, 0, 1]
-	])
+# def rot(a, alpha, S, theta):
+# 	"""
+# 	Creates a DH rotation matrix for forward kinematics.
+# 	"""
+# 	return np.array([  # eqn 3.7 pg 36
+# 		[cos(theta), -sin(theta), 0, a],
+# 		[sin(theta) * cos(alpha), cos(theta) * cos(alpha), -sin(alpha), -sin(alpha) * S],
+# 		[sin(theta) * sin(alpha), cos(theta) * sin(alpha), cos(alpha), cos(alpha) * S],
+# 		[0, 0, 0, 1]
+# 	])
+#
+# 	# return np.array([  # inverse of above ??
+# 	# 	[cos(theta), sin(theta) * cos(alpha), sin(theta) * sin(alpha), -cos(theta) * a],
+# 	# 	[-sin(theta), cos(theta) * cos(alpha), cos(theta) * sin(alpha), sin(theta) * a],
+# 	# 	[0, -sin(alpha), cos(alpha), -S],
+# 	# 	[0, 0, 0, 1]
+# 	# ])
+#
+#
+# def T(params, phi):
+# 	"""
+# 	T -> dh ??
+#
+# 	Creates a transform from the leg frame to the foot.
+#
+# 	params = [[a, alpha, S, theta],[a, alpha, S, theta],...]
+# 	"""
+# 	# handle the base frame, eqn 3.9, p36
+# 	t = np.array([
+# 		[cos(phi), -sin(phi), 0, 0],
+# 		[sin(phi), cos(phi), 0, 0],
+# 		[0, 0, 1, 0],
+# 		[0, 0, 0, 1]
+# 	])
+# 	for i, p in enumerate(params):
+# 		t = t.dot(rot(*p))
+# 	return t
 
-	# return np.array([  # inverse of above ??
-	# 	[cos(theta), sin(theta) * cos(alpha), sin(theta) * sin(alpha), -cos(theta) * a],
-	# 	[-sin(theta), cos(theta) * cos(alpha), cos(theta) * sin(alpha), sin(theta) * a],
-	# 	[0, -sin(alpha), cos(alpha), -S],
-	# 	[0, 0, 0, 1]
-	# ])
+class DH(object):
+	def __init__(self):
+		pass
 
+	def fk(self, params):
+		t = np.eye(4)
+		for p in params:
+			t = t.dot(self.makeT(*p))
+		return t
 
-def T(params, phi):
-	"""
-	T -> dh ??
-
-	Creates a transform from the leg frame to the foot.
-
-	params = [[a, alpha, S, theta],[a, alpha, S, theta],...]
-	"""
-	# handle the base frame, eqn 3.9, p36
-	t = np.array([
-		[cos(phi), -sin(phi), 0, 0],
-		[sin(phi), cos(phi), 0, 0],
-		[0, 0, 1, 0],
-		[0, 0, 0, 1]
-	])
-	for i, p in enumerate(params):
-		t = t.dot(rot(*p))
-	return t
+	def makeT(self, a, alpha, d, theta):
+		alpha = d2r(alpha)
+		theta = d2r(theta)
+		return np.array([  # classic DH
+			[cos(theta), -sin(theta) * cos(alpha),  sin(theta) * sin(alpha), cos(theta) * a],
+			[sin(theta),  cos(theta) * cos(alpha), -cos(theta) * sin(alpha), sin(theta) * a],
+			[0, sin(alpha), cos(alpha), d],
+			[0, 0, 0, 1]
+		])
 
 
 if __name__ == "__main__":

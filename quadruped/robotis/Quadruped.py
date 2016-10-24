@@ -160,6 +160,9 @@ class CrawlGait(object):
 
 ##########################
 
+class RobotException(Exception):
+	pass
+
 class Robot(object):
 	def __init__(self):
 		pass
@@ -169,17 +172,23 @@ class Quadruped(object):
 	"""
 	This is the low level driver
 	"""
-	def __init__(self, data, port=None):
+	def __init__(self, data):
 		"""
-		Sets up alll 4 legs and servos. Also setups limits for angles and servo
+		Sets up all 4 legs and servos. Also setups limits for angles and servo
 		pulses.
 		"""
-		if port:
-			self.ser = ServoSerial(port)
+		if 'serialPort' in data:
+			self.ser = ServoSerial(data['serialPort'])
 		else:
 			self.ser = DummySerial('test_port')
 
 		self.ser.open()
+
+		if 'legLengths' not in data or 'legAngleLimits' not in data:
+			raise RobotException('Quadruped json data missing required keys')
+
+		if 'legOffset' not in data:
+			raise RobotException('Quadruped json data missing required keys')
 
 		self.legs = []
 		for i in range(0, 4):  # 4 legs
@@ -189,22 +198,16 @@ class Quadruped(object):
 					data['legLengths'],
 					[channel+1, channel+2, channel+3],  # servos numbered 1-12
 					self.ser,
-					data['legAngleLimits']
+					data['legAngleLimits'],
+					data['legOffset']
 				)
 			)
 
 	def __del__(self):
 		"""
 		Leg kills all servos on exit
-
-		This is harsh, I just throw the leg up into a storage position. Should
-		be more graceful ... oh well.
 		"""
-		# angles = [0, 90, 0]
-		# # angles = [0, 45, -135]
-		# # for leg in range(0, 4): self.pose(angles, leg)
-		# self.moveFootAngles(angles)
-		# time.sleep(1)
+		self.sit()
 		pass
 
 	def sit(self):

@@ -11,7 +11,7 @@ import numpy as np
 from math import sin, cos, acos, atan2, sqrt, pi
 from math import radians as d2r
 from math import degrees as r2d
-from kinematics import T
+# from kinematics import T
 import logging
 from Servo import Servo
 
@@ -40,7 +40,7 @@ logging.basicConfig(level=logging.ERROR)
 class Leg(object):
 	"""
 	"""
-	def __init__(self, lengths, channels, ser, limits=None):
+	def __init__(self, lengths, channels, ser, limits, offsets):
 		"""
 		Each leg has 3 servos/channels
 		"""
@@ -56,11 +56,11 @@ class Leg(object):
 		# Create each servo and move it to the initial position
 		# servo arrange: coxa femur tibia
 		for i in range(0, 3):
-			if limits: lim = limits[i]
-			else: lim = None
-			self.servos.append(Servo(channels[i], ser, lim))
+			self.servos.append(Servo(channels[i], ser))
+			# self.servos[i].offset = offsets[i]
+			self.servos[i].setServoLimits(offsets[i], *limits[i])
 
-		initAngles = [0, 45, -150]  # [x,y,z] = [55.7, 0, -33.3] mm
+		initAngles = [0, 45, -150]
 		self.foot0 = self.fk(*initAngles)
 
 	def __del__(self):
@@ -74,32 +74,32 @@ class Leg(object):
 		Lf = self.femurLength
 		Lt = self.tibiaLength
 
-		if 0:
-			phi = a
-			theta2 = b
-			theta3 = g
+		# if 0:
+		# 	phi = a
+		# 	theta2 = b
+		# 	theta3 = g
+		#
+		# 	params = [
+		# 		# a_ij alpha_ij  S_j  theta_j
+		# 		[Lc,   d2r(90.0),   0.0,   d2r(theta2)],  # frame 12
+		# 		[Lf,   d2r(0.0),    0.0,   d2r(theta3)]   # frame 23
+		# 	]
+		#
+		# 	r = T(params, d2r(phi))
+		# 	foot = r.dot(np.array([Lt, 0.0, 0.0, 1.0]))
+		#
+		# 	return foot[0:-1]  # DH return vector size 4, only grab (x,y,z) which are the 1st 3 elements
+		# else:
+		a = d2r(a)
+		b = d2r(b)
+		g = d2r(g)
+		foot = [
+			Lc*cos(a) + Lf*cos(a)*cos(b) + Lt*(-sin(b)*sin(g)*cos(a) + cos(a)*cos(b)*cos(g)),
+			Lc*sin(a) + Lf*sin(a)*cos(b) + Lt*(-sin(a)*sin(b)*sin(g) + sin(a)*cos(b)*cos(g)),
+			Lf*sin(b) + Lt*(sin(b)*cos(g) + sin(g)*cos(b))
+		]
 
-			params = [
-				# a_ij alpha_ij  S_j  theta_j
-				[Lc,   d2r(90.0),   0.0,   d2r(theta2)],  # frame 12
-				[Lf,    d2r(0.0),   0.0,   d2r(theta3)]   # frame 23
-			]
-
-			r = T(params, d2r(phi))
-			foot = r.dot(np.array([Lt, 0.0, 0.0, 1.0]))
-
-			return foot[0:-1]  # DH return vector size 4, only grab (x,y,z) which are the 1st 3 elements
-		else:
-			a = d2r(a)
-			b = d2r(b)
-			g = d2r(g)
-			foot = [
-				Lc*cos(a) + Lf*cos(a)*cos(b) + Lt*(-sin(b)*sin(g)*cos(a) + cos(a)*cos(b)*cos(g)),
-				Lc*sin(a) + Lf*sin(a)*cos(b) + Lt*(-sin(a)*sin(b)*sin(g) + sin(a)*cos(b)*cos(g)),
-				Lf*sin(b) + Lt*(sin(b)*cos(g) + sin(g)*cos(b))
-			]
-
-			return np.array(foot)
+		return np.array(foot)
 
 	def ik(self, x, y, z):
 		"""
@@ -115,7 +115,7 @@ class Leg(object):
 			Lt = self.tibiaLength
 			a = atan2(y, x)
 			f = sqrt(x**2 + y**2) - Lc
-			b1 = atan2(z, f)
+			b1 = atan2(z, f)  # takes into accoutn quadrent, z is neg
 			d = sqrt(f**2 + z**2)  # <---
 			b2 = acos((Lf**2 + d**2 - Lt**2) / (2.0 * Lf * d))
 			b = b1 + b2
@@ -123,11 +123,12 @@ class Leg(object):
 
 			#### FIXES ###################################
 			g -= pi  # fix to align fk and ik frames
+			# b -= pi/2  # wtf ... i need this!!!!
 			##############################################
-
-			# print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
-
+			print('b1 b2: {:.2f} {:.2f}'.format(r2d(b1), r2d(b2)))
+			print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
 			return r2d(a), r2d(b), r2d(g)  # coxaAngle, femurAngle, tibiaAngle
+
 		except Exception as e:
 			print('ik error:', e)
 			raise e
@@ -143,7 +144,6 @@ class Leg(object):
 			for i, servo in enumerate(self.servos):
 				# print('i, servo:', i, servo)
 				angle = angles[i]
-				if i == 2: angle = -1*angle - 180   # correct for tibia servo backwards
 				# print('servo {} angle {}'.format(i, angle))
 				servo.angle = angle
 

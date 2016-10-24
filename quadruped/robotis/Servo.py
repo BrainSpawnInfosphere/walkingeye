@@ -28,26 +28,27 @@ class Servo(object):
 	kinematics to servo: servo_k = servo_r - 150
 	"""
 	_angle = 0.0  # current angle
+	_offset = 150.0 # angle offset default, see above for explaination
+	minAngle = -150.0
+	maxAngle = 150.0
+	ID = 0
+	ser = None
 
-	def __init__(self, ID, serialObj, limits=None):
+	def __init__(self, ID, serialObj):
 		"""
 		limits [angle, angle] - [optional] set the angular limits of the servo to avoid collision
 		"""
 		self.ID = ID
 		self.ser = serialObj
+		self.setServoLimits(150.0, -150.0, 150.0)  # defaults: offset, min, max
 
-		# get current location
-		# pkt = Packet.makeReadPacket(self.ID, xl320.XL320_PRESENT_POSITION, [2])
-		# self.ser.write(pkt)
-		# ret = self.ser.read()
-
-		# servos are centered at 150 deg
-		# angle = fix(*ret[6:8])  # FIXME
-		# angle -= 150
-		# self._angle = angle
-
-		if limits: self.setServoLimits(*limits)
-		else: self.setServoLimits(0.0, 300.0)
+	# @property
+	# def offset(self):
+	# 	return self._offset
+	#
+	# @offset.setter
+	# def offset(self, offset):
+	# 	self._offset = offset
 
 	@property
 	def angle(self):
@@ -62,17 +63,19 @@ class Servo(object):
 		Sets the servo angle and clamps it between [limitMinAngle, limitMaxAngle].
 		It also commands the servo to move.
 		"""
-		if self.minAngle < angle > self.maxAngle:
-			raise Exception('@angle.setter')
+		if self.minAngle > angle > self.maxAngle:
+			# raise Exception('@angle.setter {} > {} > {}'.format(self.minAngle, angle, self.maxAngle))
+			print('@angle.setter {} > {} > {}'.format(self.minAngle, angle, self.maxAngle))
+			return
 
 		if self._angle != angle:
-			# servos are centered at 150 deg
-			angle += 150.0
 			self._angle = angle
-			pkt = Packet.makeServoPacket(self.ID, angle)
+			# servos are centered at 150 deg, but offset can change
+			print(self.ID, angle, angle + self._offset)
+			pkt = Packet.makeServoPacket(self.ID, angle + self._offset)
 			self.ser.sendPkt(pkt)
 
-	def setServoLimits(self, minAngle, maxAngle):
+	def setServoLimits(self, offset, minAngle, maxAngle):
 		"""
 		sets maximum and minimum achievable angles. Remeber, the limits have to
 		be within the servo range of [0, 180] ... anything more of less won't
@@ -83,6 +86,10 @@ class Servo(object):
 			minAngle - degrees
 			maxAngle - degrees
 		"""
+		if minAngle > maxAngle:
+			raise Exception("Servo::setServoLimits: min angle > max angle")
+
+		self._offset = offset
 		self.minAngle = minAngle
 		self.maxAngle = maxAngle
 
@@ -96,9 +103,14 @@ class Servo(object):
 		# ser.write(pkt)
 		# # ser.read()
 
-		pkt = Packet.makeServoMinLimitPacket(self.ID, minAngle)
+		# Example: kinematics only allow a servo between -180 and 0
+		# min -180
+		# max 0
+		# offset 240  <-- a real servo angle of 240 is a kinematic angle of 0
+		# limits = [-180+240, 0+240] = [60, 240]  <-- these are real servo angles
+		pkt = Packet.makeServoMinLimitPacket(self.ID, minAngle+self._offset)
 		self.ser.sendPkt(pkt)
-		pkt = Packet.makeServoMaxLimitPacket(self.ID, maxAngle)
+		pkt = Packet.makeServoMaxLimitPacket(self.ID, maxAngle+self._offset)
 		self.ser.sendPkt(pkt)
 
 
