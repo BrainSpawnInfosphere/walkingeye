@@ -8,7 +8,7 @@
 from __future__ import print_function
 from __future__ import division
 import numpy as np
-from math import sin, cos, acos, atan2, sqrt, pi
+from math import sin, cos, acos, atan2, sqrt, pi, fabs
 from math import radians as d2r
 from math import degrees as r2d
 # from kinematics import T
@@ -60,7 +60,7 @@ class Leg(object):
 			# self.servos[i].offset = offsets[i]
 			self.servos[i].setServoLimits(offsets[i], *limits[i])
 
-		initAngles = [0, 45, -150]
+		initAngles = [0, 45, -90-45]
 		self.foot0 = self.fk(*initAngles)
 
 	def __del__(self):
@@ -115,37 +115,96 @@ class Leg(object):
 		Reference (there are typos)
 		https://tote.readthedocs.io/en/latest/ik.html
 		"""
-		try:
-			Lc = self.coxaLength
-			Lf = self.femurLength
-			Lt = self.tibiaLength
-			a = atan2(y, x)
-			f = sqrt(x**2 + y**2) - Lc
-			b1 = atan2(z, f)  # takes into accoutn quadrent, z is neg
-			d = sqrt(f**2 + z**2)  # <---
-			b2 = acos((Lf**2 + d**2 - Lt**2) / (2.0 * Lf * d))
-			b = b1 + b2
-			g = acos((Lf**2 + Lt**2 - d**2) / (2.0 * Lf * Lt))
+		# try:
+		Lc = self.coxaLength
+		Lf = self.femurLength
+		Lt = self.tibiaLength
 
-			#### FIXES ###################################
-			g -= pi  # fix to align fk and ik frames
-			# b -= pi/2  # wtf ... i need this!!!!
-			##############################################
-			print('b1 b2: {:.2f} {:.2f}'.format(r2d(b1), r2d(b2)))
-			print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
-			return r2d(a), r2d(b), r2d(g)  # coxaAngle, femurAngle, tibiaAngle
+		if sqrt(x**2 + y**2) < Lc:
+			print('too short')
+			return None
+		# elif z > 0.0:
+		# 	return None
 
-		except Exception as e:
-			print('ik error:', e)
-			raise e
+		a = atan2(y, x)
+		f = sqrt(x**2 + y**2) - Lc
+		# b1 = atan2(z, f)  # takes into account quadrent, z is neg
+
+		# you have different conditions depending if z is pos or neg
+		if z < 0.0:
+			b1 = atan2(f, fabs(z))
+		else:
+			b1 = atan2(z, f)
+
+		d = sqrt(f**2 + z**2)  # <---
+
+		# print('pos: {} {} {}'.format(x,y,z))
+		# print('d: {:.3f}  f: {:.3f}'.format(d,f))
+		# print('Lc Lf Lt: {} {} {}'.format(Lc,Lf,Lt))
+		# print('num: {:.3f}'.format(Lf**2 + d**2 - Lt**2))
+		# print('den: {:.3f}'.format(2.0 * Lf * d))
+		# print('acos: {:.2f}'.format((Lf**2 + d**2 - Lt**2) / (2.0 * Lf * d)))
+
+		guts = ((Lf**2 + d**2 - Lt**2) / (2.0 * Lf * d))
+		if 1.0 < guts or guts < -1.0:
+			print('acos crap!: {:.3f} {:.3f} {:.3f}'.format(x,y,z))
+			return None
+		b2 = acos((Lf**2 + d**2 - Lt**2) / (2.0 * Lf * d))  # issues?
+		b = b1 + b2
+		g = acos((Lf**2 + Lt**2 - d**2) / (2.0 * Lf * Lt))
+
+		#### FIXES ###################################
+		g -= pi  # fix to align fk and ik frames
+
+		if z < 0.0:
+			b -= pi/2  #
+		##############################################
+		# print('b1 b2: {:.2f} {:.2f}'.format(r2d(b1), r2d(b2)))
+		# print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
+		return r2d(a), r2d(b), r2d(g)  # coxaAngle, femurAngle, tibiaAngle
+
+		# except Exception as e:
+		# 	print('ik error:', e)
+		# 	raise e
+
+	# def ik2(self, x, y, z):
+	# 	"""
+	# 	Calculates the inverse kinematics from a given foot coordinate (x,y,z)[mm]
+	# 	and returns the joint angles[degrees]
+	#
+	# 	Reference (there are typos)
+	# 	https://tote.readthedocs.io/en/latest/ik.html
+	# 	"""
+	# 	# try:
+	# 	Lc = self.coxaLength
+	# 	Lf = self.femurLength
+	# 	Lt = self.tibiaLength
+	# 	a = atan2(y, x)
+	# 	L1 = sqrt(x**2+y**2)
+	# 	L = sqrt(z**2 + (L1-Lc)**2)
+	# 	b1 = acos(z/L)
+	# 	b2 = acos((Lt**2 - Lf**2 - L**2) / (-2.0 * Lf * L))  # issues?
+	# 	b = b1 + b2
+	# 	g = acos((Lf**2 + Lt**2 - L**2) / (2.0 * Lf * Lt))
+	#
+	# 	#### FIXES ###################################
+	# 	g -= pi  # fix to align fk and ik frames
+	# 	b -= pi/2  # wtf ... i need this!!!!
+	# 	##############################################
+	# 	# print('b1 b2: {:.2f} {:.2f}'.format(r2d(b1), r2d(b2)))
+	# 	# print('ik angles: {:.2f} {:.2f} {:.2f}'.format(r2d(a), r2d(b), r2d(g)))
+	# 	return r2d(a), r2d(b), r2d(g)  # coxaAngle, femurAngle, tibiaAngle
 
 	def move(self, x, y, z):
 		"""
 		Attempts to move it's foot to coordinates [x,y,z]
 		"""
 		try:
-			a, b, c = self.ik(x, y, z)  # inverse kinematics
-			angles = [a, b, c]
+			# a, b, c = self.ik(x, y, z)  # inverse kinematics
+			# angles = [a, b, c]
+			angles = self.ik(x, y, z)  # inverse kinematics
+			if angles is None:
+				return
 			# print('angles: {:.2f} {:.2f} {:.2f}'.format(*angles))
 			for i, servo in enumerate(self.servos):
 				# print('i, servo:', i, servo)

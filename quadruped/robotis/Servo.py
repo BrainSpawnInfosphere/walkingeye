@@ -71,9 +71,11 @@ class Servo(object):
 		if self._angle != angle:
 			self._angle = angle
 			# servos are centered at 150 deg, but offset can change
-			print(self.ID, angle, angle + self._offset)
+			# print(self.ID, angle, angle + self._offset)
+
 			pkt = Packet.makeServoPacket(self.ID, angle + self._offset)
 			self.ser.sendPkt(pkt)
+			# print('sent angle {} [{}]'.format(angle, angle + self._offset))
 
 	def setServoLimits(self, offset, minAngle, maxAngle):
 		"""
@@ -103,15 +105,16 @@ class Servo(object):
 		# ser.write(pkt)
 		# # ser.read()
 
-		# Example: kinematics only allow a servo between -180 and 0
-		# min -180
-		# max 0
-		# offset 240  <-- a real servo angle of 240 is a kinematic angle of 0
-		# limits = [-180+240, 0+240] = [60, 240]  <-- these are real servo angles
-		pkt = Packet.makeServoMinLimitPacket(self.ID, minAngle+self._offset)
-		self.ser.sendPkt(pkt)
-		pkt = Packet.makeServoMaxLimitPacket(self.ID, maxAngle+self._offset)
-		self.ser.sendPkt(pkt)
+		if 0:
+			# Example: kinematics only allow a servo between -180 and 0
+			# min -180
+			# max 0
+			# offset 240  <-- a real servo angle of 240 is a kinematic angle of 0
+			# limits = [-180+240, 0+240] = [60, 240]  <-- these are real servo angles
+			pkt = Packet.makeServoMinLimitPacket(self.ID, minAngle+self._offset)
+			self.ser.sendPkt(pkt)
+			pkt = Packet.makeServoMaxLimitPacket(self.ID, maxAngle+self._offset)
+			self.ser.sendPkt(pkt)
 
 
 if __name__ == "__main__":

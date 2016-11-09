@@ -3,7 +3,7 @@
 from __future__ import print_function
 from __future__ import division
 import numpy as np
-from sympy import symbols, sin, cos, pi
+from sympy import symbols, sin, cos, pi, simplify, trigsimp
 # from sympy import rad as d2r
 
 
@@ -12,12 +12,23 @@ Lc, Lf, Lt = symbols('Lc Lf Lt')
 
 
 def eval(f, inputs):
+	"""
+	Do substitution of angles/lengths
+	"""
 	h = []
 	for i in range(0, 3):
 		tmp = (f[i,3]).subs(inputs)
 		h.append(tmp.evalf())
 	return h
 
+def simp(f):
+	"""
+	Simplify down equations
+	"""
+	h = []
+	for i in range(0, 3):
+		h.append(simplify(f[i,3]))
+	return h
 
 class DH(object):
 	def __init__(self):
@@ -49,7 +60,8 @@ def test_DH():
 	]
 	dh = DH()
 	t = dh.fk(params)
-	t = eval(t,[])
+	# t = eval(t,[])
+	t = simp(t)
 	print('{}\n\n {}\n\n {}\n'.format(t[0],t[1],t[2]))
 
 test_DH()

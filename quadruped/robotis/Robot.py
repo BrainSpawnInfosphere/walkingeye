@@ -11,7 +11,7 @@ import time
 import numpy as np
 from math import radians as d2r
 from pygecko.lib.ZmqClass import Sub as zmqSub
-from Quadruped import Quadruped, CrawlGait
+from Quadruped import Quadruped, CrawlGait, TimeCrawlGait, ScaleCrawlGait
 # from kinematics import DH
 
 ##########################
@@ -22,7 +22,8 @@ class TestQuadruped(Quadruped):
 		Quadruped.__init__(self, data, serialPort)
 
 		robot = Quadruped(data)
-		self.crawl = CrawlGait(robot)
+		# self.crawl = CrawlGait(robot)
+		self.crawl = TimeCrawlGait(robot)
 
 	def run(self):
 		sub = zmqSub('js', ('localhost', '9000'))
@@ -55,19 +56,21 @@ class Test2Quadruped(Quadruped):
 		Quadruped.__init__(self, data)
 
 		robot = Quadruped(data)
-		self.crawl = CrawlGait(robot)
+		# self.crawl = CrawlGait(robot)
+		# self.crawl = TimeCrawlGait(robot)
+		self.crawl = ScaleCrawlGait(robot)
 
 	def run(self):
 		while True:
 			x, y = 1, 0
 			rz = 0
 
-			cmd = [100*x, 100*y, 40*rz]
+			cmd = [10*x, 10*y, 40*rz]
 			print('***********************************')
 			print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x, y, rz))
 			print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
 			print('***********************************')
-			# self.crawl.command(cmd)
+			self.crawl.command(cmd)
 			time.sleep(0.01)
 
 
@@ -77,9 +80,9 @@ def run():
 	test = {
 		# 'serialPort': '/dev/tty.usbserial-A5004Flb',
 		'legLengths': {
-			'coxaLength': 26,
-			'femurLength': 42,
-			'tibiaLength': 63
+			'coxaLength': 45,
+			'femurLength': 55,
+			'tibiaLength': 104
 		},
 		'legAngleLimits': [[-90, 90], [-90, 90], [-180, 0]],
 		'legOffset': [150, 150, 150+90]
