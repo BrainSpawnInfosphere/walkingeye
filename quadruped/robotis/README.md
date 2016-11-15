@@ -4,10 +4,17 @@ This is my second one after the RC version, which didn't work as nicely as I wan
 
 ## Software
 
-* Robot - pyGecko driver
-* Quadruped - basic wrapper around leg and gait algorithms
-* Leg - forward/reverse kinematics
-* Gait - syncronization of how the 4 legs walk
+This software requires [pyxl320](https://pypi.python.org/pypi/pyxl320) to work with the 
+smart servos. You can install it with:
+
+	pip install pyxl320
+
+### This [repository](https://github.com/walchko/pyGeckoRobots/tree/master/quadruped/robotis):
+
+* Robot.py - main code to get things going
+* Quadruped.py - basic wrapper around leg and gait algorithms
+* Leg.py - forward/reverse kinematics
+* Gait.py - syncronization of how the 4 legs walk
 
 ## Hardware
 
@@ -15,7 +22,8 @@ This is my second one after the RC version, which didn't work as nicely as I wan
 
 ![RPI 3](https://www.raspberrypi.org/wp-content/uploads/2016/02/Pi_3_Model_B.png)
 
-I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/products/3055) (ARMv8) as the main board running the lite version of Raspbian. It has on-board:
+I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/products/3055) 
+(ARMv8) as the main board running the lite version of Raspbian. It has on-board:
 
 * 802.11n Wifi
 * Bluetooth 4.1 BLE
@@ -24,9 +32,15 @@ I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/produc
 
 * [PiCamera](https://www.adafruit.com/products/3099) is used for video odometry
 
+### 3D Models
+
+* [Legs](https://github.com/mogillc/nico) which are the coxa, femur, and tibia
+* Misc brackets I made using [OpenScad](http://www.openscad.org/)
+
 ### USB
 
-* A [Logitech c270 camera](http://www.logitech.com/en-us/product/hd-webcam-c270) provides video and microphone capabilities
+* A [Logitech c270 camera](http://www.logitech.com/en-us/product/hd-webcam-c270) provides 
+  video and microphone capabilities
 
 ## Cost
 
