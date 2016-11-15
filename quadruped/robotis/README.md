@@ -5,12 +5,9 @@ This is my second one after the RC version, which didn't work as nicely as I wan
 ## Software
 
 * Robot - pyGecko driver
-* Quadruped - quadruped driver, if you want to use your own high level software
+* Quadruped - basic wrapper around leg and gait algorithms
 * Leg - forward/reverse kinematics
-* lib
-
-	* Servo - servo interface
-	* kinematics
+* Gait - syncronization of how the 4 legs walk
 
 ## Hardware
 

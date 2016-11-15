@@ -9,9 +9,11 @@ from __future__ import print_function
 from __future__ import division
 import time
 import numpy as np
-from math import radians as d2r
+# from math import radians as d2r
+from math import pi
 from pygecko.lib.ZmqClass import Sub as zmqSub
-from Quadruped import Quadruped, CrawlGait, TimeCrawlGait, ScaleCrawlGait
+from Quadruped import Quadruped
+from Gait import DiscreteRippleGait, ContinousRippleGait
 # from kinematics import DH
 
 ##########################
@@ -21,9 +23,10 @@ class TestQuadruped(Quadruped):
 	def __init__(self, data, serialPort):
 		Quadruped.__init__(self, data, serialPort)
 
-		robot = Quadruped(data)
+		self.robot = Quadruped(data)
 		# self.crawl = CrawlGait(robot)
-		self.crawl = TimeCrawlGait(robot)
+		# self.crawl = TimeCrawlGait(robot)
+		self.crawl = DiscreteRippleGait()
 
 	def run(self):
 		sub = zmqSub('js', ('localhost', '9000'))
@@ -47,7 +50,7 @@ class TestQuadruped(Quadruped):
 				print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x, y, rz))
 				print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
 				print('***********************************')
-				self.crawl.command(cmd)
+				self.crawl.command(cmd, self.robot.moveFoot)
 			time.sleep(0.01)
 
 
@@ -55,23 +58,26 @@ class Test2Quadruped(Quadruped):
 	def __init__(self, data):
 		Quadruped.__init__(self, data)
 
-		robot = Quadruped(data)
-		# self.crawl = CrawlGait(robot)
-		# self.crawl = TimeCrawlGait(robot)
-		self.crawl = ScaleCrawlGait(robot)
+		self.robot = Quadruped(data)
+		leg = self.robot.legs[0].foot0
+		self.crawl = DiscreteRippleGait(25.0, leg)
+		# self.crawl = ContinousRippleGait(5.0, leg)
+		# self.crawl.alpha = 0.5
 
 	def run(self):
-		while True:
-			x, y = 1, 0
-			rz = 0
-
-			cmd = [10*x, 10*y, 40*rz]
+		run = True
+		while run:
+			x, y = 0, 0
+			rz = pi/4
+			leg = self.robot.legs[0].foot0
+			cmd = [x, y, rz]
 			print('***********************************')
-			print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x, y, rz))
-			print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
+			print('* rest {:.2f} {:.2f} {:.2f}'.format(*leg))
+			print('* cmd {:.2f} {:.2f} {:.2f}'.format(*cmd))
 			print('***********************************')
-			self.crawl.command(cmd)
-			time.sleep(0.01)
+			self.crawl.command(cmd, self.robot.moveFoot, steps=12)
+			# time.sleep(0.01)
+			run = False
 
 
 def run():
