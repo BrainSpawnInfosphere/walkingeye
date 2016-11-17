@@ -52,13 +52,13 @@ def printError(pts, pts2, angles, angles2):
 	print('****************************************************')
 
 
-def test_full_fk_ik(c=[0, 1, 2]):
+def test_full_fk_ik():
 	length = {
 		'coxaLength': 26,
 		'femurLength': 42,
 		'tibiaLength': 63
 	}
-	channels = c
+	channels = [0, 1, 2]
 	serial = DummySerial('test_port')
 	limits = [[-90,90], [-90,90], [-180,0]]
 	offset = [150, 150, 150+90]
@@ -171,13 +171,13 @@ def test_fk_ik2():
 	# assert(np.linalg.norm(np.array(angles) - np.array(angles2)) < 0.00001)
 
 
-def test_full_fk_ik2(c=[0, 1, 2]):
+def test_full_fk_ik2():
 	length = {
 		'coxaLength': 26,
 		'femurLength': 42,
 		'tibiaLength': 63
 	}
-	channels = c
+	channels = [0, 1, 2]
 	serial = DummySerial('test_port')
 	limits = [[-90,90], [-90,90], [-180,0]]
 	offset = [150, 150, 150+90]

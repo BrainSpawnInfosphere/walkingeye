@@ -480,7 +480,7 @@ class Quadruped(object):
 		Leg kills all servos on exit
 		"""
 		self.sit()
-		pass
+		# pass
 
 	def sit(self):
 		"""

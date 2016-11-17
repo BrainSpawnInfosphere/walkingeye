@@ -26,7 +26,8 @@ class TestQuadruped(Quadruped):
 		self.robot = Quadruped(data)
 		# self.crawl = CrawlGait(robot)
 		# self.crawl = TimeCrawlGait(robot)
-		self.crawl = DiscreteRippleGait()
+		leg = self.robot.legs[0].foot0
+		self.crawl = DiscreteRippleGait(25.0, leg)
 
 	def run(self):
 		sub = zmqSub('js', ('localhost', '9000'))
