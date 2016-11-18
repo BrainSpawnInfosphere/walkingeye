@@ -6,7 +6,7 @@ import sys
 from pyxl320 import DummySerial
 # from ..Servo import Servo
 sys.path.insert(0, '..')
-from Servo import Servo
+# from Servo import Servo
 from Leg import Leg
 import numpy as np
 from kinematics import DH

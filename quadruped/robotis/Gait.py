@@ -40,17 +40,19 @@ class Gait(object):
 	def __init__(self):
 		self.legOffset = [0, 6, 3, 9]
 		# self.body = np.array([72.12, 0, 0])
+		# frame rotations for each leg
+		self.frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]
 		self.rest = None
 
-	def calcRotatedOffset(self, cmd, frame_angle):
+	def calcRotatedOffset(self, cmd, i):
 		"""
 		calculate the foot offsets for each leg and delta linear/rotational
 		in - cmd(x,y,z_rotation)
 		out - array(leg0, leg1, ...)
 			where leg0 = {'linear': [x,y], 'rotational': [x,y], 'angle': zrotation(rads)}
 		"""
-		# I could do the same here as I do below for rotation
 		# rotate the command into the leg frame
+		frame_angle = self.frame[i]
 		rc = rot_z(frame_angle, cmd)
 
 		# get rotation distance: dist = rot_z(angle, rest) - rest
@@ -77,11 +79,11 @@ class Gait(object):
 		# cmd = [100.0, 0.0, 0.0]
 
 		# frame rotations for each leg
-		frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]
+		# frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]
 
 		for i in range(0, steps):  # iteration, there are 12 steps in gait cycle
 			for legNum in [0, 2, 1, 3]:  # order them diagonally
-				rcmd = self.calcRotatedOffset(cmd, frame[legNum])
+				rcmd = self.calcRotatedOffset(cmd, legNum)
 				pos = self.eachLeg(i, rcmd)  # move each leg appropriately
 				if legNum == 0: print('New  [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, pos[0], pos[1], pos[2]))
 				func(legNum, pos)

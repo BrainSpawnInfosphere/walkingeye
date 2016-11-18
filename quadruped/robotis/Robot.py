@@ -8,7 +8,7 @@
 from __future__ import print_function
 from __future__ import division
 import time
-import numpy as np
+# import numpy as np
 # from math import radians as d2r
 from math import pi
 from pygecko.lib.ZmqClass import Sub as zmqSub
@@ -40,7 +40,7 @@ class TestQuadruped(Quadruped):
 			# msg values range between (-1, 1)
 			if ps4 and topic == 'js':
 				x, y = ps4['axes']['leftStick']
-				mm, rz = ps4['axes']['rightStick']
+				rz = ps4['axes']['rightStick'][1]
 
 				if ps4['buttons']['share']:
 					print('You hit <share> ... bye!')
