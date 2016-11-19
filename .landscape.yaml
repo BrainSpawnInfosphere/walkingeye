@@ -6,6 +6,7 @@ pylint:
     disable:
         - logging-too-many-args
         - too-many-function-args
+        - too-many-arguments
         - pointless-string-statement
 # requirements:
 #     - deps/core.txt
