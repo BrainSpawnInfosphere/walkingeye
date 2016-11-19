@@ -92,7 +92,7 @@ def run():
 			'tibiaLength': 104
 		},
 		'legAngleLimits': [[-90, 90], [-90, 90], [-180, 0]],
-		'legOffset': [150, 150, 150+90]
+		'legOffset': [150, 150, 150]
 	}
 
 	robot = Test2Quadruped(test)

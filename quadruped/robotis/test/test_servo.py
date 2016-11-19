@@ -7,9 +7,11 @@
 
 from __future__ import print_function
 from __future__ import division
-
-from ..Servo import Servo
+import sys
+sys.path.insert(0, '..')
+from Servo import Servo
 from nose.tools import raises
+from pyxl320 import DummySerial
 
 
 # def test_servo():
@@ -32,9 +34,9 @@ def test_limits():
 	"""
 	switching order messing things up
 	"""
-	s = Servo(15)
-	s.setServoRangeAngle(0, 180)
-	s.setServoLimits(0, 180)
+	s = Servo(15, DummySerial('test'))
+	# s.setServoRangeAngle(0, 180)
+	s.setServoLimits(0, 0, 180)
 	s.angle = 0; assert(s.angle == 0)
 	s.angle = 45; assert(s.angle == 45)
 	s.angle = 90; assert(s.angle == 90)
@@ -44,8 +46,8 @@ def test_limits():
 	s.angle = -90; assert(s.angle == 0)
 	s.angle = -270; assert(s.angle == 0)
 
-	s.setServoRangeAngle(-90, 90)
-	s.setServoLimits(-90, 90)
+	# s.setServoRangeAngle(-90, 90)
+	s.setServoLimits(0, -90, 90)
 	s.angle = 0; assert(s.angle == 0)
 	s.angle = 45; assert(s.angle == 45)
 	s.angle = 90; assert(s.angle == 90)
@@ -58,14 +60,14 @@ def test_limits():
 
 @raises(Exception)
 def test_fail():
-	s = Servo(15)
+	s = Servo(15, DummySerial('test'))
 	s.setServoRangeAngle(0, 180)
 	s.setServoLimits(-180, 90)  # this is outside of range, should fail
 
 
 @raises(Exception)
 def test_fail2():
-	s = Servo(15)
+	s = Servo(15, DummySerial('test'))
 	s.setServoRangeAngle(0, 180)
 	s.setServoLimits(180, 0)
 

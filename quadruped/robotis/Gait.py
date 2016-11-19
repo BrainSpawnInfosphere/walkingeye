@@ -8,8 +8,8 @@
 
 from __future__ import print_function
 from __future__ import division
-from Leg import Leg
-import time
+# from Leg import Leg
+# import time
 import numpy as np
 # import logging
 from math import cos, sin, sqrt, pi
@@ -140,7 +140,8 @@ class ContinousRippleGait(Gait):
 		self.height = h
 		self.rest = r
 
-	def phi(self, x):
+	@staticmethod
+	def phi(x):
 		"""
 		The phase
 		"""

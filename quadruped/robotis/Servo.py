@@ -65,8 +65,10 @@ class Servo(object):
 		"""
 		if self.minAngle > angle > self.maxAngle:
 			# raise Exception('@angle.setter {} > {} > {}'.format(self.minAngle, angle, self.maxAngle))
-			print('@angle.setter {} > {} > {}'.format(self.minAngle, angle, self.maxAngle))
-			return
+			print('@angle.setter error {} > {} > {}'.format(self.minAngle, angle, self.maxAngle))
+			# return
+			if self.minAngle > angle: angle = self.minAngle
+			if self.maxAngle < angle: angle = self.maxAngle
 
 		if self._angle != angle:
 			self._angle = angle
