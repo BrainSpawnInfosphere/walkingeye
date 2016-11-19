@@ -9,7 +9,7 @@ sys.path.insert(0, '..')
 # from Servo import Servo
 from Leg import Leg
 import numpy as np
-from kinematics import DH
+# from kinematics import DH
 from math import pi, sqrt
 
 def test_fk_ik():
@@ -122,24 +122,24 @@ def test_full_fk_ik():
 # 			leg.servos[servo].angle = angle
 # 			time.sleep(1)
 
-def test_DH():
-	coxa = 20
-	femur = 50
-	tibia = 100
-	offset = 0
-	t1 = 0
-	t2 = 45
-	t3 = -90-45
-	# a, alpha, d, theta
-	params = [
-		[ coxa, 90,       0, t1],
-		[femur,  0,       0, t2],
-		[tibia, -90, offset, t3]
-	]
-	dh = DH()
-	t = dh.fk(params)
-	print(t)
-	print('1 2 3: {:.2f} {:.2f} {:.2f}'.format(t[0,3],t[1,3],t[2,3]))
+# def test_DH():
+# 	coxa = 20
+# 	femur = 50
+# 	tibia = 100
+# 	offset = 0
+# 	t1 = 0
+# 	t2 = 45
+# 	t3 = -90-45
+# 	# a, alpha, d, theta
+# 	params = [
+# 		[ coxa, 90,       0, t1],
+# 		[femur,  0,       0, t2],
+# 		[tibia, -90, offset, t3]
+# 	]
+# 	dh = DH()
+# 	t = dh.fk(params)
+# 	print(t)
+# 	print('1 2 3: {:.2f} {:.2f} {:.2f}'.format(t[0,3],t[1,3],t[2,3]))
 
 def test_fk_ik2():
 	length = {

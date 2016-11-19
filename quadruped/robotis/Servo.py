@@ -8,7 +8,7 @@
 from __future__ import print_function
 from __future__ import division
 import logging
-from pyxl320 import Packet, xl320
+from pyxl320 import Packet
 logger = logging.getLogger(__name__)
 
 

@@ -4,7 +4,7 @@
 # Copyright (c) 2016 Kevin Walchko
 # see LICENSE for full details
 ##############################################
-# 
+#
 # from __future__ import print_function
 # from __future__ import division
 # import numpy as np

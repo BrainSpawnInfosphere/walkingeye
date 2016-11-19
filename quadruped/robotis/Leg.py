@@ -11,33 +11,12 @@ import numpy as np
 from math import sin, cos, acos, atan2, sqrt, pi, fabs
 from math import radians as d2r
 from math import degrees as r2d
-# from kinematics import T
 import logging
 from Servo import Servo
 
 # logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.ERROR)
 
-"""
-2        3
- \      /           ^ y
-  \    /            |
-   ----             |
-  |    |     <------+
-   ----      x
-  /    \
- /      \
-1        4
-
-+x forward
--x reverse
-
-
-  /\     /\
- /  -----  \
-/           \
-
-"""
 
 class Leg(object):
 	"""
