@@ -10,7 +10,8 @@ sys.path.insert(0, '..')
 from Leg import Leg
 import numpy as np
 # from kinematics import DH
-from math import pi, sqrt
+# from math import pi
+from math import sqrt
 
 def test_fk_ik():
 	length = {
