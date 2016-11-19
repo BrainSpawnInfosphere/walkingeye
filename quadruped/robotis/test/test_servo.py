@@ -61,15 +61,15 @@ def test_limits():
 @raises(Exception)
 def test_fail():
 	s = Servo(15, DummySerial('test'))
-	s.setServoRangeAngle(0, 180)
-	s.setServoLimits(-180, 90)  # this is outside of range, should fail
+	# s.setServoRangeAngle(0, 180)
+	s.setServoLimits(0, -180, 90)  # this is outside of range, should fail
 
 
 @raises(Exception)
 def test_fail2():
 	s = Servo(15, DummySerial('test'))
-	s.setServoRangeAngle(0, 180)
-	s.setServoLimits(180, 0)
+	# s.setServoRangeAngle(0, 180)
+	s.setServoLimits(0, 180, 0)
 
 # def checks():
 # 	check = lambda x, a, b: max(min(b, x), a)
