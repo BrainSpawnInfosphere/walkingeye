@@ -1,9 +1,0 @@
-# config file for https://www.quantifiedcode.com
-tmp/*
-old/*
-**/old/*
-chi/otherLibs/*
-test/*
-**/test/*
-quadruped/W4lker-master/*
-docs/*

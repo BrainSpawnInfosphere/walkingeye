@@ -11,5 +11,5 @@ python:
 #             - sox
 install: pip install pyxl320
 # command to run tests
-#script: nosetests -v -w test/
-script: true
+script: nosetests -v -w test/
+# script: true

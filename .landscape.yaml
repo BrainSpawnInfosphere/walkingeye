@@ -19,8 +19,6 @@ ignore-paths:
     - tmp
     - otherLibs
     - lib_old
-    - soccer
-    - rc_quadruped
 # ignore-patterns:
 #     - ^soccer/Adafruit_.*\.py$
 python-targets:

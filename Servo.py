@@ -63,13 +63,15 @@ class Servo(object):
 		Sets the servo angle and clamps it between [limitMinAngle, limitMaxAngle].
 		It also commands the servo to move.
 		"""
-		if self.minAngle > angle > self.maxAngle:
+
+		# saturates the angle if it is outside of the limits
+		if self.minAngle > angle or angle > self.maxAngle:
 			# raise Exception('@angle.setter {} > {} > {}'.format(self.minAngle, angle, self.maxAngle))
 			print('@angle.setter error {} > {} > {}'.format(self.minAngle, angle, self.maxAngle))
-			# return
 			if self.minAngle > angle: angle = self.minAngle
-			if self.maxAngle < angle: angle = self.maxAngle
+			elif self.maxAngle < angle: angle = self.maxAngle
 
+		# only send a pkt if there is a change
 		if self._angle != angle:
 			self._angle = angle
 			# servos are centered at 150 deg, but offset can change

@@ -4,13 +4,9 @@ from __future__ import print_function
 from __future__ import division
 import sys
 from pyxl320 import DummySerial
-# from ..Servo import Servo
 sys.path.insert(0, '..')
-# from Servo import Servo
 from Leg import Leg
 import numpy as np
-# from kinematics import DH
-# from math import pi
 from math import sqrt
 
 def test_fk_ik():
@@ -21,10 +17,9 @@ def test_fk_ik():
 	}
 	channels = [0, 1, 2]
 	limits = [[-90, 90], [-90, 90], [-180, 0]]
-	offsets = [150, 150, 150+90]
+	offsets = [150, 150, 150]
 	leg = Leg(length, channels, DummySerial('test_port'), limits, offsets)
 
-	# angles = [45, 70, -90]
 	angles = [0, 45, -145]
 
 	pts = leg.fk(*angles)
@@ -62,12 +57,8 @@ def test_full_fk_ik():
 	channels = [0, 1, 2]
 	serial = DummySerial('test_port')
 	limits = [[-90,90], [-90,90], [-180,0]]
-	offset = [150, 150, 150+90]
+	offset = [150, 150, 150]
 	leg = Leg(length, channels, serial, limits, offset)
-
-	# servorange = [[-90, 90], [-90, 90], [-180, 0]]
-	# for s in range(0, 3):
-	# 	leg.servos[s].setServoRangeAngle(*servorange[s])
 
 	for i in range(1, 3):
 		print('------------------------------------------------')
@@ -76,6 +67,8 @@ def test_full_fk_ik():
 			# if i == 2: a -= 90
 			angles[i] = a
 			pts = leg.fk(*angles)
+			if not pts.all():
+				continue
 			angles2 = leg.ik(*pts)
 			pts2 = leg.fk(*angles2)
 
