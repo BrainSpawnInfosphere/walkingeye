@@ -6,6 +6,7 @@ pylint:
     disable:
         - logging-too-many-args
         - too-many-function-args
+        - pointless-string-statement
 # requirements:
 #     - deps/core.txt
 #     - deps/test.txt
@@ -16,6 +17,9 @@ ignore-paths:
     - sounds
     - tmp
     - otherLibs
+    - lib_old
+    - soccer
+    - rc_quadruped
 # ignore-patterns:
 #     - ^soccer/Adafruit_.*\.py$
 python-targets:
