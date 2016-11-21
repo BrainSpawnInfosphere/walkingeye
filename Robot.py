@@ -14,6 +14,7 @@ from math import pi
 from pygecko.lib.ZmqClass import Sub as zmqSub
 from Quadruped import Quadruped
 from Gait import DiscreteRippleGait, ContinousRippleGait
+import time
 # from kinematics import DH
 
 ##########################
@@ -68,8 +69,8 @@ class Test2Quadruped(Quadruped):
 	def run(self):
 		run = True
 		while run:
-			x, y = 0, 0
-			rz = pi/4
+			x, y = 100, 0
+			rz = 0  # pi/4
 			leg = self.robot.legs[0].foot0
 			cmd = [x, y, rz]
 			print('***********************************')
@@ -77,22 +78,23 @@ class Test2Quadruped(Quadruped):
 			print('* cmd {:.2f} {:.2f} {:.2f}'.format(*cmd))
 			print('***********************************')
 			self.crawl.command(cmd, self.robot.moveFoot, steps=12)
-			# time.sleep(0.01)
-			run = False
+			# time.sleep(1)
+			# run = False
 
 
 def run():
 	# angles are always [min, max]
 	# xl-320
 	test = {
-		# 'serialPort': '/dev/tty.usbserial-A5004Flb',
+		# 'serialPort': '/dev/tty.usbserial-A5004Flb',  # original debug
+		'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
 		'legLengths': {
 			'coxaLength': 45,
 			'femurLength': 55,
 			'tibiaLength': 104
 		},
-		'legAngleLimits': [[-90, 90], [-90, 90], [-180, 0]],
-		'legOffset': [150, 150, 150]
+		'legAngleLimits': [[-90, 90], [-90, 90], [-150, 0]],
+		'legOffset': [150, 150, 150+90]
 	}
 
 	robot = Test2Quadruped(test)

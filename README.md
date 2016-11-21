@@ -1,10 +1,14 @@
-# Robotis Quadruped
+# XL-320 Quadruped
+
+[![Code Health](https://landscape.io/github/walchko/pyGeckoRobots/master/landscape.svg?style=flat)](https://landscape.io/github/walchko/pyGeckoRobots/master)
+[![Build Status](https://travis-ci.org/walchko/pyGeckoQuadruped.svg?branch=master)](https://travis-ci.org/walchko/pyGeckoQuadruped)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/walchko/pyGeckoQuadruped)
 
 This is my second one after the RC version, which didn't work as nicely as I wanted it too.
 
 ## Software
 
-This software requires [pyxl320](https://pypi.python.org/pypi/pyxl320) to work with the 
+This software requires [pyxl320](https://pypi.python.org/pypi/pyxl320) to work with the
 smart servos. You can install it with:
 
 	pip install pyxl320
@@ -22,7 +26,7 @@ smart servos. You can install it with:
 
 ![RPI 3](https://www.raspberrypi.org/wp-content/uploads/2016/02/Pi_3_Model_B.png)
 
-I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/products/3055) 
+I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/products/3055)
 (ARMv8) as the main board running the lite version of Raspbian. It has on-board:
 
 * 802.11n Wifi
@@ -39,7 +43,7 @@ I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/produc
 
 ### USB
 
-* A [Logitech c270 camera](http://www.logitech.com/en-us/product/hd-webcam-c270) provides 
+* A [Logitech c270 camera](http://www.logitech.com/en-us/product/hd-webcam-c270) provides
   video and microphone capabilities
 
 ## Cost

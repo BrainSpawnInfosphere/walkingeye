@@ -5,17 +5,6 @@ old
 *.log
 .AppleDouble
 .DS_Store
-*.aux
-*.out
-*.gz
-Arduino
-*.mp4
-*.m4v
-# *.wav
-website
-node_modules
-# tmp
-tmp/*.wav
 ._*
 *.bag
 .ipynb_checkpoints

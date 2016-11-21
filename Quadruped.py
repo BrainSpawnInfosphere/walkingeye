@@ -436,13 +436,16 @@ class RobotException(Exception):
 
 
 class Robot(object):
+	"""
+	is there value for this?
+	"""
 	def __init__(self):
 		pass
 
 
 class Quadruped(object):
 	"""
-	This is the low level driver
+	This is the low level driver that can be executed w/o using pyGecko.
 	"""
 	def __init__(self, data):
 		"""

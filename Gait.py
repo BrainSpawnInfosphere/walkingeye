@@ -8,14 +8,12 @@
 
 from __future__ import print_function
 from __future__ import division
-# from Leg import Leg
-# import time
 import numpy as np
 # import logging
 from math import cos, sin, sqrt, pi
 from math import radians as d2r
 
-# move to kinematics?
+# make a static method in Gait?
 def rot_z(t, c):
 	"""
 	t - theta [radians]
@@ -37,11 +35,15 @@ def rot_z(t, c):
 
 
 class Gait(object):
+	"""
+	Base class for gaits
+	"""
 	def __init__(self):
+		# for a step pattern of 12, these are the offsets of each leg
 		self.legOffset = [0, 6, 3, 9]
-		# self.body = np.array([72.12, 0, 0])
 		# frame rotations for each leg
-		self.frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]
+		self.frame = [pi/4, -pi/4, -3*pi/4, 3*pi/4]
+		# the resting or idle position/orientation of a leg
 		self.rest = None
 
 	def calcRotatedOffset(self, cmd, i):
@@ -65,7 +67,7 @@ class Gait(object):
 #		 rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
 
 #		 ans = {'linear': rc, 'rotational': rot, 'angle': zrot}
-		ans = {'linear': rc, 'angle': zrot}
+		ans = {'linear': rc, 'angle': zrot}  # FIXME: 20161119, make a tuple?
 
 		return ans
 
@@ -85,7 +87,7 @@ class Gait(object):
 			for legNum in [0, 2, 1, 3]:  # order them diagonally
 				rcmd = self.calcRotatedOffset(cmd, legNum)
 				pos = self.eachLeg(i, rcmd)  # move each leg appropriately
-				if legNum == 0: print('New  [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, pos[0], pos[1], pos[2]))
+				# if legNum == 0: print('New  [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, pos[0], pos[1], pos[2]))
 				func(legNum, pos)
 
 

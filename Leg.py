@@ -28,28 +28,27 @@ class Leg(object):
 		if not len(channels) == 3:
 			raise Exception('len(channels) != 3')
 
-		self.servos = []
-
 		self.coxaLength = lengths['coxaLength']
 		self.tibiaLength = lengths['tibiaLength']
 		self.femurLength = lengths['femurLength']
 
 		# Create each servo and move it to the initial position
 		# servo arrange: coxa femur tibia
+		self.servos = []
 		for i in range(0, 3):
 			self.servos.append(Servo(channels[i], ser))
-			# self.servos[i].offset = offsets[i]
 			self.servos[i].setServoLimits(offsets[i], *limits[i])
 
-		initAngles = [0, 45, -90-45]
-		self.foot0 = self.fk(*initAngles)
+		# initAngles = [0, 0, -90+30]  # nico legs have a small offset
+		initAngles = [0, 45, -90+30-45]  # nico legs have a small offset
+		self.foot0 = self.fk(*initAngles)  # rest/idle position of the foot/leg
 
 	def __del__(self):
 		pass
 
 	def fk(self, a, b, g):
 		"""
-		angle are all degrees
+		Forward kinematics of the leg, note, angle are all degrees
 		"""
 		Lc = self.coxaLength
 		Lf = self.femurLength
@@ -74,6 +73,9 @@ class Leg(object):
 
 		Reference (there are typos)
 		https://tote.readthedocs.io/en/latest/ik.html
+
+		If the foot (x,y,z) is in a position that does not produce a result (some
+		numeric error or invalid foot location), the this returns None.
 		"""
 		# try:
 		Lc = self.coxaLength
