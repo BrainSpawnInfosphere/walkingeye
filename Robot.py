@@ -77,7 +77,7 @@ class Test2Quadruped(Quadruped):
 			print('* rest {:.2f} {:.2f} {:.2f}'.format(*leg))
 			print('* cmd {:.2f} {:.2f} {:.2f}'.format(*cmd))
 			print('***********************************')
-			self.crawl.command(cmd, self.robot.moveFoot, steps=12)
+			self.crawl.command(cmd, self.robot.moveFoot, self.robot.bulkWrite, steps=12)
 			# time.sleep(1)
 			# run = False
 
@@ -87,7 +87,7 @@ def run():
 	# xl-320
 	test = {
 		# 'serialPort': '/dev/tty.usbserial-A5004Flb',  # original debug
-		'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
+		# 'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
 		'legLengths': {
 			'coxaLength': 45,
 			'femurLength': 55,

@@ -508,6 +508,9 @@ class Quadruped(object):
 		"""
 		return self.legs[i].move(*pos)
 
+	def bulkWrite(self):
+		self.legs[0].servos[0].bulkWrite()
+
 	def moveFootAngles(self, angles, leg=None):
 		"""
 		Sets servos of a leg, or all legs if no leg identified, to given angles.

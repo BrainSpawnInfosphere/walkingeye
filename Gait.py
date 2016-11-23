@@ -13,7 +13,7 @@ import numpy as np
 from math import cos, sin, sqrt, pi
 from math import radians as d2r
 
-# make a static method in Gait?
+# make a static method in Gait? Nothing else uses it
 def rot_z(t, c):
 	"""
 	t - theta [radians]
@@ -64,18 +64,22 @@ class Gait(object):
 		# fromcenter = self.rest + self.body
 
 		# value of this?
-#		 rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
+		#  rot = rot_z(zrot/2, fromcenter) - rot_z(-zrot/2, fromcenter)
 
-#		 ans = {'linear': rc, 'rotational': rot, 'angle': zrot}
+		#  ans = {'linear': rc, 'rotational': rot, 'angle': zrot}
 		ans = {'linear': rc, 'angle': zrot}  # FIXME: 20161119, make a tuple?
 
 		return ans
 
-	def command(self, cmd, func, steps=12):
+	def command(self, cmd, moveFoot, bulkWrite, steps=12):
+		"""
+		func is the quadruped move foot function for a specific leg
+		"""
 		# handle no movement command ... do else where?
 		if sqrt(cmd[0]**2 + cmd[1]**2 + cmd[2]**2) < 0.001:
 			for leg in range(0, 4):
-				func(leg, self.rest)  # move to resting position
+				moveFoot(leg, self.rest)  # move to resting position
+			bulkWrite()
 			return
 
 		# cmd = [100.0, 0.0, 0.0]
@@ -88,7 +92,8 @@ class Gait(object):
 				rcmd = self.calcRotatedOffset(cmd, legNum)
 				pos = self.eachLeg(i, rcmd)  # move each leg appropriately
 				# if legNum == 0: print('New  [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, pos[0], pos[1], pos[2]))
-				func(legNum, pos)
+				moveFoot(legNum, pos)
+			bulkWrite()
 
 
 class DiscreteRippleGait(Gait):

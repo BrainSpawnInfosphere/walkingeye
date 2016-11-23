@@ -34,9 +34,11 @@ class Leg(object):
 
 		# Create each servo and move it to the initial position
 		# servo arrange: coxa femur tibia
+		Servo.ser = ser
+		Servo.bulkServoWrite = True
 		self.servos = []
 		for i in range(0, 3):
-			self.servos.append(Servo(channels[i], ser))
+			self.servos.append(Servo(channels[i]))
 			self.servos[i].setServoLimits(offsets[i], *limits[i])
 
 		# initAngles = [0, 0, -90+30]  # nico legs have a small offset
