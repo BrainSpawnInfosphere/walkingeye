@@ -12,6 +12,9 @@ import numpy as np
 # import logging
 from math import cos, sin, sqrt, pi
 from math import radians as d2r
+from Servo import Servo
+import time
+
 
 # make a static method in Gait? Nothing else uses it
 def rot_z(t, c):
@@ -42,7 +45,8 @@ class Gait(object):
 		# for a step pattern of 12, these are the offsets of each leg
 		self.legOffset = [0, 6, 3, 9]
 		# frame rotations for each leg
-		self.frame = [pi/4, -pi/4, -3*pi/4, 3*pi/4]
+		# self.frame = [pi/4, -pi/4, -3*pi/4, 3*pi/4]
+		self.frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # this seem to work better ... wtf?
 		# the resting or idle position/orientation of a leg
 		self.rest = None
 
@@ -59,8 +63,8 @@ class Gait(object):
 
 		# get rotation distance: dist = rot_z(angle, rest) - rest
 		# this just reduces the function calls and math
-		zrot = d2r(float(cmd[2]))  # should I assume this is always radians? save conversion
-
+		# zrot = d2r(float(cmd[2]))  # should I assume this is always radians? save conversion
+		zrot = cmd[2]
 		# fromcenter = self.rest + self.body
 
 		# value of this?
@@ -71,7 +75,7 @@ class Gait(object):
 
 		return ans
 
-	def command(self, cmd, moveFoot, bulkWrite, steps=12):
+	def command(self, cmd, moveFoot, steps=12):
 		"""
 		func is the quadruped move foot function for a specific leg
 		"""
@@ -79,7 +83,7 @@ class Gait(object):
 		if sqrt(cmd[0]**2 + cmd[1]**2 + cmd[2]**2) < 0.001:
 			for leg in range(0, 4):
 				moveFoot(leg, self.rest)  # move to resting position
-			bulkWrite()
+			Servo.bulkWrite()
 			return
 
 		# cmd = [100.0, 0.0, 0.0]
@@ -90,10 +94,13 @@ class Gait(object):
 		for i in range(0, steps):  # iteration, there are 12 steps in gait cycle
 			for legNum in [0, 2, 1, 3]:  # order them diagonally
 				rcmd = self.calcRotatedOffset(cmd, legNum)
-				pos = self.eachLeg(i, rcmd)  # move each leg appropriately
+				index = (i + self.legOffset[legNum]) % 12
+				pos = self.eachLeg(index, rcmd)  # move each leg appropriately
 				# if legNum == 0: print('New  [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, pos[0], pos[1], pos[2]))
 				moveFoot(legNum, pos)
-			bulkWrite()
+			# bulkWrite()
+			Servo.bulkWrite(Servo.ser)
+			time.sleep(0.5)
 
 
 class DiscreteRippleGait(Gait):
@@ -113,7 +120,7 @@ class DiscreteRippleGait(Gait):
 			angle (rads)
 		"""
 		rest = self.rest
-		i = index % 12
+		i = index
 		phi = self.phi[i]
 
 		# rotational commands -----------------------------------------------

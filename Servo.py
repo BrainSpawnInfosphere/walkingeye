@@ -39,6 +39,11 @@ def makeBulkAnglePacket(info):
 	return pkt
 
 
+# I don't like global variables, but I don't know how else to have one array
+# shared by all servos and have one simple class method to push updates
+gBulkData = []
+
+
 class ServoBase(object):
 	"""
 	I might reverse these classes, so i can combine RC and Robotis servos
@@ -50,20 +55,26 @@ class ServoBase(object):
 	+- RobotisServo
 	   |  bulkWrite
 	"""
-	bulkData = []
 	ser = None
 	bulkServoWrite = False
+	# bulkData = [0]
 
-	def __init__(self, serialObj):
+	def __init__(self):
+		# global bulkData
+		# self.bulkData = [0]
 		pass
 
 	def setSerial(self, serialObj):
 		self.ser = serialObj
 
-	def bulkWrite(self):
-		pkt = makeBulkAnglePacket(self.bulkData)
-		self.ser.write(pkt)
-		self.bulkData = []
+	@staticmethod
+	def bulkWrite(ser):
+		global gBulkData
+		pkt = makeBulkAnglePacket(gBulkData)
+		ser.write(pkt)
+		# print(pkt)
+		# print(gBulkData)
+		gBulkData = []
 
 
 class Servo(ServoBase):
@@ -93,6 +104,7 @@ class Servo(ServoBase):
 		"""
 		limits [angle, angle] - [optional] set the angular limits of the servo to avoid collision
 		"""
+		ServoBase.__init__(self)
 		self.ID = ID
 		# self.ser = serialObj
 		self.setServoLimits(150.0, -150.0, 150.0)  # defaults: offset, min, max
@@ -127,6 +139,8 @@ class Servo(ServoBase):
 			elif self.maxAngle < angle: angle = self.maxAngle
 			print('@angle.setter now {}'.format(angle))
 
+		# print('servo[{}]: bulkWrite {}'.format(self.ID, self.bulkServoWrite))
+
 		# only send a pkt if there is a change
 		if self._angle != angle:
 			self._angle = angle
@@ -134,7 +148,10 @@ class Servo(ServoBase):
 			# print(self.ID, angle, angle + self._offset)
 
 			if self.bulkServoWrite:
-				self.bulkData.append([self.ID, angle])
+				# global gBulkData
+				gBulkData.append([self.ID, angle + self._offset])
+				# self.bulkData.append([self.ID, angle + self._offset])
+				# print('servo[{}]: bulkWrite {}'.format(self.ID, gBulkData))
 			else:
 				pkt = Packet.makeServoPacket(self.ID, angle + self._offset)
 				self.ser.sendPkt(pkt)
