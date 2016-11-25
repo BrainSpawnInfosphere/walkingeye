@@ -9,6 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 import numpy as np
+from numpy.linalg import norm
 # import logging
 from math import cos, sin, sqrt, pi
 from math import radians as d2r
@@ -35,6 +36,132 @@ def rot_z(t, c):
 		])
 
 	return ans
+
+
+def inSideCM(pts):
+	"""
+	Determine if a point P is inside of a triangle composed of points
+	A, B, and C.
+	pts = [A,B,C]
+	P = [0,0] at the center of mass of the robot
+	returns True (inside triangle) or False (outside the triangle)
+	"""
+	# print('inSideCM pts:', pts)
+	A = pts[0]
+	B = pts[1]
+	C = pts[2]
+	P = np.array([0, 0])  # CM is at the center :)
+
+	# Compute vectors
+	v0 = C - A
+	v1 = B - A
+	v2 = P - A
+
+	# Compute dot products
+	dot00 = np.dot(v0, v0)
+	dot01 = np.dot(v0, v1)
+	dot02 = np.dot(v0, v2)
+	dot11 = np.dot(v1, v1)
+	dot12 = np.dot(v1, v2)
+
+	# Compute barycentric coordinates
+	invDenom = 1 / (dot00 * dot11 - dot01 * dot01)
+	u = (dot11 * dot02 - dot01 * dot12) * invDenom
+	v = (dot00 * dot12 - dot01 * dot02) * invDenom
+
+	# Check if point is in triangle
+	return (u >= 0) and (v >= 0) and (u + v < 1)
+
+
+def lineIntersection(p1, p2, p3, p4):
+	"""
+	Find the intersection of 2 lines.
+	line 1: p1, p2
+	line 2: p3, p4
+	"""
+	x1 = p1[0]
+	x2 = p2[0]
+	x3 = p3[0]
+	x4 = p4[0]
+	y1 = p1[1]
+	y2 = p2[1]
+	y3 = p3[1]
+	y4 = p4[1]
+
+	denom = ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4))
+	if abs(denom) < 0.00001:
+		# print('crap {}'.format(denom))
+		return np.array([0, 0])
+	x = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/denom
+	y = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/denom
+	return np.array([x, y])
+
+
+def vmin(a):
+	"""
+	Find the minimum vector in an array of 2D vectors.
+	in = [[1,2], [2,3], ...]
+	out = [1,2]
+	"""
+	minv = 0
+	min_val = 1000000000000000
+	for p in a:
+		val = norm(p)
+		if val < min_val:
+			min_val = val
+			minv = p
+	return minv
+
+
+def checkCM(pts):
+	"""
+	Given the robot's foot locations, provide correction if the
+	center of mass (CM) is outside the triangle formed by the 3
+	foot locations.
+	pts = [foot0, foot1, foot2]
+	correction = [x,y]
+	"""
+	pts2 = []
+	for i in range(0, 3):
+		pts2.append(pts[i][0:2])
+	pts = pts2
+	# print('2d', pts)
+	correction = np.array([0, 0, 0])
+
+	if not inSideCM(pts):
+		a = []
+		for i in range(0, 3):
+			p0 = pts[i]
+			p1 = pts[(i+1) % 3]
+			x1 = 50
+			x0 = -50
+			cm1 = np.array([x1, -(p1[0] - p0[0])/(p1[1] - p0[1])*x1])
+			cm0 = np.array([x0, -(p1[0] - p0[0])/(p1[1] - p0[1])*x0])
+			xx = lineIntersection(p0, p1, cm0, cm1)
+			a.append(xx)
+		a = vmin(a)
+		print(a)
+		correction = np.array([-a[0], -a[1], 0.0])
+	return correction
+
+# cm = 45*cos(pi/4)
+#
+# offset = [
+# 	np.array([cm, cm]),
+# 	np.array([cm, -cm]),
+# 	np.array([-cm, -cm]),
+# 	np.array([-cm, cm])
+# ]
+#
+# pts = [
+# 	np.array([30,60]) + offset[0],    # 0
+# 	np.array([40,-25]) + offset[1],   # 1
+# 	np.array([-31, 61]) + offset[3]   # 3
+# ]
+#
+# corr = checkCM(pts)
+# print(corr)
+
 
 
 class Gait(object):
@@ -92,15 +219,30 @@ class Gait(object):
 		# frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]
 
 		for i in range(0, steps):  # iteration, there are 12 steps in gait cycle
+			footPos = []
 			for legNum in [0, 2, 1, 3]:  # order them diagonally
 				rcmd = self.calcRotatedOffset(cmd, legNum)
 				index = (i + self.legOffset[legNum]) % 12
 				pos = self.eachLeg(index, rcmd)  # move each leg appropriately
 				# if legNum == 0: print('New  [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, pos[0], pos[1], pos[2]))
-				moveFoot(legNum, pos)
+				footPos.append([index, pos])
+			# hate this!!!
+			temp = []
+			for p in footPos:
+				if p[0] > 2: temp.append(p[1])
+			if len(temp) != 3:
+				print('fuck ... wrong points:', len(temp))
+
+			correction = checkCM(temp)
+
+			for legNum in [0, 2, 1, 3]:
+				n = footPos[legNum][1]+correction
+				print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *(n)))
+				moveFoot(legNum, footPos[legNum][1]+correction)
+
 			# bulkWrite()
 			Servo.bulkWrite(Servo.ser)
-			time.sleep(0.5)
+			# time.sleep(0.5)
 
 
 class DiscreteRippleGait(Gait):

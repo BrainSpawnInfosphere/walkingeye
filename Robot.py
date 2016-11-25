@@ -87,7 +87,7 @@ def run():
 	# xl-320
 	test = {
 		# 'serialPort': '/dev/tty.usbserial-A5004Flb',  # original debug
-		'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
+		# 'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
 		'legLengths': {
 			'coxaLength': 45,
 			'femurLength': 55,
