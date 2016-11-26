@@ -13,8 +13,8 @@ import time
 from math import pi
 from pygecko.lib.ZmqClass import Sub as zmqSub
 from Quadruped import Quadruped
-from Gait import DiscreteRippleGait, ContinousRippleGait
-import time
+from Gait import DiscreteRippleGait
+# import time
 # from kinematics import DH
 
 ##########################
@@ -69,8 +69,8 @@ class Test2Quadruped(Quadruped):
 	def run(self):
 		run = True
 		while run:
-			x, y = 100, 0
-			rz = 0 # pi/4  # FIXME: 20161123 CM falling outstide the stability triangle
+			x, y = 50, 0
+			rz = 0 #pi/4  # FIXME: 20161123 CM falling outstide the stability triangle
 			leg = self.robot.legs[0].foot0
 			cmd = [x, y, rz]
 			print('***********************************')
@@ -87,7 +87,7 @@ def run():
 	# xl-320
 	test = {
 		# 'serialPort': '/dev/tty.usbserial-A5004Flb',  # original debug
-		# 'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
+		'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
 		'legLengths': {
 			'coxaLength': 45,
 			'femurLength': 55,

@@ -12,9 +12,87 @@ import numpy as np
 from numpy.linalg import norm
 # import logging
 from math import cos, sin, sqrt, pi
-from math import radians as d2r
+# from math import radians as d2r
 from Servo import Servo
 import time
+
+
+
+class Correction(object):
+	# cmrot
+	leg2body = [pi/4, -pi/4, -3*pi/4, 3*pi/4]  # legs to body frame
+
+	# frame
+	cmd2leg = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # cmds to leg frame
+
+	def __init__(self):
+		# account for base, in base frame
+		cm = 45*cos(pi/4)
+		self.base = [
+			np.array([cm, cm, 0]),
+			np.array([cm, -cm, 0]),
+			np.array([-cm, -cm, 0]),
+			np.array([-cm, cm, 0])
+		]
+
+	def checkStable(self, feet):
+		"""
+		Check CM (located at [0,0]) is inside the triangle formed by the feet.
+		in:
+			feet = [[index, legNum, foot], ...] there are 3 of these
+		out:
+			True - CM is inside
+			False - CM is outside
+		"""
+		pass
+
+	def calcCorrection(self, feet, moveFoot):
+		"""
+		in:
+			feet = [[index, legNum, foot], ...] there are 3 of these
+					index - tells if foot is up/down
+					legNum - which leg [0-3]
+					foot - (x,y,z) is converted to 2D
+		out:
+			correction = [x,y,0] is only a 2D correction
+		"""
+		# hate this!!!
+		temp = []  # [[x,y,z], [x,y,z], [x,y,z]] feet positions
+
+		base = self.base
+
+		for p in feet:  # p = [index, (x,y,z), legNum]
+			index = p[0]
+			legNum = p[1]
+			foot = p[2]
+			if index > 2:
+				temp.append(rot_z(self.cmrot[legNum], foot) + base[legNum])
+		# if len(temp) != 3:
+		# 	print('fuck ... wrong points:', len(temp))
+
+		correction = self.checkCM(temp)
+		correction = np.array([0, 0, 0])
+		print('correction: {:.2f} {:.2f} {:.2f}'.format(*correction))
+
+		temp = []  # double check CM
+		order = [0, 2, 1, 3]
+		for i in range(0, 4):
+			index = feet[i][0]
+			legNum = order[i]
+			n = feet[i][1]
+			if index > 2:  # check index to see if leg moving
+				n = n+rot_z(self.frame[legNum], correction)  # leg space
+				# temp.append(rot_z(self.cmrot[footPos[i][2]], n)+base[footPos[i][2]])
+				temp.append(rot_z(self.cmrot[feet[i][2]], n)+base[feet[i][2]])
+				# print('index', footPos[legNum][0])
+			moveFoot(legNum, n)
+
+		for i in range(0, len(temp)):
+			print('Foot[?]: {:.2f} {:.2f} {:.2f}'.format(*(temp[i])))
+
+		# print('temp len:{}'.format(len(temp)))
+		print('double check: {}'.format(inSideCM(temp, True)))
+
 
 
 # make a static method in Gait? Nothing else uses it
@@ -38,7 +116,7 @@ def rot_z(t, c):
 	return ans
 
 
-def inSideCM(pts):
+def inSideCM(pts, p=False):
 	"""
 	Determine if a point P is inside of a triangle composed of points
 	A, B, and C.
@@ -47,9 +125,9 @@ def inSideCM(pts):
 	returns True (inside triangle) or False (outside the triangle)
 	"""
 	# print('inSideCM pts:', pts)
-	A = pts[0]
-	B = pts[1]
-	C = pts[2]
+	A = pts[0][0:2]
+	B = pts[1][0:2]
+	C = pts[2][0:2]
 	P = np.array([0, 0])  # CM is at the center :)
 
 	# Compute vectors
@@ -68,6 +146,9 @@ def inSideCM(pts):
 	invDenom = 1 / (dot00 * dot11 - dot01 * dot01)
 	u = (dot11 * dot02 - dot01 * dot12) * invDenom
 	v = (dot00 * dot12 - dot01 * dot02) * invDenom
+
+	if p:
+		print(u, v)
 
 	# Check if point is in triangle
 	return (u >= 0) and (v >= 0) and (u + v < 1)
@@ -121,10 +202,17 @@ def checkCM(pts):
 	pts = [foot0, foot1, foot2]
 	correction = [x,y]
 	"""
-	pts2 = []
-	for i in range(0, 3):
-		pts2.append(pts[i][0:2])
-	pts = pts2
+	# pts2 = []
+	# for i in range(0, 3):
+	# 	pts2.append(pts[i][0:2])
+	# pts = pts2
+
+	pts = [
+		pts[0][0:2],
+		pts[1][0:2],
+		pts[2][0:2],
+	]
+
 	# print('2d', pts)
 	correction = np.array([0, 0, 0])
 
@@ -140,7 +228,7 @@ def checkCM(pts):
 			xx = lineIntersection(p0, p1, cm0, cm1)
 			a.append(xx)
 		a = vmin(a)
-		print(a)
+		# print(a)
 		correction = np.array([-a[0], -a[1], 0.0])
 	return correction
 
@@ -163,7 +251,6 @@ def checkCM(pts):
 # print(corr)
 
 
-
 class Gait(object):
 	"""
 	Base class for gaits
@@ -172,7 +259,7 @@ class Gait(object):
 		# for a step pattern of 12, these are the offsets of each leg
 		self.legOffset = [0, 6, 3, 9]
 		# frame rotations for each leg
-		# self.frame = [pi/4, -pi/4, -3*pi/4, 3*pi/4]
+		self.cmrot = [pi/4, -pi/4, -3*pi/4, 3*pi/4]
 		self.frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # this seem to work better ... wtf?
 		# the resting or idle position/orientation of a leg
 		self.rest = None
@@ -210,7 +297,8 @@ class Gait(object):
 		if sqrt(cmd[0]**2 + cmd[1]**2 + cmd[2]**2) < 0.001:
 			for leg in range(0, 4):
 				moveFoot(leg, self.rest)  # move to resting position
-			Servo.bulkWrite()
+				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(leg, *(self.rest)))
+			# Servo.bulkWrite()
 			return
 
 		# cmd = [100.0, 0.0, 0.0]
@@ -224,25 +312,54 @@ class Gait(object):
 				rcmd = self.calcRotatedOffset(cmd, legNum)
 				index = (i + self.legOffset[legNum]) % 12
 				pos = self.eachLeg(index, rcmd)  # move each leg appropriately
+				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *(pos)))
 				# if legNum == 0: print('New  [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, pos[0], pos[1], pos[2]))
-				footPos.append([index, pos])
+				footPos.append([index, pos, legNum])  # all in leg frame
 			# hate this!!!
 			temp = []
-			for p in footPos:
-				if p[0] > 2: temp.append(p[1])
+
+			# account for base, in base frame
+			cm = 45*cos(pi/4)
+			base = [
+				np.array([cm, cm, 0]),
+				np.array([cm, -cm, 0]),
+				np.array([-cm, -cm, 0]),
+				np.array([-cm, cm, 0])
+			]
+
+			for p in footPos:  # p = [index, (x,y,z), legNum]
+				if p[0] > 2: temp.append(rot_z(self.cmrot[p[2]], p[1])+base[p[2]])
 			if len(temp) != 3:
 				print('fuck ... wrong points:', len(temp))
 
 			correction = checkCM(temp)
+			# correction = np.array([0, 0, 0])
+			print('correction: {:.2f} {:.2f} {:.2f}'.format(*correction))
 
-			for legNum in [0, 2, 1, 3]:
-				n = footPos[legNum][1]+correction
-				print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *(n)))
-				moveFoot(legNum, footPos[legNum][1]+correction)
+			temp = []  # double check CM
+			order = [0, 2, 1, 3]
+			for i in range(0, 4):
+				index = footPos[i][0]
+				legNum = order[i]
+				n = footPos[i][1]
+				if index > 2:  # check index to see if leg moving
+					n = n+rot_z(self.frame[legNum], correction)  # leg space
+					# temp.append(rot_z(self.cmrot[footPos[i][2]], n)+base[footPos[i][2]])
+					temp.append(rot_z(self.cmrot[footPos[i][2]], n)+base[footPos[i][2]])
+					# print('index', footPos[legNum][0])
+				moveFoot(legNum, n)
+
+			for i in range(0, len(temp)):
+				print('Foot[?]: {:.2f} {:.2f} {:.2f}'.format(*(temp[i])))
+
+			# print('temp len:{}'.format(len(temp)))
+			print('double check: {}'.format(inSideCM(temp, True)))
 
 			# bulkWrite()
 			Servo.bulkWrite(Servo.ser)
-			# time.sleep(0.5)
+			# time.sleep(0.1)
+			time.sleep(0.25)
+			# time.sleep(1)
 
 
 class DiscreteRippleGait(Gait):
@@ -251,7 +368,8 @@ class DiscreteRippleGait(Gait):
 		self.phi = [9/9, 6/9, 3/9, 0/9, 1/9, 2/9, 3/9, 4/9, 5/9, 6/9, 7/9, 8/9]  # foot pos in gait sequence
 		maxl = h  # lifting higher gives me errors
 		minl = maxl/2
-		self.z = [minl, maxl, maxl, minl, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # leg height
+		# self.z = [minl, maxl, maxl, minl, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # leg height
+		self.z = [minl, maxl, minl, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # leg height
 		self.rest = r  # idle leg position
 
 	def eachLeg(self, index, cmd):
@@ -288,71 +406,71 @@ class DiscreteRippleGait(Gait):
 		return newpos
 
 
-class ContinousRippleGait(Gait):
-	alpha = 1.0
-
-	def __init__(self, h, r):
-		Gait.__init__(self)
-		self.height = h
-		self.rest = r
-
-	@staticmethod
-	def phi(x):
-		"""
-		The phase
-		"""
-		phi = 0.0
-		if x <= 3.0:
-			phi = 1/3*(3.0-x)
-		else:
-			phi = 1/9*(x-3)
-		return phi
-
-	def z(self, x):
-		"""
-		Leg height
-
-		duty cycle:
-			0-3: leg lifted
-			3-12: leg on ground
-			duty = (12-3)/12 = 0.75 = 75% a walking gait
-		"""
-		height = self.height
-		z = 0.0
-		if x <= 1:
-			z = height/1.0*x
-		elif x <= 2.0:
-			z = height
-		elif x <= 3.0:
-			z = -height/1.0*(x-2.0)+height
-		return z
-
-	def eachLeg(self, index, cmd):
-		"""
-		interpolates the foot position of each leg
-		"""
-		rest = self.rest
-		i = (index*self.alpha) % 12
-		phi = self.phi(i)
-		z = self.z(i)
-
-		# rotational commands -----------------------------------------------
-		angle = cmd['angle']/2-cmd['angle']*phi
-		rest_rot = rot_z(-angle, rest)
-		# rest_rot[2] = 0  # let linear handle z height
-
-		# linear commands ----------------------------------------------------
-		linear = cmd['linear']
-		xx = linear[0]
-		yy = linear[1]
-
-		# create new move command
-		move = np.array([
-			xx/2 - phi*xx,
-			yy/2 - phi*yy,
-			z
-		])
-
-		# new foot position: newpos = rot + move ----------------------------
-		newpos = move + rest_rot
-		return newpos
+# class ContinousRippleGait(Gait):
+# 	alpha = 1.0
+#
+# 	def __init__(self, h, r):
+# 		Gait.__init__(self)
+# 		self.height = h
+# 		self.rest = r
+#
+# 	@staticmethod
+# 	def phi(x):
+# 		"""
+# 		The phase
+# 		"""
+# 		phi = 0.0
+# 		if x <= 3.0:
+# 			phi = 1/3*(3.0-x)
+# 		else:
+# 			phi = 1/9*(x-3)
+# 		return phi
+#
+# 	def z(self, x):
+# 		"""
+# 		Leg height
+#
+# 		duty cycle:
+# 			0-3: leg lifted
+# 			3-12: leg on ground
+# 			duty = (12-3)/12 = 0.75 = 75% a walking gait
+# 		"""
+# 		height = self.height
+# 		z = 0.0
+# 		if x <= 1:
+# 			z = height/1.0*x
+# 		elif x <= 2.0:
+# 			z = height
+# 		elif x <= 3.0:
+# 			z = -height/1.0*(x-2.0)+height
+# 		return z
+#
+# 	def eachLeg(self, index, cmd):
+# 		"""
+# 		interpolates the foot position of each leg
+# 		"""
+# 		rest = self.rest
+# 		i = (index*self.alpha) % 12
+# 		phi = self.phi(i)
+# 		z = self.z(i)
+#
+# 		# rotational commands -----------------------------------------------
+# 		angle = cmd['angle']/2-cmd['angle']*phi
+# 		rest_rot = rot_z(-angle, rest)
+# 		# rest_rot[2] = 0  # let linear handle z height
+#
+# 		# linear commands ----------------------------------------------------
+# 		linear = cmd['linear']
+# 		xx = linear[0]
+# 		yy = linear[1]
+#
+# 		# create new move command
+# 		move = np.array([
+# 			xx/2 - phi*xx,
+# 			yy/2 - phi*yy,
+# 			z
+# 		])
+#
+# 		# new foot position: newpos = rot + move ----------------------------
+# 		newpos = move + rest_rot
+# 		return newpos
