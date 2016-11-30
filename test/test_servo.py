@@ -7,32 +7,15 @@
 
 from __future__ import print_function
 from __future__ import division
+from nose.tools import raises
 import sys
 sys.path.insert(0, '..')
 from Servo import Servo
-from nose.tools import raises
-from pyxl320 import DummySerial
-
-
-# def test_servo():
-# 	Servo.all_stop()
-# 	s = Servo(10)
-# 	s.angle = 90
-# 	s.setServoRangePulse(0, 4095)  # use the entire range
-# 	assert(s.angleToPWM(0) == 0)
-# 	assert(s.angleToPWM(180) == 4095)
-# 	assert(s.angle == 90)
-# 	assert(s.channel == 10)
-#
-# 	s.angle = 270  # limited to 0-180
-# 	assert(s.angle == 180)
-# 	s.angle = -10
-# 	assert(s.angle == 0)
+# from pyxl320 import DummySerial
 
 
 def test_limits():
 	s = Servo(15)
-	# s.setServoRangeAngle(0, 180)
 	s.setServoLimits(0, 0, 180)
 	s.angle = 0; assert(s.angle == 0)
 	s.angle = 45; assert(s.angle == 45)
@@ -43,7 +26,6 @@ def test_limits():
 	s.angle = -90; assert(s.angle == 0)
 	s.angle = -270; assert(s.angle == 0)
 
-	# s.setServoRangeAngle(-90, 90)
 	s.setServoLimits(150, -90, 90)
 	s.angle = 0; assert(s.angle == 0)
 	s.angle = 45; assert(s.angle == 45)
@@ -86,7 +68,3 @@ def test_fail2():
 
 if __name__ == "__main__":
 	print('run this with "nosetests -v test_servo.py"')
-# 	# cmd_servo()
-# 	# swing_servo()
-# 	# test_limits()
-# 	checks()

@@ -4,10 +4,12 @@ from __future__ import print_function
 from __future__ import division
 import sys
 from pyxl320 import DummySerial
-sys.path.insert(0, '..')
-from Leg import Leg
 import numpy as np
 from math import sqrt
+
+sys.path.insert(0, '..')
+from Leg import Leg
+
 
 def test_fk_ik():
 	length = {
@@ -26,7 +28,7 @@ def test_fk_ik():
 	angles2 = leg.ik(*pts)
 	pts2 = leg.fk(*angles2)
 	# angles2 = [r2d(a), r2d(b), r2d(c)]
-	print('angles (orig):', angles,'deg')
+	print('angles (orig):', angles, 'deg')
 	print('pts from fk(orig): {:.2f} {:.2f} {:.2f} mm'.format(*pts))
 	print('angles2 from ik(pts): {:.2f} {:.2f} {:.2f} deg'.format(*angles2))
 	print('pts2 from fk(angle2): {:.2f} {:.2f} {:.2f} mm'.format(*pts2))
@@ -56,13 +58,13 @@ def test_full_fk_ik():
 	}
 	channels = [0, 1, 2]
 	serial = DummySerial('test_port')
-	limits = [[-90,90], [-90,90], [-180,0]]
+	limits = [[-90, 90], [-90, 90], [-180, 0]]
 	offset = [150, 150, 150]
 	leg = Leg(length, channels, serial, limits, offset)
 
 	for i in range(1, 3):
 		print('------------------------------------------------')
-		for a in range(limits[i][0],limits[i][1], 10):
+		for a in range(limits[i][0], limits[i][1], 10):
 			angles = [0, 0, -10]
 			# if i == 2: a -= 90
 			angles[i] = a
@@ -154,7 +156,7 @@ def test_fk_ik2():
 	angles2 = leg.ik(*pts)
 	pts2 = leg.fk(*angles2)
 	# angles2 = [r2d(a), r2d(b), r2d(c)]
-	print('angles (orig):', angles,'deg')
+	print('angles (orig):', angles, 'deg')
 	print('pts from fk(orig): {:.2f} {:.2f} {:.2f} mm'.format(*pts))
 	print('angles2 from ik(pts): {:.2f} {:.2f} {:.2f} deg'.format(*angles2))
 	print('pts2 from fk(angle2): {:.2f} {:.2f} {:.2f} mm'.format(*pts2))
@@ -173,7 +175,7 @@ def test_full_fk_ik2():
 	}
 	channels = [0, 1, 2]
 	serial = DummySerial('test_port')
-	limits = [[-90,90], [-90,90], [-180,0]]
+	limits = [[-90, 90], [-90, 90], [-180, 0]]
 	offset = [150, 150, 150+90]
 	leg = Leg(length, channels, serial, limits, offset)
 
@@ -183,10 +185,10 @@ def test_full_fk_ik2():
 
 	delta = 15
 	for a in range(-45, 45, delta):
-		for b in range(-45,90, delta):
-			for g in range(-160,0, delta):
+		for b in range(-45, 90, delta):
+			for g in range(-160, 0, delta):
 				print('------------------------------------------------')
-				angles = [a,b,g]
+				angles = [a, b, g]
 				pts = leg.fk(*angles)
 				angles2 = leg.ik(*pts)
 				if angles2 is None:
@@ -215,10 +217,12 @@ def test_full_fk_ik2():
 					# leg.move(*pts)
 					# time.sleep(0.1)
 
+
 if __name__ == "__main__":
+	print('run this with "nosetests -v test_leg.py"')
 	# main()
 	# test_fk_ik()
 	# test_full_fk_ik()
 	# test_DH()
 	# test_fk_ik2()
-	test_full_fk_ik2()
+	# test_full_fk_ik2()

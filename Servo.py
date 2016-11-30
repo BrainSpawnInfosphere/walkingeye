@@ -52,17 +52,16 @@ class ServoBase(object):
 	|  angle()
 	|  limits()
 	+- RCServo
-	   |  servo things
+		|  servo things
 	+- RobotisServo
-	   |  bulkWrite
+		|  bulkWrite
 	"""
 	ser = None
 	bulkServoWrite = False
 	# bulkData = [0]
 
 	def __init__(self):
-		# global bulkData
-		# self.bulkData = [0]
+		# just put a dummy serial here, because testing needs it in the angle setter
 		self.ser = DummySerial('test')
 		pass
 
@@ -74,8 +73,6 @@ class ServoBase(object):
 		global gBulkData
 		pkt = makeBulkAnglePacket(gBulkData)
 		ser.write(pkt)
-		# print(pkt)
-		# print(gBulkData)
 		gBulkData = []
 
 
@@ -99,8 +96,6 @@ class Servo(ServoBase):
 	minAngle = -150.0
 	maxAngle = 150.0
 	ID = 0
-	# ser = None
-	# bulkWrite = False
 
 	def __init__(self, ID):
 		"""
@@ -108,16 +103,7 @@ class Servo(ServoBase):
 		"""
 		ServoBase.__init__(self)
 		self.ID = ID
-		# self.ser = serialObj
 		self.setServoLimits(150.0, -150.0, 150.0)  # defaults: offset, min, max
-
-	# @property
-	# def offset(self):
-	# 	return self._offset
-	#
-	# @offset.setter
-	# def offset(self, offset):
-	# 	self._offset = offset
 
 	@property
 	def angle(self):
