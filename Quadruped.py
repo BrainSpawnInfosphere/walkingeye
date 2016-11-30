@@ -435,12 +435,12 @@ class RobotException(Exception):
 	pass
 
 
-class Robot(object):
-	"""
-	is there value for this?
-	"""
-	def __init__(self):
-		pass
+# class Robot(object):
+# 	"""
+# 	is there value for this?
+# 	"""
+# 	def __init__(self):
+# 		pass
 
 
 class Quadruped(object):

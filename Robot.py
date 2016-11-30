@@ -62,15 +62,31 @@ class Test2Quadruped(Quadruped):
 
 		self.robot = Quadruped(data)
 		leg = self.robot.legs[0].foot0
-		self.crawl = DiscreteRippleGait(25.0, leg)
+		self.crawl = DiscreteRippleGait(45.0, leg)
 		# self.crawl = ContinousRippleGait(5.0, leg)
 		# self.crawl.alpha = 0.5
+		self.path = [  # x,y,rot
+			[50, 0, 0],
+			[50, 0, 0],
+			[50, 0, 0],
+			[50, 0, 0],
+			[50, 0, 0],
+			[0, 0, pi/4],
+			[0, 0, -pi/4],
+			[-50, 0, 0],
+			[-50, 0, 0],
+			[-50, 0, 0],
+			[-50, 0, 0],
+			[-50, 0, 0],
+		]
 
 	def run(self):
 		run = True
-		while run:
-			x, y = 50, 0
-			rz = 0 #pi/4  # FIXME: 20161123 CM falling outstide the stability triangle
+		# while run:
+		for pose in self.path:
+			# x, y = 0, 0
+			# rz = pi/4  # FIXME: 20161123 CM falling outstide the stability triangle
+			x, y, rz = pose
 			leg = self.robot.legs[0].foot0
 			cmd = [x, y, rz]
 			print('***********************************')
