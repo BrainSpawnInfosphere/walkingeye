@@ -31,7 +31,7 @@ from pyxl320 import DummySerial
 
 
 def test_limits():
-	s = Servo(15, DummySerial('test'))
+	s = Servo(15)
 	# s.setServoRangeAngle(0, 180)
 	s.setServoLimits(0, 0, 180)
 	s.angle = 0; assert(s.angle == 0)
@@ -57,7 +57,7 @@ def test_limits():
 
 @raises(Exception)
 def test_fail2():
-	s = Servo(15, DummySerial('test'))
+	s = Servo(15)
 	s.setServoLimits(0, 180, 0)  # min > max ... error
 
 # def checks():

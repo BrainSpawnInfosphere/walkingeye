@@ -9,6 +9,7 @@ from __future__ import print_function
 from __future__ import division
 import logging
 from pyxl320 import Packet
+from pyxl320 import DummySerial
 logger = logging.getLogger(__name__)
 
 from pyxl320 import xl320
@@ -62,6 +63,7 @@ class ServoBase(object):
 	def __init__(self):
 		# global bulkData
 		# self.bulkData = [0]
+		self.ser = DummySerial('test')
 		pass
 
 	def setSerial(self, serialObj):
