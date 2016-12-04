@@ -6,16 +6,33 @@
 
 This is my second one after the RC version, which didn't work as nicely as I wanted it too.
 
+Inspired by the original [Walking Eye](https://www.youtube.com/watch?v=f77gw2Pp3aY)
+
 ** Still a work in progress **
+
+## Documentation
+
+Since the software is written in python, iPhython (or now [Jupyter](http://jupyter.org/)) is used for interactive
+documentation. Take a look at the [docs](https://github.com/walchko/WalkingEye/tree/master/docs/ipython)
+folder. The ipython files are where some of the development (e.g., gait, forward/inverse
+kinematics, etc) takes place before it is tranferred into the python code.
 
 ## Software
 
 ![spiderbot classes](pics/spiderbot_classes.png)
 
+The class diagram only shows the main classes and important functions, there is more.
+
 This software requires [pyxl320](https://pypi.python.org/pypi/pyxl320) to work with the
 smart servos. You can install it with:
 
 	pip install pyxl320
+
+Since all of the leg servos are on the same RS845 bus, you will need to use `set_id` to 
+assign an *id* number to each servo **BEFORE** you hook them all together. To see how to
+use it, type:
+
+	set_id --help
 
 ### This [repository](https://github.com/walchko/pyGeckoRobots/tree/master/quadruped/robotis):
 
@@ -45,7 +62,7 @@ I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/produc
 * [Legs](https://github.com/mogillc/nico) which are the coxa, femur, and tibia
 * Misc brackets I made using [OpenScad](http://www.openscad.org/)
 
-## Cost
+### Cost
 
 Here is a parts list of **key components** that I am using. I am not listing wires, bread boards, cables, etc. Also note,
 I have rounded up the costs (i.e., $4.95 => $5). Also, lot of the body is 3d printed, the costs for that are not shown here.
@@ -72,7 +89,9 @@ ROS like system written in python.
 
 	pip install pygecko
 
-# License
+# Licenses
+
+**Note:** The software, hardware, and documentation are under different licenses.
 
 ## Software
 
@@ -96,7 +115,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-## Hardware
+## Hardware and Documentation
 
 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
 	<img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
