@@ -40,6 +40,7 @@ use it, type:
 * Quadruped.py - basic wrapper around leg and gait algorithms
 * Leg.py - forward/reverse kinematics
 * Gait.py - syncronization of how the 4 legs walk
+* Servo.py - talks to the XL-320 smart servos
 
 ## Hardware
 
@@ -53,11 +54,13 @@ I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/produc
 * 802.11n Wifi
 * Bluetooth 4.1 BLE
 
-### Camera Interface (CSI)
+### Pi Camera
 
-* [PiCamera](https://www.adafruit.com/products/3099) is used to stream images.
+[PiCamera](https://www.adafruit.com/products/3099) is used to stream images.
 
 ### 3D Models
+
+The 3d printer models (stl format) come from the following sources:
 
 * [Legs](https://github.com/mogillc/nico) which are the coxa, femur, and tibia
 * Misc brackets I made using [OpenScad](http://www.openscad.org/)
@@ -79,11 +82,11 @@ I have rounded up the costs (i.e., $4.95 => $5). Also, lot of the body is 3d pri
 | 74LS241                             |                                   | 1 | $1 | $1 | Used to convert the RPi's RS232 into a RS485 port |
 | 12V, 5A Wall Power Adaptor          | [Pololu](https://www.pololu.com) | 1 | $15 | $15 | So I don't have to always run off batteries |
 
-# PyGecko
+# PyGecko or ROS [Optional]
 
 ![Spiderbot_Processes](pics/Spiderbot_Processes.png)
 
-You can also use this driver with [PyGecko](https://github.com/walchko/pygecko) (or ROS 
+You can also use this driver with [PyGecko](https://github.com/walchko/pygecko) (or [ROS](http://www.ros.org) 
 if you write the interface), see the `pygecko` folder for an example. PyGecko is a simple
 ROS like system written in python.
 
