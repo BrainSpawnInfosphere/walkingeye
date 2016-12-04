@@ -8,6 +8,8 @@ This is my second one after the RC version, which didn't work as nicely as I wan
 
 ## Software
 
+![spiderbot classes](pics/spiderbot_classes.png)
+
 This software requires [pyxl320](https://pypi.python.org/pypi/pyxl320) to work with the
 smart servos. You can install it with:
 
@@ -22,9 +24,9 @@ smart servos. You can install it with:
 
 ## Hardware
 
-### Raspberry Pi
+![system layout](pics/system_layout.png)
 
-![RPI 3](https://www.raspberrypi.org/wp-content/uploads/2016/02/Pi_3_Model_B.png)
+### Raspberry Pi
 
 I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/products/3055)
 (ARMv8) as the main board running the lite version of Raspbian. It has on-board:
@@ -53,14 +55,23 @@ I have rounded up the costs (i.e., $4.95 => $5). Also, lot of the body is 3d pri
 
 | Part | Source | Number | Item Cost | Sum | Notes |
 | ---  | ---    | ---    | ---       | --- | ---   |
-| RPi v3    | [Adafruit](https://www.adafruit.com) | 1 | $40 | $40 | Main board, has wifi and bluetooth already |
-| Pi Camera | [Adafruit](https://www.adafruit.com) | 1 | $30 | $30 | 8 Mpixel |
-| 9-DOF IMU (BNO055) | [Adafruit](https://www.adafruit.com) | 1 | $35 | $35 | It is an AHRS, works over I2C |
-| 5V, 5A Buck Converter (D24V50F5)  | [Adafruit](https://www.adafruit.com) | 4 | $15 | $15 | For powering my electronics |
-| Dynamixel xl-320 smart servo | [RobotShop](https://www.robotshop.com) | 12 | $22 | $264 |  |
-| PS4 Controller   | [Walmart](http://www.walmart.com) | 1 | $54 | $54 | |
-| Micro SD (32 GB) | [Walmart](http://www.walmart.com) | 1 | $12 | $12 | |
-| Logitech C270 | [Walmart](http://www.walmart.com) | 1 | $30 | $30 | Connected via USB, also use the on board microphone |
+| RPi v3                              | [Adafruit](https://www.adafruit.com) | 1 | $40 | $40 | Main board, has wifi and bluetooth already |
+| Pi Camera                           | [Adafruit](https://www.adafruit.com) | 1 | $30 | $30 | 8 Mpixel |
+| 5V, 2.5A Buck Converter (D24V22F5)  | [Pololu](https://www.pololu.com) | 1 | $10 | $10 | For powering the RPi |
+| 5V, 2.4A Buck Converter (D24V22F7)  | [Pololu](https://www.pololu.com) | 1 | $10 | $10 | For powering the xl-320 |
+| Dynamixel xl-320 smart servo        | [RobotShop](https://www.robotshop.com) | 12 | $22 | $264 |  |
+| PS4 Controller                      | [Walmart](http://www.walmart.com) | 1 | $54 | $54 | |
+| Micro SD (32 GB)                    | [Walmart](http://www.walmart.com) | 1 | $12 | $12 | Raspbian |
+| 74LS241                             |                                   | 1 | $1 | $1 | Used to convert the RPi's RS232 into a RS485 port |
+| 12V, 5A Wall Power Adaptor          | [Pololu](https://www.pololu.com) | 1 | $15 | $15 | So I don't have to always run off batteries |
+
+# PyGecko
+
+![Spiderbot_Processes](pics/Spiderbot_Processes.png)
+
+You can also use this driver with [PyGecko](https://github.com/walchko/pygecko) (or ROS 
+if you write the interface), see the `pygecko` folder for an example. PyGecko is a simple
+ROS like system written in python.
 
 # License
 
