@@ -89,6 +89,9 @@ ROS like system written in python.
 
 	pip install pygecko
 
+Follow the other installation instructions for pygecko, will requires [ZeroMQ](http://zeromq.org/)
+and some other libraries to be installed to work.
+
 # Licenses
 
 **Note:** The software, hardware, and documentation are under different licenses.
