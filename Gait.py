@@ -17,84 +17,6 @@ from Servo import Servo
 import time
 
 
-#
-# class Correction(object):
-# 	# cmrot
-# 	leg2body = [pi/4, -pi/4, -3*pi/4, 3*pi/4]  # legs to body frame
-#
-# 	# frame
-# 	cmd2leg = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # cmds to leg frame
-#
-# 	def __init__(self):
-# 		# account for base, in base frame
-# 		cm = 45*cos(pi/4)
-# 		self.base = [
-# 			np.array([cm, cm, 0]),
-# 			np.array([cm, -cm, 0]),
-# 			np.array([-cm, -cm, 0]),
-# 			np.array([-cm, cm, 0])
-# 		]
-#
-# 	def checkStable(self, feet):
-# 		"""
-# 		Check CM (located at [0,0]) is inside the triangle formed by the feet.
-# 		in:
-# 			feet = [[index, legNum, foot], ...] there are 3 of these
-# 		out:
-# 			True - CM is inside
-# 			False - CM is outside
-# 		"""
-# 		pass
-#
-# 	def calcCorrection(self, feet, moveFoot):
-# 		"""
-# 		in:
-# 			feet = [[index, legNum, foot], ...] there are 3 of these
-# 					index - tells if foot is up/down
-# 					legNum - which leg [0-3]
-# 					foot - (x,y,z) is converted to 2D
-# 		out:
-# 			correction = [x,y,0] is only a 2D correction
-# 		"""
-# 		# hate this!!!
-# 		temp = []  # [[x,y,z], [x,y,z], [x,y,z]] feet positions
-#
-# 		base = self.base
-#
-# 		for p in feet:  # p = [index, (x,y,z), legNum]
-# 			index = p[0]
-# 			legNum = p[1]
-# 			foot = p[2]
-# 			if index > 2:
-# 				temp.append(rot_z(self.cmrot[legNum], foot) + base[legNum])
-# 		# if len(temp) != 3:
-# 		# 	print('fuck ... wrong points:', len(temp))
-#
-# 		correction = self.checkCM(temp)
-# 		correction = np.array([0, 0, 0])
-# 		print('correction: {:.2f} {:.2f} {:.2f}'.format(*correction))
-#
-# 		temp = []  # double check CM
-# 		order = [0, 2, 1, 3]
-# 		for i in range(0, 4):
-# 			index = feet[i][0]
-# 			legNum = order[i]
-# 			n = feet[i][1]
-# 			if index > 2:  # check index to see if leg moving
-# 				n = n+rot_z(self.frame[legNum], correction)  # leg space
-# 				# temp.append(rot_z(self.cmrot[footPos[i][2]], n)+base[footPos[i][2]])
-# 				temp.append(rot_z(self.cmrot[feet[i][2]], n)+base[feet[i][2]])
-# 				# print('index', footPos[legNum][0])
-# 			moveFoot(legNum, n)
-#
-# 		for i in range(0, len(temp)):
-# 			print('Foot[?]: {:.2f} {:.2f} {:.2f}'.format(*(temp[i])))
-#
-# 		# print('temp len:{}'.format(len(temp)))
-# 		print('double check: {}'.format(inSideCM(temp, True)))
-
-
-
 # make a static method in Gait? Nothing else uses it
 def rot_z(t, c):
 	"""
@@ -116,133 +38,24 @@ def rot_z(t, c):
 	return ans
 
 
-# def inSideCM(pts, p=False):
-# 	"""
-# 	Determine if a point P is inside of a triangle composed of points
-# 	A, B, and C.
-# 	pts = [A,B,C]
-# 	P = [0,0] at the center of mass of the robot
-# 	returns True (inside triangle) or False (outside the triangle)
-# 	"""
-# 	# print('inSideCM pts:', pts)
-# 	A = pts[0][0:2]
-# 	B = pts[1][0:2]
-# 	C = pts[2][0:2]
-# 	P = np.array([0, 0])  # CM is at the center :)
-#
-# 	# Compute vectors
-# 	v0 = C - A
-# 	v1 = B - A
-# 	v2 = P - A
-#
-# 	# Compute dot products
-# 	dot00 = np.dot(v0, v0)
-# 	dot01 = np.dot(v0, v1)
-# 	dot02 = np.dot(v0, v2)
-# 	dot11 = np.dot(v1, v1)
-# 	dot12 = np.dot(v1, v2)
-#
-# 	# Compute barycentric coordinates
-# 	invDenom = 1 / (dot00 * dot11 - dot01 * dot01)
-# 	u = (dot11 * dot02 - dot01 * dot12) * invDenom
-# 	v = (dot00 * dot12 - dot01 * dot02) * invDenom
-#
-# 	if p:
-# 		print(u, v)
-#
-# 	# Check if point is in triangle
-# 	return (u >= 0) and (v >= 0) and (u + v < 1)
-#
-#
-# def lineIntersection(p1, p2, p3, p4):
-# 	"""
-# 	Find the intersection of 2 lines.
-# 	line 1: p1, p2
-# 	line 2: p3, p4
-# 	"""
-# 	x1 = p1[0]
-# 	x2 = p2[0]
-# 	x3 = p3[0]
-# 	x4 = p4[0]
-# 	y1 = p1[1]
-# 	y2 = p2[1]
-# 	y3 = p3[1]
-# 	y4 = p4[1]
-#
-# 	denom = ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4))
-# 	if abs(denom) < 0.00001:
-# 		# print('crap {}'.format(denom))
-# 		return np.array([0, 0])
-# 	x = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/denom
-# 	y = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/denom
-# 	return np.array([x, y])
-#
-#
-# def vmin(a):
-# 	"""
-# 	Find the minimum vector in an array of 2D vectors.
-# 	in = [[1,2], [2,3], ...]
-# 	out = [1,2]
-# 	"""
-# 	minv = 0
-# 	min_val = 1000000000000000
-# 	for p in a:
-# 		val = norm(p)
-# 		if val < min_val:
-# 			min_val = val
-# 			minv = p
-# 	return minv
-#
-#
-# def checkCM(pts):
-# 	"""
-# 	Given the robot's foot locations, provide correction if the
-# 	center of mass (CM) is outside the triangle formed by the 3
-# 	foot locations.
-# 	pts = [foot0, foot1, foot2]
-# 	correction = [x,y]
-# 	"""
-# 	# pts2 = []
-# 	# for i in range(0, 3):
-# 	# 	pts2.append(pts[i][0:2])
-# 	# pts = pts2
-#
-# 	pts = [
-# 		pts[0][0:2],
-# 		pts[1][0:2],
-# 		pts[2][0:2],
-# 	]
-#
-# 	# print('2d', pts)
-# 	correction = np.array([0, 0, 0])
-#
-# 	if not inSideCM(pts):
-# 		a = []
-# 		for i in range(0, 3):
-# 			p0 = pts[i]
-# 			p1 = pts[(i+1) % 3]
-# 			x1 = 50
-# 			x0 = -50
-# 			cm1 = np.array([x1, -(p1[0] - p0[0])/(p1[1] - p0[1])*x1])
-# 			cm0 = np.array([x0, -(p1[0] - p0[0])/(p1[1] - p0[1])*x0])
-# 			xx = lineIntersection(p0, p1, cm0, cm1)
-# 			a.append(xx)
-# 		a = vmin(a)
-# 		# print(a)
-# 		correction = np.array([-a[0], -a[1], 0.0])
-# 	return correction
-class Correction(object):
-	# cmrot
-	# leg2body = [pi/4, -pi/4, -3*pi/4, 3*pi/4]  # legs to body frame
-	cmrot = [pi/4, -pi/4, -3*pi/4, 3*pi/4]  # legs to body frame
-
-	# frame
-	# cmd2leg = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # cmds to leg frame
-	frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # cmds to leg frame
-
-	def __init__(self):
+class RobotTransform(object):
+	"""
+	Converts pts between the leg and body frame.
+	"""
+	def __init__(self, radius):
+		"""
+		in:
+			radius - radius of body from CM in mm
+			anglesB2L - angles to transform between body and leg frames
+		"""
+		# cmrot
+		self.leg2body = [pi/4, -pi/4, -3*pi/4, 3*pi/4]  # legs to body frame # orig
+#         self.leg2body = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # legs to body frame
+		# frame
+		self.body2leg = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # body to leg frame # orig
+#         self.body2leg = [pi/4, -pi/4, -3*pi/4, 3*pi/4]  # body to leg frame
 		# account for base, in base frame
-		cm = 45*cos(pi/4)
+		cm = radius*cos(pi/4)
 		self.base = [
 			np.array([cm, cm, 0]),
 			np.array([cm, -cm, 0]),
@@ -250,8 +63,27 @@ class Correction(object):
 			np.array([-cm, cm, 0])
 		]
 
+	def leg2Body(self, legNum, pts):
+		"""
+		Converts points from leg_frame to body_frame
+		"""
+		pts2 = rot_z(self.leg2body[legNum], pts) + self.base[legNum]
+		return pts2
+
+	def body2Leg(self, legNum, pts):
+		"""
+		Converts points from body_frame to leg_frame
+		"""
+		pts2 = rot_z(self.body2leg[legNum], pts-self.base[legNum])
+		return pts2
+
+
+class Correction(object):
+	def __init__(self):
+		pass
+
 	@staticmethod
-	def inside(pts, prnt=False):
+	def inside(feet, prnt=False):
 		"""
 		Determine if a point P is inside of a triangle composed of points
 		A, B, and C.
@@ -259,6 +91,11 @@ class Correction(object):
 		P = [0,0] at the center of mass of the robot
 		returns True (inside triangle) or False (outside the triangle)
 		"""
+		pts = []
+		for p in feet:
+			if isinstance(p, np.ndarray):
+				pts.append(p)
+
 		# print('inSideCM pts:', pts)
 		A = pts[0][0:2]
 		B = pts[1][0:2]
@@ -286,23 +123,26 @@ class Correction(object):
 			print(u, v)
 
 		# Check if point is in triangle
-		return (u >= 0) and (v >= 0) and (u + v < 1)
+		ans = ((u >= 0) and (v >= 0) and (u + v < 1))
+
+		print('inside():', ans)
+		return ans
 
 	@staticmethod
-	def lineIntersection(p1, p2, p3, p4):
+	def lineIntersection(p1, p2, p3):
 		"""
 		Find the intersection of 2 lines.
 		line 1: p1, p2
-		line 2: p3, p4
+		line 2: p3, [0,0]
 		"""
 		x1 = p1[0]
 		x2 = p2[0]
 		x3 = p3[0]
-		x4 = p4[0]
+		x4 = 0.0
 		y1 = p1[1]
 		y2 = p2[1]
 		y3 = p3[1]
-		y4 = p4[1]
+		y4 = 0.0
 
 		denom = ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4))
 		if abs(denom) < 0.00001:
@@ -328,37 +168,28 @@ class Correction(object):
 				minv = p
 		return minv
 
-	def check2(self, pts):
+	def correction(self, feet, movingFoot):
 		"""
 		Given the robot's foot locations, provide correction if the
 		center of mass (CM) is outside the triangle formed by the 3
 		foot locations.
-		in: pts = [foot0, foot1, foot2] <- body frame, 3d
-		return: CM inside True/False
-		"""
-		return self.inside(pts)
-
-	def correction2(self, pts):
-		"""
-		Given the robot's foot locations, provide correction if the
-		center of mass (CM) is outside the triangle formed by the 3
-		foot locations.
-		pts = [foot0, foot1, foot2]
+		pts = [foot0, foot1, foot2, foot3]
 		correction = [x,y,0]
 		"""
-		a = []
-		for i in range(0, 3):
-			p0 = pts[i]
-			p1 = pts[(i+1) % 3]
-			x1 = 50
-			x0 = -50
-			cm1 = np.array([x1, -(p1[0] - p0[0])/(p1[1] - p0[1])*x1])
-			cm0 = np.array([x0, -(p1[0] - p0[0])/(p1[1] - p0[1])*x0])
-			xx = self.lineIntersection(p0, p1, cm0, cm1)
-			a.append(xx)
-		a = self.vmin(a)
+#         a = []
+#         for i in range(0, 3):
+#             p0 = pts[i]
+#             p1 = pts[(i+1) % 3]
+#             xx = self.lineIntersection(p0, p1, cm0, cm1)
+#             a.append(xx)
+#         a = self.vmin(a)
+#         correction = np.array([-a[0], -a[1], 0.0])
+		# 0 1 2 3
+		op = feet[(movingFoot + 2) % 4]
+		p0 = feet[(movingFoot + 1) % 4]
+		p1 = feet[(movingFoot + 3) % 4]
+		a = self.lineIntersection(p0, p1, op)
 		correction = np.array([-a[0], -a[1], 0.0])
-
 		return correction
 
 	def calcCorrection(self, feet):
@@ -367,19 +198,33 @@ class Correction(object):
 		to ensure the CM is inside of the stability triangle.
 
 		in:
-			feet = [[index, legNum, foot], ...] there are 3 of these
+			feet = [[index, legNum, foot], ...] there are 4 of these
 					index - tells if foot is up/down
 					legNum - which leg [0-3]
 					foot - (x,y,z) is converted to 2D
 		out:
 			correction = [x,y,0] is only a 2D correction
 		"""
-		temp = []  # [[x,y,z], [x,y,z], [x,y,z]] feet positions
+		temp = [0, 0, 0, 0]
+		tf = RobotTransform(45)
 
-		temp = self.rotateFeet(feet)
+		print('-------------------')
+		print('calcCorrection()')
+		movingFoot = 0
+		for f in feet:
+			index = f[0]
+			foot = f[2]
+			legNum = f[1]
+			if index > 2:
+				print('in foot: {:.2f} {:.2f}'.format(*foot[0:2]))
+				ft = tf.leg2Body(legNum, foot)
+				temp[legNum] = ft
+				print('rotated foot: {:.2f} {:.2f}'.format(*ft[0:2]))
+			else:
+				movingFoot = legNum
 
-		if not self.check2(temp):
-			correction = 1.5*self.correction2(temp)
+		if not self.inside(temp):
+			correction = 1.5*self.correction(temp, movingFoot)
 		else:
 			correction = np.array([0, 0, 0])
 		return correction
@@ -388,31 +233,17 @@ class Correction(object):
 		"""
 		return: [[index, legNum, (x,y,z)], ...] corrected stationary feet positions
 		"""
+		tf = RobotTransform(45)
+		ans = []
 		for p in feet:  # p = [index, legNum, (x,y,z)]
 			index = p[0]
 			legNum = p[1]
 			foot = p[2]
 			if index > 2:  # check index to see if leg moving
-				foot = foot + rot_z(self.frame[legNum], correction)  # leg frame
-				p[2] = foot
-		return feet
-
-	def rotateFeet(self, feet):
-		"""
-		return: [[x,y,z], [x,y,z], [x,y,z]] stationary feet positions
-		"""
-		temp = []
-		for p in feet:  # p = [index, legNum, (x,y,z)]
-			index = p[0]
-			legNum = p[1]
-			foot = p[2]
-
-			# only grab feet that are on the ground, index > 2
-			if index > 2:
-				# transform leg into body frame and add base offsets
-				temp.append(rot_z(self.cmrot[legNum], foot) + self.base[legNum])
-
-		return temp
+				foot = tf.leg2Body(legNum, foot) + correction
+				foot = tf.body2Leg(legNum, foot)
+			ans.append([index, legNum, foot])
+		return ans
 
 
 class Gait(object):
@@ -479,45 +310,7 @@ class Gait(object):
 				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *(pos)))
 				# if legNum == 0: print('New  [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, pos[0], pos[1], pos[2]))
 				footPos.append([index, legNum, pos])  # all in leg frame
-			# # hate this!!!
-			# temp = []
-			#
-			# # account for base, in base frame
-			# cm = 45*cos(pi/4)
-			# base = [
-			# 	np.array([cm, cm, 0]),
-			# 	np.array([cm, -cm, 0]),
-			# 	np.array([-cm, -cm, 0]),
-			# 	np.array([-cm, cm, 0])
-			# ]
-			#
-			# for p in footPos:  # p = [index, (x,y,z), legNum]
-			# 	if p[0] > 2: temp.append(rot_z(self.cmrot[p[2]], p[1])+base[p[2]])
-			# if len(temp) != 3:
-			# 	print('fuck ... wrong points:', len(temp))
-			#
-			# correction = checkCM(temp)
-			# # correction = np.array([0, 0, 0])
-			# print('correction: {:.2f} {:.2f} {:.2f}'.format(*correction))
-			#
-			# temp = []  # double check CM
-			# order = [0, 2, 1, 3]
-			# for i in range(0, 4):
-			# 	index = footPos[i][0]
-			# 	legNum = order[i]
-			# 	n = footPos[i][1]
-			# 	if index > 2:  # check index to see if leg moving
-			# 		n = n+rot_z(self.frame[legNum], correction)  # leg space
-			# 		# temp.append(rot_z(self.cmrot[footPos[i][2]], n)+base[footPos[i][2]])
-			# 		temp.append(rot_z(self.cmrot[footPos[i][2]], n)+base[footPos[i][2]])
-			# 		# print('index', footPos[legNum][0])
-			# 	moveFoot(legNum, n)
-			#
-			# for i in range(0, len(temp)):
-			# 	print('Foot[?]: {:.2f} {:.2f} {:.2f}'.format(*(temp[i])))
-			#
-			# # print('temp len:{}'.format(len(temp)))
-			# print('double check: {}'.format(inSideCM(temp, True)))
+
 			corr = Correction()
 			c = corr.calcCorrection(footPos)
 			feet = corr.rotateFeetCorrected(footPos, c)

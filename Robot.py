@@ -7,11 +7,11 @@
 
 from __future__ import print_function
 from __future__ import division
-import time
+# import time
 # import numpy as np
 # from math import radians as d2r
 from math import pi
-from pygecko.lib.ZmqClass import Sub as zmqSub
+# from pygecko.lib.ZmqClass import Sub as zmqSub
 from Quadruped import Quadruped
 from Gait import DiscreteRippleGait
 # import time
@@ -20,40 +20,40 @@ from Gait import DiscreteRippleGait
 ##########################
 
 
-class TestQuadruped(Quadruped):
-	def __init__(self, data, serialPort):
-		Quadruped.__init__(self, data, serialPort)
-
-		self.robot = Quadruped(data)
-		# self.crawl = CrawlGait(robot)
-		# self.crawl = TimeCrawlGait(robot)
-		leg = self.robot.legs[0].foot0
-		self.crawl = DiscreteRippleGait(25.0, leg)
-
-	def run(self):
-		sub = zmqSub('js', ('localhost', '9000'))
-
-		print('Press <share> on PS4 controller to exit')
-
-		while True:
-			topic, ps4 = sub.recv()
-
-			# msg values range between (-1, 1)
-			if ps4 and topic == 'js':
-				x, y = ps4['axes']['leftStick']
-				rz = ps4['axes']['rightStick'][1]
-
-				if ps4['buttons']['share']:
-					print('You hit <share> ... bye!')
-					exit()
-
-				cmd = [100*x, 100*y, 40*rz]
-				print('***********************************')
-				print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x, y, rz))
-				print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
-				print('***********************************')
-				self.crawl.command(cmd, self.robot.moveFoot)
-			time.sleep(0.01)
+# class TestQuadruped(Quadruped):
+# 	def __init__(self, data, serialPort):
+# 		Quadruped.__init__(self, data, serialPort)
+#
+# 		self.robot = Quadruped(data)
+# 		# self.crawl = CrawlGait(robot)
+# 		# self.crawl = TimeCrawlGait(robot)
+# 		leg = self.robot.legs[0].foot0
+# 		self.crawl = DiscreteRippleGait(25.0, leg)
+#
+# 	def run(self):
+# 		sub = zmqSub('js', ('localhost', '9000'))
+#
+# 		print('Press <share> on PS4 controller to exit')
+#
+# 		while True:
+# 			topic, ps4 = sub.recv()
+#
+# 			# msg values range between (-1, 1)
+# 			if ps4 and topic == 'js':
+# 				x, y = ps4['axes']['leftStick']
+# 				rz = ps4['axes']['rightStick'][1]
+#
+# 				if ps4['buttons']['share']:
+# 					print('You hit <share> ... bye!')
+# 					exit()
+#
+# 				cmd = [100*x, 100*y, 40*rz]
+# 				print('***********************************')
+# 				print('* xyz {:.2f} {:.2f} {:.2f} *'.format(x, y, rz))
+# 				print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
+# 				print('***********************************')
+# 				self.crawl.command(cmd, self.robot.moveFoot)
+# 			time.sleep(0.01)
 
 
 class Test2Quadruped(Quadruped):
@@ -81,7 +81,7 @@ class Test2Quadruped(Quadruped):
 		]
 
 	def run(self):
-		run = True
+		# run = True
 		# while run:
 		for pose in self.path:
 			# x, y = 0, 0
