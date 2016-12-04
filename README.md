@@ -1,10 +1,12 @@
 # XL-320 Quadruped
 
-[![Code Health](https://landscape.io/github/walchko/pyGeckoRobots/master/landscape.svg?style=flat)](https://landscape.io/github/walchko/pyGeckoRobots/master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/868cde15459a4840ae627f311eef4b2c)](https://www.codacy.com/app/kevin-walchko/pyGeckoRobots?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=walchko/pyGeckoRobots&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.org/walchko/pyGeckoQuadruped.svg?branch=master)](https://travis-ci.org/walchko/pyGeckoQuadruped)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/walchko/pyGeckoQuadruped)
 
 This is my second one after the RC version, which didn't work as nicely as I wanted it too.
+
+** Still a work in progress **
 
 ## Software
 
@@ -17,7 +19,7 @@ smart servos. You can install it with:
 
 ### This [repository](https://github.com/walchko/pyGeckoRobots/tree/master/quadruped/robotis):
 
-* Robot.py - main code to get things going
+* Robot.py - main code to get things going ... adapt this to your needs.
 * Quadruped.py - basic wrapper around leg and gait algorithms
 * Leg.py - forward/reverse kinematics
 * Gait.py - syncronization of how the 4 legs walk
@@ -36,17 +38,12 @@ I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/produc
 
 ### Camera Interface (CSI)
 
-* [PiCamera](https://www.adafruit.com/products/3099) is used for video odometry
+* [PiCamera](https://www.adafruit.com/products/3099) is used to stream images.
 
 ### 3D Models
 
 * [Legs](https://github.com/mogillc/nico) which are the coxa, femur, and tibia
 * Misc brackets I made using [OpenScad](http://www.openscad.org/)
-
-### USB
-
-* A [Logitech c270 camera](http://www.logitech.com/en-us/product/hd-webcam-c270) provides
-  video and microphone capabilities
 
 ## Cost
 
@@ -72,6 +69,8 @@ I have rounded up the costs (i.e., $4.95 => $5). Also, lot of the body is 3d pri
 You can also use this driver with [PyGecko](https://github.com/walchko/pygecko) (or ROS 
 if you write the interface), see the `pygecko` folder for an example. PyGecko is a simple
 ROS like system written in python.
+
+	pip install pygecko
 
 # License
 
