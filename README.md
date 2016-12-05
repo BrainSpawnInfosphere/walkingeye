@@ -10,7 +10,7 @@ This is my second one after the RC version, which didn't work as nicely as I wan
 
 Inspired by the original [Walking Eye](https://www.youtube.com/watch?v=f77gw2Pp3aY)
 
-** Still a work in progress **
+**Still a work in progress**
 
 ## Documentation
 
