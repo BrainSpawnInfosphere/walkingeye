@@ -1,7 +1,7 @@
 # XL-320 Quadruped
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/868cde15459a4840ae627f311eef4b2c)](https://www.codacy.com/app/kevin-walchko/pyGeckoRobots?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=walchko/pyGeckoRobots&amp;utm_campaign=Badge_Grade)
-[![Build Status](https://travis-ci.org/walchko/pyGeckoQuadruped.svg?branch=master)](https://travis-ci.org/walchko/pyGeckoQuadruped)
+[![Build Status](https://travis-ci.org/walchko/WalkingEye.svg?branch=master)](https://travis-ci.org/walchko/WalkingEye)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/walchko/pyGeckoQuadruped)
 
 ![spidebot dev](pics/spiderbot_dev.JPG)
