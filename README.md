@@ -4,6 +4,8 @@
 [![Build Status](https://travis-ci.org/walchko/pyGeckoQuadruped.svg?branch=master)](https://travis-ci.org/walchko/pyGeckoQuadruped)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/walchko/pyGeckoQuadruped)
 
+![spidebot dev](pics/spiderbot_dev.JPG)
+
 This is my second one after the RC version, which didn't work as nicely as I wanted it too.
 
 Inspired by the original [Walking Eye](https://www.youtube.com/watch?v=f77gw2Pp3aY)
@@ -28,7 +30,7 @@ smart servos. You can install it with:
 
 	pip install pyxl320
 
-Since all of the leg servos are on the same RS845 bus, you will need to use `set_id` to 
+Since all of the leg servos are on the same RS845 bus, you will need to use `set_id` to
 assign an *id* number to each servo **BEFORE** you hook them all together. To see how to
 use it, type:
 
@@ -86,7 +88,7 @@ I have rounded up the costs (i.e., $4.95 => $5). Also, lot of the body is 3d pri
 
 ![Spiderbot_Processes](pics/Spiderbot_Processes.png)
 
-You can also use this driver with [PyGecko](https://github.com/walchko/pygecko) (or [ROS](http://www.ros.org) 
+You can also use this driver with [PyGecko](https://github.com/walchko/pygecko) (or [ROS](http://www.ros.org)
 if you write the interface), see the `pygecko` folder for an example. PyGecko is a simple
 ROS like system written in python.
 
