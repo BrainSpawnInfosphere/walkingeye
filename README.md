@@ -10,6 +10,11 @@ This is my second one after the RC version, which didn't work as nicely as I wan
 
 Inspired by the original [Walking Eye](https://www.youtube.com/watch?v=f77gw2Pp3aY)
 
+## Videos
+
+* [YouTube](https://www.youtube.com/watch?v=kH2hlxUfCNg)
+* [Vimeo](https://player.vimeo.com/video/194676675)
+
 **Still a work in progress**
 
 ## Documentation
@@ -55,6 +60,9 @@ I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/produc
 
 * 802.11n Wifi
 * Bluetooth 4.1 BLE
+
+However, I have done a little testing and it looks like the Pi Zero **might** be powerful
+enough to do the job too. When I get more time, I will investigate it more.
 
 ### Pi Camera
 
@@ -103,7 +111,8 @@ and some other libraries to be installed to work.
 
 ## Software
 
-The MIT License (MIT)
+**The MIT License (MIT)**
+
 Copyright (c) 2016 Kevin J. Walchko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
