@@ -10,9 +10,10 @@ from __future__ import division
 import logging
 from pyxl320 import Packet
 from pyxl320 import DummySerial
+from pyxl320 import xl320
+
 logger = logging.getLogger(__name__)
 
-from pyxl320 import xl320
 
 def makeBulkAnglePacket(info):
 	"""
@@ -81,10 +82,10 @@ class Servo(ServoBase):
 	Keeps info for servo and commands their movement.
 	angles are in degrees
 
-	            0
+				0
 	-150 ------ + ------- 150  kinematics (servo_k)
-	           150
-	   0 ------ + ------- 300  real servo (servo_r)
+				150
+		0 ------ + ------- 300  real servo (servo_r)
 
 	servo_k commands are between -150 and 150 degrees, with 0 deg being center
 
