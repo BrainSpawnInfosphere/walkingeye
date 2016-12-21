@@ -117,7 +117,7 @@ class Leg(object):
 		b = b1 + b2
 		g = acos((Lf**2 + Lt**2 - d**2) / (2.0 * Lf * Lt))
 
-		#### FIXES ###################################
+		# FIXES ###################################
 		g -= pi  # fix to align fk and ik frames
 
 		if z < 0.0:

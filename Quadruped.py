@@ -9,6 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 from Leg import Leg
+import multiprocessing as mp
 # import time
 # import numpy as np
 # import logging
@@ -443,7 +444,7 @@ class RobotException(Exception):
 # 		pass
 
 
-class Quadruped(object):
+class Quadruped(mp.Process):
 	"""
 	This is the low level driver that can be executed w/o using pyGecko.
 	"""
@@ -452,6 +453,7 @@ class Quadruped(object):
 		Sets up all 4 legs and servos. Also setups limits for angles and servo
 		pulses.
 		"""
+		mp.Process.__init__(self)
 		if 'serialPort' in data:
 			self.ser = ServoSerial(data['serialPort'])
 		else:

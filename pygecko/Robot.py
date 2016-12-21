@@ -10,8 +10,9 @@ from __future__ import division
 import time
 # import numpy as np
 # from math import radians as d2r
-from math import pi
+# from math import pi
 from pygecko.lib.ZmqClass import Sub as zmqSub
+from pygecko.Vision import RobotCameraServer as CameraServer
 from Quadruped import Quadruped
 from Gait import DiscreteRippleGait
 
@@ -26,10 +27,10 @@ class pyGeckoQuadruped(Quadruped):
 		leg = self.robot.legs[0].foot0
 		self.crawl = DiscreteRippleGait(45.0, leg)
 		# self.crawl = ContinousRippleGait(5.0, leg)
-
+		self.hostinfo = data['hostinfo']
 
 	def run(self):
-		sub = zmqSub('js', ('localhost', '9000'))
+		sub = zmqSub('js', self.hostinfo)
 
 		print('Press <share> on PS4 controller to exit')
 
@@ -66,11 +67,18 @@ def run():
 			'tibiaLength': 104
 		},
 		'legAngleLimits': [[-90, 90], [-90, 90], [-150, 0]],
-		'legOffset': [150, 150, 150+90]
+		'legOffset': [150, 150, 150+90],
+		'hostinfo': ('localhost', 9100)
 	}
 
 	robot = pyGeckoQuadruped(test)
-	robot.run()
+	robot.start()
+
+	cs = CameraServer('localhost', 9000)
+	cs.start()
+
+	robot.join()
+	cs.join()
 
 
 if __name__ == "__main__":
