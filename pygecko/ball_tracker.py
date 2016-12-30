@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
 import cv2
 import pygecko.lib.ZmqClass as zmq
-# from collections import deque
-# import numpy as np
-# import opencvutils as cvu
+import pygecko.lib.Messages as Msg
+import multiprocessing as mp
+from time import sleep
 
 
 class BallTracker(object):
+	# hsv colors to threshold on
 	greenLower = (29, 86, 6)
 	greenUpper = (64, 255, 255)
 	diameter = 6.7  # cm
@@ -16,7 +19,7 @@ class BallTracker(object):
 		"""
 		Tracks a ball in an image.
 
-		
+
 		"""
 		self.greenLower = lower
 		self.greenUpper = upper
@@ -63,12 +66,50 @@ class BallTracker(object):
 		return center, radius
 
 
+class Command_BT(mp.Process):
+	def __init__(self, port):
+		"""
+		Sets up all 4 legs and servos. Also setups limits for angles and servo
+		pulses.
+		"""
+		mp.Process.__init__(self)
+		self.port = port
+
+	# def init(self, port):
+	# 	self.port = port
+
+	def run(self):
+		bt = BallTracker()
+
+		sub = zmq.Sub(topics='image_color', connect_to=('0.0.0.0', self.port))
+		pub = zmq.Pub(bind_to=('0.0.0.0', self.port+1))
+
+		print('Started {} on ports: {} {}'.format('Command_BT', self.port, self.port+1))
+
+		while True:
+			_, msg = sub.recvB64()
+			if msg:
+				im = msg['image']
+				width, height = im.shape[:2]
+				center, radius = bt.find(im)
+				if center and radius > 10:
+					x, y = center
+					xx = x-width/2
+					yy = y-height/2
+					print('adjust:', xx, yy)
+
+					t = Msg.Twist()
+					pub.pub(t)
+					# print im.shape
+			sleep(0.01)
+
+
 if __name__ == '__main__':
-	s = zmq.SubBase64(topics='image_color', connect_to=('localhost', 9000))
+	s = zmq.Sub(topics='image_color', connect_to=('localhost', 9000))
 	while True:
 		bt = BallTracker()
 		try:
-			tp, msg = s.recv()
+			_, msg = s.recvB64()
 			if not msg:
 				# print tp, 'no message:', msg_miss
 				# msg_miss += 1
@@ -83,18 +124,16 @@ if __name__ == '__main__':
 					cv2.line(im, (0, height/2), (width, height/2), (255, 255, 255), 1)
 					cv2.line(im, (320, 0), (320, 480), (255, 255, 255), 1)
 					x, y = center
-					print 'adjust:', x-640/2, y-480/2
-					print im.shape
+					print('adjust:', x-640/2, y-480/2)
+					print(im.shape)
 
 				cv2.imshow('Camera', im)
 				key = cv2.waitKey(10)
 				if key == ord('q'):
 					break
 
-			# elif 'sensors' in msg:
-			# 	print '[+] Time (', msg['sensors'], '):', msg['imu']
 		except (IOError, EOFError):
-			print '[-] Connection gone .... bye'
+			print('[-] Connection gone .... bye')
 			break
 
 	s.close()

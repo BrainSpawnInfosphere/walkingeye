@@ -25,13 +25,12 @@ IPs.
 
 from __future__ import print_function
 from __future__ import division
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
 import time
-# import numpy as np
-# from math import radians as d2r
-# from math import pi
 from pygecko.lib.ZmqClass import Sub as zmqSub
-# from pygecko.Vision import RobotCameraServer as CameraServer
-from ..Quadruped import Quadruped
+from Quadruped import Quadruped
 from Gait import DiscreteRippleGait
 
 ##########################
@@ -87,7 +86,7 @@ def run():
 	# xl-320
 	test = {
 		# 'serialPort': '/dev/tty.usbserial-A5004Flb',  # original debug
-		'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
+		# 'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
 		'legLengths': {
 			'coxaLength': 45,
 			'femurLength': 55,
@@ -97,6 +96,8 @@ def run():
 		'legOffset': [150, 150, 150+90],
 		'port': 9020
 	}
+
+	print('Starting {} on port {}', 'pyGeckoQuadruped', test['port'])
 
 	robot = pyGeckoQuadruped(test)
 	robot.start()
