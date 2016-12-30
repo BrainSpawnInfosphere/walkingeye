@@ -27,9 +27,9 @@ from __future__ import print_function
 from __future__ import division
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
 import time
 from pygecko.lib.ZmqClass import Sub as zmqSub
+sys.path.insert(0, os.path.abspath('..'))
 from Quadruped import Quadruped
 from Gait import DiscreteRippleGait
 
@@ -48,7 +48,6 @@ class pyGeckoQuadruped(Quadruped):
 
 	def run(self):
 		sub = zmqSub(['js', 'led', 'compass'], ('0.0.0.0', self.port))
-		# sub = zmqSub('', ('0.0.0.0', self.ports[1]))
 
 		print('Press <share> on PS4 controller to exit')
 
@@ -73,10 +72,10 @@ class pyGeckoQuadruped(Quadruped):
 				self.crawl.command(cmd, self.robot.moveFoot)
 
 			elif topic is 'led':
-				pass
+				print(msg)
 
 			elif topic is 'compass':
-				pass
+				print(msg)
 
 			time.sleep(0.01)
 

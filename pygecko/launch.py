@@ -3,8 +3,6 @@
 
 from __future__ import print_function
 from pygecko.servers.Vision import RobotCameraServer as CameraServer
-# from pygecko.Navigation import NavigationServer
-# from pygecko.Speech import SoundServer
 from Robot import pyGeckoQuadruped
 from ball_tracker import Command_BT
 from ahrs import I2C
