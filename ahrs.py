@@ -10,6 +10,7 @@ from __future__ import division
 import os              # check we are not on travis.ci
 import platform        # determine linux or darwin (OSX)
 from math import cos, sin, pi, atan2, asin, sqrt
+from quaternions import Quaternion
 
 if platform.system().lower() == 'linux' and 'TRAVISCI' not in os.environ:
 	# pip install adafruit-lsm303
@@ -57,7 +58,7 @@ class AHRS(object):
 
 	def quaterion(self):
 		r, p, y = self.read()
-		return [0, 0, 0, 1]
+		return Quaternion.from_eluer(r, p, y)
 
 	def read(self, deg=False):
 		accel, mag = self.lsm303.read()
@@ -83,8 +84,8 @@ class AHRS(object):
 			heading += 2*pi
 
 		if deg:
-			roll *= 180/pi
-			pitch *= 180/pi
+			roll    *= 180/pi
+			pitch   *= 180/pi
 			heading *= 180/pi
 
 		return roll, pitch, heading

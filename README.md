@@ -6,7 +6,8 @@
 
 ![spidebot dev](pics/spiderbot_dev.JPG)
 
-This is my second one after the RC version, which didn't work as nicely as I wanted it too.
+This is my second one after the RC version, which didn't work as nicely as I
+wanted it too.
 
 Inspired by the original [Walking Eye](https://www.youtube.com/watch?v=f77gw2Pp3aY)
 
@@ -19,10 +20,12 @@ Inspired by the original [Walking Eye](https://www.youtube.com/watch?v=f77gw2Pp3
 
 ## Documentation
 
-Since the software is written in python, iPhython (or now [Jupyter](http://jupyter.org/)) is used for interactive
-documentation. Take a look at the [docs](https://github.com/walchko/WalkingEye/tree/master/docs/ipython)
-folder. The ipython files are where some of the development (e.g., gait, forward/inverse
-kinematics, etc) takes place before it is tranferred into the python code.
+Since the software is written in python, iPhython (or now
+[Jupyter](http://jupyter.org/)) is used for interactive documentation. Take a
+look at the [docs](https://github.com/walchko/WalkingEye/tree/master/docs/ipython)
+folder. The ipython files are where some of the development (e.g., gait,
+forward/inverse kinematics, etc) takes place before it is tranferred into the
+python code.
 
 ## Software
 
@@ -30,14 +33,14 @@ kinematics, etc) takes place before it is tranferred into the python code.
 
 The class diagram only shows the main classes and important functions, there is more.
 
-This software requires [pyxl320](https://pypi.python.org/pypi/pyxl320) to work with the
-smart servos. You can install it with:
+This software requires [pyxl320](https://pypi.python.org/pypi/pyxl320) to work
+with the smart servos. You can install it with:
 
 	pip install pyxl320
 
-Since all of the leg servos are on the same RS845 bus, you will need to use `set_id` to
-assign an *id* number to each servo **BEFORE** you hook them all together. To see how to
-use it, type:
+Since all of the leg servos are on the same RS845 bus, you will need to use
+`set_id` to assign an *id* number to each servo **BEFORE** you hook them all
+together. To see how to use it, type:
 
 	set_id --help
 
@@ -61,8 +64,9 @@ I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/produc
 * 802.11n Wifi
 * Bluetooth 4.1 BLE
 
-However, I have done a little testing and it looks like the Pi Zero **might** be powerful
-enough to do the job too. When I get more time, I will investigate it more.
+However, I have done a little testing and it looks like the Pi Zero **might** be
+powerful enough to do the job too. When I get more time, I will investigate it
+more.
 
 ### Pi Camera
 
@@ -77,8 +81,10 @@ The 3d printer models (stl format) come from the following sources:
 
 ### Cost
 
-Here is a parts list of **key components** that I am using. I am not listing wires, bread boards, cables, etc. Also note,
-I have rounded up the costs (i.e., $4.95 => $5). Also, lot of the body is 3d printed, the costs for that are not shown here.
+Here is a parts list of **key components** that I am using. I am not listing
+wires, bread boards, cables, etc. Also note, I have rounded up the costs
+(i.e., $4.95 => $5). Also, lot of the body is 3d printed, the costs for that are
+not shown here.
 
 | Part | Source | Number | Item Cost | Sum | Notes |
 | ---  | ---    | ---    | ---       | --- | ---   |
@@ -96,14 +102,22 @@ I have rounded up the costs (i.e., $4.95 => $5). Also, lot of the body is 3d pri
 
 ![Spiderbot_Processes](pics/Spiderbot_Processes.png)
 
-You can also use this driver with [PyGecko](https://github.com/walchko/pygecko) (or [ROS](http://www.ros.org)
-if you write the interface), see the `pygecko` folder for an example. PyGecko is a simple
-ROS like system written in python.
+You can also use this driver with [PyGecko](https://github.com/walchko/pygecko)
+(or [ROS](http://www.ros.org) if you write the interface), see the `pygecko`
+folder for an example. PyGecko is a simple ROS like system written in python.
 
 	pip install pygecko
+	pip install adafruit-lsm303
 
-Follow the other installation instructions for pygecko, will requires [ZeroMQ](http://zeromq.org/)
-and some other libraries to be installed to work.
+Follow the other installation instructions for pygecko, will requires
+[ZeroMQ](http://zeromq.org/) and some other libraries to be installed to work.
+
+# History
+
+Originally, this used toy RC servos (9 g's), they didn't work that great.
+
+![](pics/rc-spider-1.jpg)
+![](pics/rc-spider-2.jpg)
 
 # Licenses
 

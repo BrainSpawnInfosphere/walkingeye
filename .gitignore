@@ -2,6 +2,7 @@ Thumbs.db
 *.pyc
 old
 *.mp3
+*.wav
 *.log
 .AppleDouble
 .DS_Store

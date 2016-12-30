@@ -5,6 +5,24 @@
 # see LICENSE for full details
 ##############################################
 
+"""
+http://www.howtogeek.com/225487/what-is-the-difference-between-127.0.0.1-and-0.0.0.0/
+
+What is the Difference Between 127.0.0.1 and 0.0.0.0?
+
+* 127.0.0.1 is the loopback address (also known as localhost).
+* 0.0.0.0 is a non-routable meta-address used to designate an invalid, unknown,
+or non-applicable target (a no particular address place holder).
+
+In the context of a route entry, it usually means the default route.
+
+In the context of servers, 0.0.0.0 means all IPv4 addresses on the local
+machine. If a host has two IP addresses, 192.168.1.1 and 10.1.2.1, and a server
+running on the host listens on 0.0.0.0, it will be reachable at both of those
+IPs.
+"""
+
+
 from __future__ import print_function
 from __future__ import division
 import time
@@ -12,8 +30,8 @@ import time
 # from math import radians as d2r
 # from math import pi
 from pygecko.lib.ZmqClass import Sub as zmqSub
-from pygecko.Vision import RobotCameraServer as CameraServer
-from Quadruped import Quadruped
+# from pygecko.Vision import RobotCameraServer as CameraServer
+from ..Quadruped import Quadruped
 from Gait import DiscreteRippleGait
 
 ##########################
@@ -27,18 +45,20 @@ class pyGeckoQuadruped(Quadruped):
 		leg = self.robot.legs[0].foot0
 		self.crawl = DiscreteRippleGait(45.0, leg)
 		# self.crawl = ContinousRippleGait(5.0, leg)
-		self.hostinfo = data['hostinfo']
+		self.port = data['port']
 
 	def run(self):
-		sub = zmqSub('js', self.hostinfo)
+		sub = zmqSub(['js', 'led', 'compass'], ('0.0.0.0', self.port))
+		# sub = zmqSub('', ('0.0.0.0', self.ports[1]))
 
 		print('Press <share> on PS4 controller to exit')
 
 		while True:
-			topic, ps4 = sub.recv()
+			topic, msg = sub.recv()
 
 			# msg values range between (-1, 1)
-			if ps4 and topic == 'js':
+			if msg and topic is 'js':
+				ps4 = msg
 				x, y = ps4['axes']['leftStick']
 				rz = ps4['axes']['rightStick'][1]
 
@@ -52,6 +72,13 @@ class pyGeckoQuadruped(Quadruped):
 				print('* cmd {:.2f} {:.2f} {:.2f} *'.format(*cmd))
 				print('***********************************')
 				self.crawl.command(cmd, self.robot.moveFoot)
+
+			elif topic is 'led':
+				pass
+
+			elif topic is 'compass':
+				pass
+
 			time.sleep(0.01)
 
 
@@ -68,17 +95,17 @@ def run():
 		},
 		'legAngleLimits': [[-90, 90], [-90, 90], [-150, 0]],
 		'legOffset': [150, 150, 150+90],
-		'hostinfo': ('localhost', 9100)
+		'port': 9020
 	}
 
 	robot = pyGeckoQuadruped(test)
 	robot.start()
 
-	cs = CameraServer('localhost', 9000)
-	cs.start()
+	# cs = CameraServer('0.0.0.0', 9000)
+	# cs.start()
 
 	robot.join()
-	cs.join()
+	# cs.join()
 
 
 if __name__ == "__main__":
