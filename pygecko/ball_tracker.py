@@ -69,8 +69,6 @@ class BallTracker(object):
 class Command_BT(mp.Process):
 	def __init__(self, port):
 		"""
-		Sets up all 4 legs and servos. Also setups limits for angles and servo
-		pulses.
 		"""
 		mp.Process.__init__(self)
 		self.port = port

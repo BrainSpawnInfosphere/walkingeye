@@ -101,12 +101,7 @@ def run():
 
 	robot = pyGeckoQuadruped(test)
 	robot.start()
-
-	# cs = CameraServer('0.0.0.0', 9000)
-	# cs.start()
-
 	robot.join()
-	# cs.join()
 
 
 if __name__ == "__main__":

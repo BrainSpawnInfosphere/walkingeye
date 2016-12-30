@@ -7,6 +7,7 @@ from pygecko.servers.Vision import RobotCameraServer as CameraServer
 # from pygecko.Speech import SoundServer
 from Robot import pyGeckoQuadruped
 from ball_tracker import Command_BT
+from ahrs import I2C
 
 
 """
@@ -35,18 +36,21 @@ def robot():
 	cmd = Command_BT(9300)
 	# cmd.init(9300)
 	cs = CameraServer('localhost', 9000)  # not MP ... start last
+	i2c = I2C(9310)
 
 	print('start processes -----------------------------')
 	# nav.start()
 	# aud.start()
 	cmd.start()
 	quad.start()
+	i2c.start()
 	cs.start()
 
 	print('join processes ------------------------------')
 	cs.join()
 	cmd.join()
 	quad.join()
+	i2c.join()
 	# aud.join()
 
 

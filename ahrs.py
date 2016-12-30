@@ -11,6 +11,10 @@ import os              # check we are not on travis.ci
 import platform        # determine linux or darwin (OSX)
 from math import cos, sin, pi, atan2, asin, sqrt
 from quaternions import Quaternion
+import pygecko.lib.ZmqClass as zmq
+import pygecko.lib.Messages as Msg
+import multiprocessing as mp
+from time import sleep
 
 if platform.system().lower() == 'linux' and 'TRAVISCI' not in os.environ:
 	# pip install adafruit-lsm303
@@ -89,6 +93,25 @@ class AHRS(object):
 			heading *= 180/pi
 
 		return roll, pitch, heading
+
+
+class I2C(mp.Process):
+	def __init__(self, port):
+		"""
+		"""
+		mp.Process.__init__(self)
+		self.port = port
+
+	def run(self):
+		ahrs = AHRS()
+		pub = zmq.Pub(bind_to=('0.0.0.0', self.port))
+
+		while True:
+			msg = Msg.Compass()
+			r, p, h = ahrs.read()
+
+			pub.pub('compass', msg)
+			sleep(1)
 
 
 if __name__ == "__main__":
