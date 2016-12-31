@@ -37,7 +37,7 @@ else:
 			"""
 			data = []
 			for i in range(6):
-				data.append(random.uniform(-1.0, 1.0))
+				data.append(random.uniform(-2048, 2048))
 			accel = AHRS.normalize(*data[:3])
 			mag = AHRS.normalize(*data[3:])
 			return accel, mag
@@ -48,7 +48,26 @@ class AHRS(object):
 		# MinIMU-9 (L3G4200D and LSM303DLM carrier)
 		# http://www.pololu.com/catalog/product/1265
 		# accel and mag are measured at 12b
+
+		# Mx points to North
+
+		# pi@zoidberg pygecko $ sudo i2cdetect -y 1
+		# 0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+		# 00:          -- -- -- -- -- -- -- -- -- -- -- -- --
+		# 10: -- -- -- -- -- -- -- -- 18 -- -- -- -- -- 1e --
+		# 20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+		# 30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+		# 40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+		# 50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+		# 60: -- -- -- -- -- -- -- -- -- 69 -- -- -- -- -- --
+		# 70: -- -- -- -- -- -- -- --
+		# 18 [24]  - accel
+		# 1e [30]  - magnometer
+		# 69 [105] - gyros
+
 		self.lsm303 = LSM303(accel_address=0x18, mag_address=0x1e)
+		self.lsm303._mag.write8(0x01, 0x20)  # set mag to 1.3 gauss
+		self.lsm303._mag.write8(0x23, 0x00)  # set accel to 2 g
 
 	@staticmethod
 	def normalize(a, b, c):
@@ -61,7 +80,7 @@ class AHRS(object):
 		b /= m
 		c /= m
 
-		return a, b, c
+		return (a, b, c)
 
 	def quaterion(self):
 		r, p, y = self.read()
@@ -69,33 +88,34 @@ class AHRS(object):
 
 	@staticmethod
 	def grav(x, y, z):
+		# converts to g's
 		# default is 2 g's
 		div = 2048/2.0
 		x /= div
 		y /= div
 		z /= div
-		return x, y, z
+		return (x, y, z)
 
 	@staticmethod
 	def mag(x, y, z):
+		# converts to gauss
 		# default is 1.3 gauss
 		div = 2048/1.3
 		x /= div
 		y /= div
 		z /= div
-		return x, y, z
+		return (x, y, z)
 
 	def read(self, deg=False):
+		"""
+		heading is fucked up but roll/pitch seem to be ok
+		"""
 		accel, mag = self.lsm303.read()
-		mag = self.mag(*mag)
-		# accel = self.normalize(*accel)
-		accel = self.grav(*accel)
-		# accel = self.normalize(*accel)
-		ax, ay, az = accel
-		mx, my, mz = mag
-		# print('accel {:.4f} {:.4f} {:.4f}\t\tmag {:.4f} {:.4f} {:.4f}'.format(ax,ay,az,mx,my,mz))
-		ax, ay, az = accel
-		# ax, ay, az = self.normalize(*accel)
+
+		mx, my, mz = self.normalize(*mag)
+		# ax, ay, az = self.grav(*accel)
+		ax, ay, az = self.normalize(*accel)
+		# print('accel {:.4f} {:.4f} {:.4f}\t\tmag {:.4f} {:.4f} {:.4f}'.format(ax, ay, az, mx, my, mz))
 
 		pitch = asin(-ax)
 
@@ -103,9 +123,8 @@ class AHRS(object):
 			roll = 0.0
 		else:
 			roll = asin(ay/cos(pitch))
-		# pitch = roll = 0.0
 
-		mx, my, mz = mag
+		# mx, my, mz = mag
 		x = mx*cos(pitch)+mz*sin(pitch)
 		y = mx*sin(roll)*sin(pitch)+my*cos(roll)-mz*sin(roll)*cos(pitch)
 		heading = atan2(y, x)
