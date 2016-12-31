@@ -18,7 +18,7 @@ from time import sleep
 
 if platform.system().lower() == 'linux' and 'TRAVISCI' not in os.environ:
 	# pip install adafruit-lsm303
-	import Adafruit_LSM303 as LSM303
+	from Adafruit_LSM303 import LSM303
 else:
 	import random
 
@@ -45,7 +45,10 @@ else:
 
 class AHRS(object):
 	def __init__(self):
-		self.lsm303 = LSM303()
+		# MinIMU-9 (L3G4200D and LSM303DLM carrier)
+		# http://www.pololu.com/catalog/product/1265
+		# accel and mag are measured at 12b
+		self.lsm303 = LSM303(accel_address=0x18, mag_address=0x1e)
 
 	@staticmethod
 	def normalize(a, b, c):
@@ -64,8 +67,33 @@ class AHRS(object):
 		r, p, y = self.read()
 		return Quaternion.from_eluer(r, p, y)
 
+	@staticmethod
+	def grav(x, y, z):
+		# default is 2 g's
+		div = 2048/2.0
+		x /= div
+		y /= div
+		z /= div
+		return x, y, z
+
+	@staticmethod
+	def mag(x, y, z):
+		# default is 1.3 gauss
+		div = 2048/1.3
+		x /= div
+		y /= div
+		z /= div
+		return x, y, z
+
 	def read(self, deg=False):
 		accel, mag = self.lsm303.read()
+		mag = self.mag(*mag)
+		# accel = self.normalize(*accel)
+		accel = self.grav(*accel)
+		# accel = self.normalize(*accel)
+		ax, ay, az = accel
+		mx, my, mz = mag
+		# print('accel {:.4f} {:.4f} {:.4f}\t\tmag {:.4f} {:.4f} {:.4f}'.format(ax,ay,az,mx,my,mz))
 		ax, ay, az = accel
 		# ax, ay, az = self.normalize(*accel)
 
@@ -75,6 +103,7 @@ class AHRS(object):
 			roll = 0.0
 		else:
 			roll = asin(ay/cos(pitch))
+		# pitch = roll = 0.0
 
 		mx, my, mz = mag
 		x = mx*cos(pitch)+mz*sin(pitch)
@@ -108,7 +137,8 @@ class I2C(mp.Process):
 
 		while True:
 			msg = Msg.Compass()
-			r, p, h = ahrs.read()
+			r, p, h = ahrs.read(deg=True)
+			print('{:.4f} {:.4f} {:.4f}'.format(r, p, h))
 
 			pub.pub('compass', msg)
 			sleep(1)
