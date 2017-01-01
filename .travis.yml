@@ -9,7 +9,9 @@ python:
 #         packages:
 #             - libzmq3-dev
 #             - sox
-install: pip install pyxl320, quaternions
+install:
+    - pip install -U pip setuptools
+    - pip install -U pyxl320 quaternions
 # command to run tests
 script: cd test && nosetests -v *.py
 # script: nosetests -v -w test/
