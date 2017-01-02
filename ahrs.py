@@ -18,14 +18,19 @@ if platform.system().lower() == 'linux' and 'CI' not in os.environ:
 else:
 	import random
 
+	class HW(object):
+		def write8(self, a, b):
+			pass
+
 	class LSM303(object):
 		"""
 		Dummy interface for testing outside of linux/RPi where I don't have
 		access to I2C and the real sensor. Also, check to see if we are on
 		travis.ci which also doesn't have i2c access but is linux.
 		"""
-		def __init__(self):
+		def __init__(self, accel_address, mag_address):
 			random.seed()  # init for random data
+			self._mag = HW()
 
 		def read(self):
 			"""
@@ -35,8 +40,10 @@ else:
 			data = []
 			for i in range(6):
 				data.append(random.uniform(-2048, 2048))
-			accel = AHRS.normalize(*data[:3])
-			mag = AHRS.normalize(*data[3:])
+			# accel = AHRS.normalize(*data[:3])
+			# mag = AHRS.normalize(*data[3:])
+			accel = data[:3]
+			mag = data[3:]
 			return accel, mag
 
 

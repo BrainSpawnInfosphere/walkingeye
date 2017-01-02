@@ -13,13 +13,11 @@ class BallTracker(object):
 	# hsv colors to threshold on
 	greenLower = (29, 86, 6)
 	greenUpper = (64, 255, 255)
-	diameter = 6.7  # cm
+	diameter = 6.7  # diameter of average tennis ball in cm
 
 	def __init__(self, lower=(29, 86, 6), upper=(64, 255, 255), diameter=6.7):
 		"""
 		Tracks a ball in an image.
-
-
 		"""
 		self.greenLower = lower
 		self.greenUpper = upper
@@ -67,22 +65,25 @@ class BallTracker(object):
 
 
 class Command_BT(mp.Process):
-	def __init__(self, port):
+	pubport = None
+	subport = None
+
+	def __init__(self):
 		"""
 		"""
 		mp.Process.__init__(self)
-		self.port = port
 
-	# def init(self, port):
-	# 	self.port = port
+	def init(self, pport, sport):
+		self.pubport = pport
+		self.subport = sport
 
 	def run(self):
 		bt = BallTracker()
 
-		sub = zmq.Sub(topics='image_color', connect_to=('0.0.0.0', self.port))
-		pub = zmq.Pub(bind_to=('0.0.0.0', self.port+1))
+		sub = zmq.Sub(topics='image_color', connect_to=('0.0.0.0', self.subport))
+		pub = zmq.Pub(bind_to=('0.0.0.0', self.pubport))
 
-		print('Started {} on ports: {} {}'.format('Command_BT', self.port, self.port+1))
+		print('Started {} on ports: pub {} sub {}'.format('Command_BT', self.pubport, self.subport))
 
 		while True:
 			_, msg = sub.recvB64()
@@ -94,44 +95,15 @@ class Command_BT(mp.Process):
 					x, y = center
 					xx = x-width/2
 					yy = y-height/2
-					print('adjust:', xx, yy)
+					# print('adjust:', xx, yy)
 
 					t = Msg.Twist()
-					pub.pub(t)
+					pub.pub('command', t)
 					# print im.shape
 			sleep(0.01)
 
 
 if __name__ == '__main__':
-	s = zmq.Sub(topics='image_color', connect_to=('localhost', 9000))
-	while True:
-		bt = BallTracker()
-		try:
-			_, msg = s.recvB64()
-			if not msg:
-				# print tp, 'no message:', msg_miss
-				# msg_miss += 1
-				pass
-			elif 'image' in msg:
-				im = msg['image']
-				width, height, depth = im.shape
-				center, radius = bt.find(im)
-				if center:
-					cv2.circle(im, center, radius, (0, 255, 255), 2)
-					cv2.circle(im, center, 5, (0, 0, 255), -1)
-					cv2.line(im, (0, height/2), (width, height/2), (255, 255, 255), 1)
-					cv2.line(im, (320, 0), (320, 480), (255, 255, 255), 1)
-					x, y = center
-					print('adjust:', x-640/2, y-480/2)
-					print(im.shape)
-
-				cv2.imshow('Camera', im)
-				key = cv2.waitKey(10)
-				if key == ord('q'):
-					break
-
-		except (IOError, EOFError):
-			print('[-] Connection gone .... bye')
-			break
-
-	s.close()
+	bt = Command_BT()
+	bt.init(9000, 9001)
+	bt.start()
