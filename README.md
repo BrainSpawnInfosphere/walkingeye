@@ -51,6 +51,22 @@ together. To see how to use it, type:
 * Leg.py - forward/reverse kinematics
 * Gait.py - syncronization of how the 4 legs walk
 * Servo.py - talks to the XL-320 smart servos
+* ahrs - tilt compensated compass which gives roll, pitch, heading
+
+### docs
+
+Documentation and [ipython](http://jupyter.org/) notebooks that show how the
+code works. There is also other information on hardware.
+
+### tests
+
+`nose` unit tests ... just run `nosetests -vs *.py`.
+
+### pygecko
+
+Software using [pygecko](https://github.com/walchko/pygecko) to run the robot. It uses the basic driver files in the 
+main directory.
+
 
 ## Hardware
 

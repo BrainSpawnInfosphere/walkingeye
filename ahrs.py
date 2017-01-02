@@ -11,13 +11,9 @@ import os              # check we are not on travis.ci
 import platform        # determine linux or darwin (OSX)
 from math import cos, sin, pi, atan2, asin, sqrt
 from quaternions import Quaternion
-import pygecko.lib.ZmqClass as zmq
-import pygecko.lib.Messages as Msg
-import multiprocessing as mp
-from time import sleep
 
-if platform.system().lower() == 'linux' and 'TRAVISCI' not in os.environ:
-	# pip install adafruit-lsm303
+
+if platform.system().lower() == 'linux' and 'CI' not in os.environ:
 	from Adafruit_LSM303 import LSM303
 else:
 	import random
@@ -25,7 +21,8 @@ else:
 	class LSM303(object):
 		"""
 		Dummy interface for testing outside of linux/RPi where I don't have
-		access to I2C and the real sensor.
+		access to I2C and the real sensor. Also, check to see if we are on
+		travis.ci which also doesn't have i2c access but is linux.
 		"""
 		def __init__(self):
 			random.seed()  # init for random data
@@ -141,26 +138,6 @@ class AHRS(object):
 			heading *= 180/pi
 
 		return roll, pitch, heading
-
-
-class I2C(mp.Process):
-	def __init__(self, port):
-		"""
-		"""
-		mp.Process.__init__(self)
-		self.port = port
-
-	def run(self):
-		ahrs = AHRS()
-		pub = zmq.Pub(bind_to=('0.0.0.0', self.port))
-
-		while True:
-			msg = Msg.Compass()
-			r, p, h = ahrs.read(deg=True)
-			print('{:.4f} {:.4f} {:.4f}'.format(r, p, h))
-
-			pub.pub('compass', msg)
-			sleep(1)
 
 
 if __name__ == "__main__":

@@ -6,11 +6,12 @@
 ##############################################
 
 from __future__ import print_function
+import platform
 # from pygecko.servers.Vision import RobotCameraServer as CameraServer
 from Robot import pyGeckoQuadruped
 from ball_tracker import Command_BT
-from ahrs import I2C
-import platform
+sys.path.insert(0, os.path.abspath('..'))
+from I2C import I2C
 # import os
 
 
@@ -83,7 +84,6 @@ class CameraServer(mp.Process):
 		except KeyboardInterrupt:
 			print('Ctl-C ... exiting')
 			return
-
 
 
 """
