@@ -37,12 +37,19 @@ import time
 #   image_rect_color - color, rectified
 
 
-class CameraServer(mp.Process):
+"""
+This is an example of a ROS like launch file
+
+sometimes OpenCV doesn't like multiprocessing and crashes, the move to macOS
+Sierra has broken cv and mp.
+"""
+# class CameraServer(mp.Process):
+class CameraServer(object):
 	"""
 	Streams camera images as fast as possible
 	"""
 	def __init__(self, port='9100', camera_num=0, camera_type='cv'):
-		mp.Process.__init__(self)
+		# mp.Process.__init__(self)
 		self.epoch = dt.datetime.now()
 		# self.host = host
 		self.port = port
@@ -52,6 +59,9 @@ class CameraServer(mp.Process):
 		# self.logger = logging.getLogger('robot')
 
 		# self.epoch = dt.datetime.now()
+
+	def start(self): self.run()
+	def join(self): pass
 
 	def run(self):
 		pub = zmq.Pub(('0.0.0.0', self.port))
@@ -67,23 +77,14 @@ class CameraServer(mp.Process):
 		try:
 			while True:
 				ret, frame = camera.read()
-				jpeg = cv2.imencode('.jpg', frame)[1]  # jpeg compression
-				msg = Msg.Image(jpeg)
-				pub.pubB64('image_color', msg)
-				# print '[*] frame: %d k   jpeg: %d k'%(frame.size/1000,len(jpeg)/1000)
-				time.sleep(0.01)
+				msg = Msg.Image()
+				msg.img = frame
+				pub.pub('image_color', msg)
+				# time.sleep(0.01)
 
 		except KeyboardInterrupt:
 			print('Ctl-C ... exiting')
 			return
-
-
-"""
-This is an example of a ROS like launch file
-
-sometimes OpenCV doesn't like multiprocessing and crashes, the move to macOS
-Sierra has broken cv and mp.
-"""
 
 
 def robot():
@@ -106,28 +107,28 @@ def robot():
 
 	quad = pyGeckoQuadruped(test)
 
-	cmd = Command_BT()
-	cmd.init(command, image_color)
+	# cmd = Command_BT()
+	# cmd.init(command, image_color)
 
 	if platform.system().lower() == 'linux':
 		cs = CameraServer(port=image_color, camera_type='pi')
 	else:
 		cs = CameraServer(port=image_color, camera_type='cv')
 
-	i2c = I2C(ahrs)
+	# i2c = I2C(ahrs)
 
 	print('start processes -----------------------------')
 	# aud.start()
-	cmd.start()
+	# cmd.start()
 	quad.start()
-	i2c.start()
+	# i2c.start()
 	cs.start()
 
 	print('join processes ------------------------------')
 	cs.join()
-	cmd.join()
+	# cmd.join()
 	quad.join()
-	i2c.join()
+	# i2c.join()
 	# aud.join()
 
 

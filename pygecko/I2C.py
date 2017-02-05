@@ -15,9 +15,37 @@ import pygecko.lib.ZmqClass as zmq
 import pygecko.lib.Messages as Msg
 import multiprocessing as mp
 from time import sleep
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.abspath('..'))
 from ahrs import AHRS
+
+
+# maybe have every i2c sensor like this and then the i2c server can be
+# generic and run through an array of them
+class I2Ccomponent(object):
+	def __init__(self):
+		# do somethign to setup
+		self.sampletime = 0.010  # seconds
+		self.topic = 'my_topic'
+		pass
+
+	def __del__(self):
+		# cleanup?
+		pass
+
+	def read(self):
+		# get delta from last time
+
+		# is it time yet to read yet? if not return None
+
+		# read sensor and create zmq pub packet
+		pkt = {
+			'sensor': 'name',
+			'data': [1, 2]
+		}
+
+		return (pkt, self.topic)
 
 
 class I2C(mp.Process):
