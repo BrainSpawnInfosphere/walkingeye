@@ -80,8 +80,8 @@ class Command_BT(mp.Process):
 	def run(self):
 		bt = BallTracker()
 
-		sub = zmq.Sub(topics='image_color', connect_to=('0.0.0.0', self.subport))
-		pub = zmq.Pub(bind_to=('0.0.0.0', self.pubport))
+		sub = zmq.Sub(topics='image_color', connect_to=('0.0.0.0', self.subport), hwm=10)
+		# pub = zmq.Pub(bind_to=('0.0.0.0', self.pubport))
 
 		print('Started {} on ports: pub {} sub {}'.format('Command_BT', self.pubport, self.subport))
 
@@ -100,8 +100,10 @@ class Command_BT(mp.Process):
 					# t = Msg.Twist()
 					# pub.pub('command', t)
 					# print im.shape
+			else:
+				print('no image')
 
-			sleep(0.01)
+			sleep(1)
 
 
 if __name__ == '__main__':
