@@ -64,7 +64,7 @@ class CameraServer(object):
 	def join(self): pass
 
 	def run(self):
-		pub = zmq.Pub(('0.0.0.0', self.port))
+		pub = zmq.Pub(('192.168.1.39', self.port))
 		if self.camera_type is 'cv':
 			camera = Camera()
 			camera.init(cameraNumber=self.camera_num, win=(640, 480))
@@ -105,7 +105,7 @@ def robot():
 		'port': command
 	}
 
-	quad = pyGeckoQuadruped(test)
+	# quad = pyGeckoQuadruped(test)
 
 	# cmd = Command_BT()
 	# cmd.init(command, image_color)
@@ -120,14 +120,14 @@ def robot():
 	print('start processes -----------------------------')
 	# aud.start()
 	# cmd.start()
-	quad.start()
+	# quad.start()
 	# i2c.start()
 	cs.start()
 
 	print('join processes ------------------------------')
 	cs.join()
 	# cmd.join()
-	quad.join()
+	# quad.join()
 	# i2c.join()
 	# aud.join()
 
