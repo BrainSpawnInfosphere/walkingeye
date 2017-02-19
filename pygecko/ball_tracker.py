@@ -86,7 +86,7 @@ class Command_BT(mp.Process):
 		print('Started {} on ports: pub {} sub {}'.format('Command_BT', self.pubport, self.subport))
 
 		while True:
-			_, msg = sub.recvB64()
+			_, msg = sub.recv()
 			if msg:
 				im = msg['image']
 				width, height = im.shape[:2]
@@ -95,11 +95,12 @@ class Command_BT(mp.Process):
 					x, y = center
 					xx = x-width/2
 					yy = y-height/2
-					# print('adjust:', xx, yy)
+					print('adjust:', xx, yy)
 
-					t = Msg.Twist()
-					pub.pub('command', t)
+					# t = Msg.Twist()
+					# pub.pub('command', t)
 					# print im.shape
+
 			sleep(0.01)
 
 
