@@ -455,8 +455,10 @@ class Quadruped(mp.Process):
 		"""
 		mp.Process.__init__(self)
 		if 'serialPort' in data:
+			print('Using servo serial port: {}'.format(data['serialPort']))
 			self.ser = ServoSerial(data['serialPort'])
 		else:
+			print('Using dummy serial port!!!')
 			self.ser = DummySerial('test_port')
 
 		self.ser.open()

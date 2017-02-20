@@ -71,10 +71,11 @@ class ServoBase(object):
 
 	@staticmethod
 	def bulkWrite(ser):
+		print('Servo::bulkWrite()')
 		global gBulkData
 		pkt = makeBulkAnglePacket(gBulkData)
 		ser.write(pkt)
-		gBulkData = []
+		gBulkData = []  # clear global
 
 
 class Servo(ServoBase):

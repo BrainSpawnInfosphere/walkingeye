@@ -289,12 +289,12 @@ class Gait(object):
 		func is the quadruped move foot function for a specific leg
 		"""
 		# handle no movement command ... do else where?
-		if sqrt(cmd[0]**2 + cmd[1]**2 + cmd[2]**2) < 0.001:
-			for leg in range(0, 4):
-				moveFoot(leg, self.rest)  # move to resting position
-				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(leg, *(self.rest)))
-			# Servo.bulkWrite()
-			return
+		# if sqrt(cmd[0]**2 + cmd[1]**2 + cmd[2]**2) < 0.001:
+		# 	for leg in range(0, 4):
+		# 		moveFoot(leg, self.rest)  # move to resting position
+		# 		# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(leg, *(self.rest)))
+		# 	# Servo.bulkWrite()
+		# 	return
 
 		# cmd = [100.0, 0.0, 0.0]
 

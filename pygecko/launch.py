@@ -88,13 +88,14 @@ class CameraServer(object):
 
 
 def robot():
-	image_color = 9000
-	command = 9100
+	image_color = 9100
+	command = 9010
 	ahrs = 9200
 
 	test = {
 		# 'serialPort': '/dev/tty.usbserial-A5004Flb',  # original debug
 		# 'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
+		'serialPort': '/dev/serial0',  # new robot
 		'legLengths': {
 			'coxaLength': 45,
 			'femurLength': 55,
@@ -105,29 +106,29 @@ def robot():
 		'port': command
 	}
 
-	# quad = pyGeckoQuadruped(test)
+	quad = pyGeckoQuadruped(test)
 
 	# cmd = Command_BT()
 	# cmd.init(command, image_color)
 
-	if platform.system().lower() == 'linux':
-		cs = CameraServer(port=image_color, camera_type='pi')
-	else:
-		cs = CameraServer(port=image_color, camera_type='cv')
+	# if platform.system().lower() == 'linux':
+	# 	cs = CameraServer(port=image_color, camera_type='pi')
+	# else:
+	# 	cs = CameraServer(port=image_color, camera_type='cv')
 
 	# i2c = I2C(ahrs)
 
 	print('start processes -----------------------------')
 	# aud.start()
 	# cmd.start()
-	# quad.start()
+	quad.start()
 	# i2c.start()
-	cs.start()
+	# cs.start()
 
 	print('join processes ------------------------------')
-	cs.join()
+	# cs.join()
 	# cmd.join()
-	# quad.join()
+	quad.join()
 	# i2c.join()
 	# aud.join()
 
