@@ -18,6 +18,19 @@ Inspired by the original [Walking Eye](https://www.youtube.com/watch?v=f77gw2Pp3
 
 **Still a work in progress**
 
+## Current Pics
+
+** As of 2017 Feb 26 **
+
+![](pics/2017-02-26-robot-front.JPG)
+![](pics/2017-02-26-robot-top.JPG)
+![](pics/2017-02-26-robot-cat.JPG)
+![](pics/main-board-iso.JPG)
+![](pics/main-board-top.JPG)
+![](pics/main-board-botton.JPG)
+![](pics/2017-02-26-main-board.png)
+![](pics/2017-02-26-distribution-panel.png)
+
 ## Documentation
 
 Since the software is written in python, iPhython (or now
@@ -106,12 +119,13 @@ not shown here.
 | ---  | ---    | ---    | ---       | --- | ---   |
 | RPi v3                              | [Adafruit](https://www.adafruit.com) | 1 | $40 | $40 | Main board, has wifi and bluetooth already |
 | Pi Camera                           | [Adafruit](https://www.adafruit.com) | 1 | $30 | $30 | 8 Mpixel |
-| 5V, 2.5A Buck Converter (D24V22F5)  | [Pololu](https://www.pololu.com) | 1 | $10 | $10 | For powering the RPi |
-| 5V, 2.4A Buck Converter (D24V22F7)  | [Pololu](https://www.pololu.com) | 1 | $10 | $10 | For powering the xl-320 |
+| 5V, 5A Buck Converter (D24V22F5)    | [Pololu](https://www.pololu.com) | 1 | $10 | $10 | For powering the RPi |
+| 7.5V, 2.4A Buck Converter (D24V22F7)| [Pololu](https://www.pololu.com) | 1 | $10 | $10 | For powering the xl-320 |
 | Dynamixel xl-320 smart servo        | [RobotShop](https://www.robotshop.com) | 12 | $22 | $264 |  |
 | PS4 Controller                      | [Walmart](http://www.walmart.com) | 1 | $54 | $54 | |
 | Micro SD (32 GB)                    | [Walmart](http://www.walmart.com) | 1 | $12 | $12 | Raspbian |
 | 74LS241                             |                                   | 1 | $1 | $1 | Used to convert the RPi's RS232 into a RS485 port |
+| Small signal MOSFET                 |                                  | 1 | $1  |    | Used for 3.3V to 5V conversion |
 | 12V, 5A Wall Power Adaptor          | [Pololu](https://www.pololu.com) | 1 | $15 | $15 | So I don't have to always run off batteries |
 
 # PyGecko or ROS [Optional]
