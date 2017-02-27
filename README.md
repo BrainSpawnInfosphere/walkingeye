@@ -20,16 +20,27 @@ Inspired by the original [Walking Eye](https://www.youtube.com/watch?v=f77gw2Pp3
 
 ## Current Pics
 
-** As of 2017 Feb 26 **
+**As of 2017 Feb 26**
 
 ![](pics/2017-02-26-robot-front.JPG)
 ![](pics/2017-02-26-robot-top.JPG)
 ![](pics/2017-02-26-robot-cat.JPG)
+
+Between the mat with a grid in inches and my cat, you can get an idea of the size.
+
 ![](pics/main-board-iso.JPG)
+
+The 2 buck converts (5V and 7.5V) were really close to each other, so I stuck a piece of cardboard between them. To prevent the cardboard from slipping, I also used some tape to hold them in place. I will eventaully turn this into a real PCB once I am fully happy with it and do a better layout.
+
 ![](pics/main-board-top.JPG)
 ![](pics/main-board-bottom.JPG)
+
+Decent job of soldering and wire wrapping, however, the scrap of protoboard I was useing only had 1 mounting hole to put a nylon stand off in. So far the single mount point doesn't seem to be an issue.
+
 ![](pics/2017-02-26-main-board.png)
 ![](pics/2017-02-26-distribution-panel.png)
+
+My hand drawn circuit diagrams using some protoboard pictures I found on the internet. I will eventually turn these into PCB's and post the schematics (probably going to use EagleCAD since it is free).
 
 ## Documentation
 
@@ -128,7 +139,7 @@ not shown here.
 | Small signal MOSFET                 |                                  | 1 | $1  |    | Used for 3.3V to 5V conversion |
 | 12V, 5A Wall Power Adaptor          | [Pololu](https://www.pololu.com) | 1 | $15 | $15 | So I don't have to always run off batteries |
 
-# PyGecko or ROS [Optional]
+# PyGecko [Optional]
 
 ![Spiderbot_Processes](pics/Spiderbot_Processes.png)
 
