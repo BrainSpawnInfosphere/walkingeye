@@ -27,7 +27,7 @@ Inspired by the original [Walking Eye](https://www.youtube.com/watch?v=f77gw2Pp3
 ![](pics/2017-02-26-robot-cat.JPG)
 ![](pics/main-board-iso.JPG)
 ![](pics/main-board-top.JPG)
-![](pics/main-board-botton.JPG)
+![](pics/main-board-bottom.JPG)
 ![](pics/2017-02-26-main-board.png)
 ![](pics/2017-02-26-distribution-panel.png)
 
