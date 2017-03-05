@@ -9,9 +9,9 @@ from __future__ import print_function
 from __future__ import division
 # import time
 from math import pi
-from Quadruped import Quadruped
+from Engine import Engine
 from Gait import DiscreteRippleGait
-from ahrs import AHRS
+from ahrs import AHRS  # attitude and heading reference system
 
 ##########################
 
@@ -20,61 +20,62 @@ This is a simple demo that walks in a pre-defined path
 """
 
 
-class SimpleQuadruped(Quadruped):
+class SimpleQuadruped(object):
 	def __init__(self, data):
-		Quadruped.__init__(self, data)
-		self.ahrs = AHRS()
+		self.ahrs = AHRS()  # compass sensor
+		self.body = Engine(data)  # legs/servos
+		leg = self.body.getFoot0(0)
+		self.crawl = DiscreteRippleGait(45.0, leg, self.body.moveFoot)  # walking motion
 
-		self.robot = Quadruped(data)
-		leg = self.robot.legs[0].foot0
-		self.crawl = DiscreteRippleGait(45.0, leg)
+		# predefined walking path
 		self.path = [  # x,y,rot
-			[50, 0, 0],
-			[50, 0, 0],
-			[50, 0, 0],
-			[50, 0, 0],
-			[50, 0, 0],
-			[50, 0, 0],
-			[50, 0, 0],
-			[50, 0, 0],
-			[50, 0, 0],
-			[50, 0, 0],
+			[1.0, 0, 0],
+			[1.0, 0, 0],
+			[1.0, 0, 0],
+			[1.0, 0, 0],
+			[1.0, 0, 0],
+			[1.0, 0, 0],
+			[1.0, 0, 0],
+			[1.0, 0, 0],
+			[1.0, 0, 0],
+			[1.0, 0, 0],
 			[0, 0, pi/4],
 			[0, 0, pi/4],
 			[0, 0, pi/4],
 			[0, 0, -pi/4],
 			[0, 0, -pi/4],
 			[0, 0, -pi/4],
-			[-50, 0, 0],
-			[-50, 0, 0],
-			[-50, 0, 0],
-			[-50, 0, 0],
-			[-50, 0, 0],
-			[-50, 0, 0],
-			[-50, 0, 0],
-			[-50, 0, 0],
-			[-50, 0, 0],
-			[-50, 0, 0],
+			[-1.0, 0, 0],
+			[-1.0, 0, 0],
+			[-1.0, 0, 0],
+			[-1.0, 0, 0],
+			[-1.0, 0, 0],
+			[-1.0, 0, 0],
+			[-1.0, 0, 0],
+			[-1.0, 0, 0],
+			[-1.0, 0, 0],
+			[-1.0, 0, 0],
 		]
 
 	def run(self):
-		# run = True
-		# while run:
 		for pose in self.path:
 			x, y, rz = pose
-			leg = self.robot.legs[0].foot0
-			cmd = [x, y, rz]
-			print('***********************************')
-			print('* rest {:.2f} {:.2f} {:.2f}'.format(*leg))
-			print('* cmd {:.2f} {:.2f} {:.2f}'.format(*cmd))
-			print('***********************************')
-			self.crawl.command(cmd, self.robot.moveFoot, steps=12)
+			# leg = self.body.getFoot0
+			cmd = (x, y, rz)
 
 			# read ahrs
 			d = self.ahrs.read(deg=True)
-			print('\n\n<<<<<<<<<<<>>>>>>>>>>>')
-			print('ahrs', d)
-			print('<<<<<<<<<<<>>>>>>>>>>>\n\n')
+			roll, pitch, heading = d
+			if (-90.0 > roll > 90.0) or (-90.0 > pitch > 90.0):
+				print('Crap we flipped!!!')
+				cmd = (0, 0, 0)
+
+			print('***********************************')
+			# print('* rest {:.2f} {:.2f} {:.2f}'.format(*leg))
+			print('ahrs[deg]: roll {:.2f} pitch: {:.2f} yaw: {:.2f}'.format(d[0], d[1], d[2]))
+			print('* cmd {:.2f} {:.2f} {:.2f}'.format(*cmd))
+			print('***********************************')
+			self.crawl.command(cmd)
 
 
 def run():
