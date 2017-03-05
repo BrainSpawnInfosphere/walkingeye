@@ -18,32 +18,49 @@ from Servo import Servo
 logging.basicConfig(level=logging.ERROR)
 
 
+class LegException(Exception):
+	pass
+
+
 class Leg(object):
 	"""
 	"""
-	def __init__(self, lengths, channels, ser, limits, offsets):
+	# these are fixed by the 3D printing, not changing
+	coxaLength = 45.0
+	tibiaLength = 55.0
+	femurLength = 104.0
+	s_limits = [
+		[-90, 90],  # set limits
+		[-90, 90],
+		[-150, 0]
+	]
+	s_offsets = [150, 150, 150+90]  # angle offsets to line up with fk
+
+	def __init__(self, channels):
 		"""
 		Each leg has 3 servos/channels
 		"""
 		if not len(channels) == 3:
-			raise Exception('len(channels) != 3')
+			raise LegException('len(channels) != 3')
 
-		self.coxaLength = lengths['coxaLength']
-		self.tibiaLength = lengths['tibiaLength']
-		self.femurLength = lengths['femurLength']
+		# --- maybe put in an override to change lengths ------
+		# self.coxaLength = lengths['coxaLength']
+		# self.tibiaLength = lengths['tibiaLength']
+		# self.femurLength = lengths['femurLength']
+		# do limits and offsets too
 
-		# Create each servo and move it to the initial position
-		# servo arrange: coxa femur tibia
-		Servo.ser = ser
 		Servo.bulkServoWrite = True
+
+		# angle offsets to line up with fk
 		self.servos = []
 		for i in range(0, 3):
 			self.servos.append(Servo(channels[i]))
-			self.servos[i].setServoLimits(offsets[i], *limits[i])
+			self.servos[i].setServoLimits(self.s_offsets[i], *self.s_limits[i])
 
-		# initAngles = [0, 0, -90+30]  # nico legs have a small offset
-		initAngles = [0, 45, -90+30-45]  # nico legs have a small offset
+		initAngles = [0, 0, -90+30]  # nico legs have a small offset
+		# initAngles = [0, 45, -90+30-45]  # nico legs have a small offset
 		self.foot0 = self.fk(*initAngles)  # rest/idle position of the foot/leg
+		# print('foot0', self.foot0)
 
 	def __del__(self):
 		pass
@@ -131,7 +148,7 @@ class Leg(object):
 		# 	print('ik error:', e)
 		# 	raise e
 
-	def move(self, x, y, z):
+	def moveFoot(self, x, y, z):
 		"""
 		Attempts to move it's foot to coordinates [x,y,z]
 		"""
@@ -155,9 +172,9 @@ class Leg(object):
 			print (e)
 			raise
 
-	def reset(self):
-		# self.angles = self.resting_position
-		self.move(*self.foot0)
+	# def reset(self):
+	# 	# self.angles = self.resting_position
+	# 	self.move(*self.foot0)
 
 
 if __name__ == "__main__":

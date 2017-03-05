@@ -61,7 +61,7 @@ class pyGeckoQuadruped(Quadruped):
 			# msg values range between (-1, 1)
 			if msg and topic is 'js':
 				print('loop')
-				x, y, rz = (0, 0, 0)
+				x, y, rz = (1, 0, 0)
 				# ps4 = msg
 				# x, y = ps4['axes']['leftStick']
 				# rz = ps4['axes']['rightStick'][1]
@@ -112,7 +112,7 @@ def run():
 	# robot = pyGeckoQuadruped(test)
 	# robot.start()
 	# robot.join()
-	pass
+	print('Nothing to see here ... move along, move along')
 
 
 if __name__ == "__main__":

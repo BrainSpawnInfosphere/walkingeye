@@ -63,11 +63,12 @@ class ServoBase(object):
 
 	def __init__(self):
 		# just put a dummy serial here, because testing needs it in the angle setter
-		self.ser = DummySerial('test')
-		pass
+		if self.ser is None:
+			self.ser = DummySerial('test')
+		# pass
 
-	def setSerial(self, serialObj):
-		self.ser = serialObj
+	# def setSerial(self, serialObj):
+	# 	self.ser = serialObj
 
 	@staticmethod
 	def bulkWrite(ser):

@@ -11,19 +11,23 @@ from __future__ import division
 from math import pi
 from Quadruped import Quadruped
 from Gait import DiscreteRippleGait
+from ahrs import AHRS
 
 ##########################
+
+"""
+This is a simple demo that walks in a pre-defined path
+"""
 
 
 class SimpleQuadruped(Quadruped):
 	def __init__(self, data):
 		Quadruped.__init__(self, data)
+		self.ahrs = AHRS()
 
 		self.robot = Quadruped(data)
 		leg = self.robot.legs[0].foot0
 		self.crawl = DiscreteRippleGait(45.0, leg)
-		# self.crawl = ContinousRippleGait(5.0, leg)
-		# self.crawl.alpha = 0.5
 		self.path = [  # x,y,rot
 			[50, 0, 0],
 			[50, 0, 0],
@@ -66,19 +70,25 @@ class SimpleQuadruped(Quadruped):
 			print('***********************************')
 			self.crawl.command(cmd, self.robot.moveFoot, steps=12)
 
+			# read ahrs
+			d = self.ahrs.read(deg=True)
+			print('\n\n<<<<<<<<<<<>>>>>>>>>>>')
+			print('ahrs', d)
+			print('<<<<<<<<<<<>>>>>>>>>>>\n\n')
+
 
 def run():
 	# angles are always [min, max]
 	# xl-320
 	test = {
-		'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
-		'legLengths': {
-			'coxaLength': 45,
-			'femurLength': 55,
-			'tibiaLength': 104
-		},
-		'legAngleLimits': [[-90, 90], [-90, 90], [-150, 0]],
-		'legOffset': [150, 150, 150+90]
+		# 'serialPort': '/dev/serial0',  # real robot
+		# 'legLengths': {
+		# 	'coxaLength': 45,
+		# 	'femurLength': 55,
+		# 	'tibiaLength': 104
+		# },
+		# 'legAngleLimits': [[-90, 90], [-90, 90], [-150, 0]],
+		# 'legOffset': [150, 150, 150+90]
 	}
 
 	robot = SimpleQuadruped(test)
