@@ -18,6 +18,30 @@ Inspired by the original [Walking Eye](https://www.youtube.com/watch?v=f77gw2Pp3
 
 **Still a work in progress**
 
+## Current Pics
+
+**As of 2017 Feb 26**
+
+![](pics/2017-02-26-robot-front.JPG)
+![](pics/2017-02-26-robot-top.JPG)
+![](pics/2017-02-26-robot-cat.JPG)
+
+Between the mat with a grid in inches and my cat, you can get an idea of the size.
+
+![](pics/main-board-iso.JPG)
+
+The 2 buck converts (5V and 7.5V) were really close to each other, so I stuck a piece of cardboard between them. To prevent the cardboard from slipping, I also used some tape to hold them in place. I will eventaully turn this into a real PCB once I am fully happy with it and do a better layout.
+
+![](pics/main-board-top.JPG)
+![](pics/main-board-bottom.JPG)
+
+Decent job of soldering and wire wrapping, however, the scrap of protoboard I was useing only had 1 mounting hole to put a nylon stand off in. So far the single mount point doesn't seem to be an issue.
+
+![](pics/2017-02-26-main-board.png)
+![](pics/2017-02-26-distribution-panel.png)
+
+My hand drawn circuit diagrams using some protoboard pictures I found on the internet. I will eventually turn these into PCB's and post the schematics (probably going to use EagleCAD since it is free).
+
 ## Documentation
 
 Since the software is written in python, iPhython (or now
@@ -106,15 +130,16 @@ not shown here.
 | ---  | ---    | ---    | ---       | --- | ---   |
 | RPi v3                              | [Adafruit](https://www.adafruit.com) | 1 | $40 | $40 | Main board, has wifi and bluetooth already |
 | Pi Camera                           | [Adafruit](https://www.adafruit.com) | 1 | $30 | $30 | 8 Mpixel |
-| 5V, 2.5A Buck Converter (D24V22F5)  | [Pololu](https://www.pololu.com) | 1 | $10 | $10 | For powering the RPi |
-| 5V, 2.4A Buck Converter (D24V22F7)  | [Pololu](https://www.pololu.com) | 1 | $10 | $10 | For powering the xl-320 |
+| 5V, 5A Buck Converter (D24V22F5)    | [Pololu](https://www.pololu.com) | 1 | $10 | $10 | For powering the RPi |
+| 7.5V, 2.4A Buck Converter (D24V22F7)| [Pololu](https://www.pololu.com) | 1 | $10 | $10 | For powering the xl-320 |
 | Dynamixel xl-320 smart servo        | [RobotShop](https://www.robotshop.com) | 12 | $22 | $264 |  |
 | PS4 Controller                      | [Walmart](http://www.walmart.com) | 1 | $54 | $54 | |
 | Micro SD (32 GB)                    | [Walmart](http://www.walmart.com) | 1 | $12 | $12 | Raspbian |
 | 74LS241                             |                                   | 1 | $1 | $1 | Used to convert the RPi's RS232 into a RS485 port |
+| Small signal MOSFET                 |                                  | 1 | $1  |    | Used for 3.3V to 5V conversion |
 | 12V, 5A Wall Power Adaptor          | [Pololu](https://www.pololu.com) | 1 | $15 | $15 | So I don't have to always run off batteries |
 
-# PyGecko or ROS [Optional]
+# PyGecko [Optional]
 
 ![Spiderbot_Processes](pics/Spiderbot_Processes.png)
 
