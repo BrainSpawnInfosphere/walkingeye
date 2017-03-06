@@ -5,6 +5,7 @@
 # see LICENSE for full details
 ##############################################
 
+from __future__ import division
 from __future__ import print_function
 import platform
 from Robot import pyGeckoQuadruped
@@ -12,16 +13,9 @@ from ball_tracker import Command_BT
 import sys
 import os
 sys.path.insert(0, os.path.abspath('..'))
-from I2C import I2C
-# import os
-
-
-
-# from __future__ import print_function
-# from __future__ import division
-import pygecko.lib.ZmqClass as zmq
+from pygecko.lib import ZmqClass as zmq
 from pygecko.lib import Messages as Msg
-import multiprocessing as mp
+# import multiprocessing as mp
 # import logging
 import datetime as dt
 import cv2
@@ -88,22 +82,22 @@ class CameraServer(object):
 
 
 def robot():
-	image_color = 9100
-	command = 9010
-	ahrs = 9200
+	# image_color = 9100
+	# command = 9010
+	# ahrs = 9200
 
 	test = {
 		# 'serialPort': '/dev/tty.usbserial-A5004Flb',  # original debug
 		# 'serialPort': '/dev/tty.usbserial-A700h2xE',  # robot
 		'serialPort': '/dev/serial0',  # new robot
-		'legLengths': {
-			'coxaLength': 45,
-			'femurLength': 55,
-			'tibiaLength': 104
-		},
-		'legAngleLimits': [[-90, 90], [-90, 90], [-150, 0]],
-		'legOffset': [150, 150, 150+90],
-		'port': command
+		# 'legLengths': {
+		# 	'coxaLength': 45,
+		# 	'femurLength': 55,
+		# 	'tibiaLength': 104
+		# },
+		# 'legAngleLimits': [[-90, 90], [-90, 90], [-150, 0]],
+		# 'legOffset': [150, 150, 150+90],
+		# 'port': command
 	}
 
 	quad = pyGeckoQuadruped(test)
@@ -116,20 +110,16 @@ def robot():
 	# else:
 	# 	cs = CameraServer(port=image_color, camera_type='cv')
 
-	# i2c = I2C(ahrs)
-
 	print('start processes -----------------------------')
 	# aud.start()
 	# cmd.start()
 	quad.start()
-	# i2c.start()
 	# cs.start()
 
 	print('join processes ------------------------------')
 	# cs.join()
 	# cmd.join()
 	quad.join()
-	# i2c.join()
 	# aud.join()
 
 

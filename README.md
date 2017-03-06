@@ -88,7 +88,7 @@ code works. There is also other information on hardware.
 
 ### pygecko
 
-Software using [pygecko](https://github.com/walchko/pygecko) to run the robot. It uses the basic driver files in the 
+Software using [pygecko](https://github.com/walchko/pygecko) to run the robot. It uses the basic driver files in the
 main directory.
 
 
