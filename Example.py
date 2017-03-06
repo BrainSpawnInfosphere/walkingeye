@@ -82,7 +82,7 @@ def run():
 	# angles are always [min, max]
 	# xl-320
 	test = {
-		# 'serialPort': '/dev/serial0',  # real robot
+		'serialPort': '/dev/serial0',  # real robot
 		# 'legLengths': {
 		# 	'coxaLength': 45,
 		# 	'femurLength': 55,

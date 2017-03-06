@@ -18,7 +18,8 @@ import time
 def rot_z_tuple(t, c):
 	"""
 	t - theta [radians]
-	c - [x,y,z] or [x,y] ... the function detects 2D or 3D vector
+	c - [x,y,z]
+	return - (x,y,z) tuple rotated about z-axis
 	"""
 	ans = (
 		c[0]*cos(t)-c[1]*sin(t),
@@ -33,7 +34,8 @@ def rot_z_tuple(t, c):
 def rot_z(t, c):
 	"""
 	t - theta [radians]
-	c - [x,y,z] or [x,y] ... the function detects 2D or 3D vector
+	c - [x,y,z]
+	return - [x,y,z] numpy array rotated about z-axis
 	"""
 	ans = np.array([
 		c[0]*cos(t)-c[1]*sin(t),
@@ -80,7 +82,8 @@ class Gait(object):
 			for leg in range(0, 4):
 				self.moveFoot(leg, self.rest)  # move to resting position
 				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(leg, *(self.rest)))
-			Servo.bulkWrite()
+			# Servo.bulkWrite()
+			Servo.syncWrite(Servo.ser)
 			return
 
 		self.oneCyle(x, y, rz)
@@ -144,7 +147,7 @@ class DiscreteRippleGait(Gait):
 			# corr = Correction()
 			# c = corr.calcCorrection(footPos)
 			# feet = corr.rotateFeetCorrected(footPos, c)
-			
+
 			feet = footPos
 			print('----------------------------')
 			for foot in feet:
@@ -153,7 +156,8 @@ class DiscreteRippleGait(Gait):
 				self.moveFoot(legNum, ft)
 				print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *ft))
 
-			Servo.bulkWrite(Servo.ser)
+			# Servo.bulkWrite(Servo.ser)
+			Servo.syncWrite(Servo.ser)
 			time.sleep(0.1)
 
 

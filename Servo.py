@@ -9,6 +9,7 @@ from __future__ import print_function
 from __future__ import division
 import logging
 from pyxl320 import Packet
+from pyxl320.Packet import makeSyncAnglePacket
 from pyxl320 import DummySerial
 from pyxl320 import xl320
 
@@ -44,6 +45,7 @@ def makeBulkAnglePacket(info):
 # I don't like global variables, but I don't know how else to have one array
 # shared by all servos and have one simple class method to push updates
 gBulkData = []
+gSyncData = []  # this is much less data than bulk
 
 
 class ServoBase(object):
@@ -59,6 +61,7 @@ class ServoBase(object):
 	"""
 	ser = None
 	bulkServoWrite = False
+	syncServoWrite = False
 	# bulkData = [0]
 
 	def __init__(self):
@@ -77,6 +80,14 @@ class ServoBase(object):
 		pkt = makeBulkAnglePacket(gBulkData)
 		ser.write(pkt)
 		gBulkData = []  # clear global
+
+	@staticmethod
+	def syncWrite(ser):
+		print('Servo::syncWrite()')
+		global gSyncData
+		pkt = makeSyncAnglePacket(gSyncData)
+		ser.write(pkt)
+		gSyncData = []
 
 
 class Servo(ServoBase):
@@ -138,9 +149,10 @@ class Servo(ServoBase):
 			# servos are centered at 150 deg, but offset can change
 			# print(self.ID, angle, angle + self._offset)
 
-			if self.bulkServoWrite:
+			if self.syncServoWrite:
 				# global gBulkData
-				gBulkData.append([self.ID, angle + self._offset])
+				# gBulkData.append([self.ID, angle + self._offset])
+				gSyncData.append([self.ID, angle + self._offset])
 				# self.bulkData.append([self.ID, angle + self._offset])
 				# print('servo[{}]: bulkWrite {}'.format(self.ID, gBulkData))
 			else:
