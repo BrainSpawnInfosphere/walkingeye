@@ -1,11 +1,17 @@
 # History
 
+**Mar 2017**
+
+My [pololu](http://www.pololu.com) 7.5V 2.5A power supply doesn't work. When all 12 servos
+move, the power system brown out. Had to switch to a crazyhorse 7.2V 5A power supply. So
+far it seems to work nicely.
+
+**Aug 2016**
+
 Originally, this used toy RC servos (9 g's), they didn't work that great.
 
 ![](pics/rc-spider-1.jpg)
 ![](pics/rc-spider-2.jpg)
-
-[Index](./index.md)
 
 ---
 

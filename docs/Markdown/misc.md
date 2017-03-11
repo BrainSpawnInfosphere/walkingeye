@@ -79,3 +79,5 @@ Params: i2c_gpio_sda            GPIO used for I2C data (default "23")
 
         i2c_gpio_delay_us       Clock delay in microseconds
                                 (default "2" = ~100kHz)
+
+pandoc *.md -f markdown -t html -s --highlight-style pygments --mathjax -o test/index.html
