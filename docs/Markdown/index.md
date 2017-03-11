@@ -1,2 +1,3 @@
 # Index
 
+- [History](./history.md)
