@@ -38,6 +38,19 @@ code works. There is also other information on hardware.
 Software using [pygecko](https://github.com/walchko/pygecko) to run the robot. It uses the basic driver files in the
 main directory.
 
+# PyGecko [Optional]
+
+![Spiderbot_Processes](pics/Spiderbot_Processes.png)
+
+You can also use this driver with [PyGecko](https://github.com/walchko/pygecko)
+(or [ROS](http://www.ros.org) if you write the interface), see the `pygecko`
+folder for an example. PyGecko is a simple ROS like system written in python.
+
+	pip install pygecko
+	pip install adafruit-lsm303
+
+Follow the other installation instructions for pygecko, will requires
+[ZeroMQ](http://zeromq.org/) and some other libraries to be installed to work.
 
 ---
 
