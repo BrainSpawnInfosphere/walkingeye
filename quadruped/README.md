@@ -1,11 +1,32 @@
 # Software
 
+**Issue:** Anything that has opencv in it *can't* be derived from `process`, opencv
+crashes. It has to be in it's own python script *or* be derived from `object`.
+
 Simple layout of the code:
+
+- ImageServer:
+	- allows image processing to be done off-board
+		- allows commands to also come from a completely different type of input
+		(joystick) without robot modification
+	- grabs image
+	- searches for:
+		- tennis ball
+		- people's faces
+	- publishes:
+		- images
+		- commands to robot
+
+- Audio:
+	- listen for speach
+	- convert to wave format
+	- send to service (wit or whatever)
+	- 
 
 - Quadruped:
 	- Engine({serial})
-	- I2C()
-	- IR()
+	- AHRS() - compass
+	- MCP3208() - ADC for IR and whatever else
 	- movement_states['walk', 'climb', 'animate', 'sit', 'stand']
 		- these are used to call movements[] functions using command()
 	- movements[]

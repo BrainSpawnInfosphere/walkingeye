@@ -5,7 +5,7 @@ from __future__ import print_function
 import cv2
 import pygecko.lib.ZmqClass as zmq
 import pygecko.lib.Messages as Msg
-import multiprocessing as mp
+# import multiprocessing as mp
 from time import sleep
 
 

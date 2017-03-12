@@ -14,8 +14,8 @@ from pyxl320 import DummySerial
 from Servo import Servo
 
 
-class RobotException(Exception):
-	pass
+# class RobotException(Exception):
+# 	pass
 
 
 class Engine(object):
@@ -24,7 +24,7 @@ class Engine(object):
 
 	This is the low level driver that can be executed w/o using pyGecko.
 	"""
-	def __init__(self, data):
+	def __init__(self, data={}):
 		"""
 		Sets up all 4 legs and servos. Also setups limits for angles and servo
 		pulses.

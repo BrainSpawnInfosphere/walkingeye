@@ -18,6 +18,8 @@ if platform.system().lower() == 'linux' and 'CI' not in os.environ:
 else:
 	import random
 
+	print('WARNING: Using fake LSM303 (compass) library')
+	
 	class HW(object):
 		def write8(self, a, b):
 			pass
