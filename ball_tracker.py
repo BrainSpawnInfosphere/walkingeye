@@ -1,12 +1,16 @@
 #!/usr/bin/env python
-
+##############################################
+# The MIT License (MIT)
+# Copyright (c) 2016 Kevin Walchko
+# see LICENSE for full details
+##############################################
 from __future__ import division
 from __future__ import print_function
 import cv2
-import pygecko.lib.ZmqClass as zmq
-import pygecko.lib.Messages as Msg
+# import pygecko.lib.ZmqClass as zmq
+# import pygecko.lib.Messages as Msg
 # import multiprocessing as mp
-from time import sleep
+# from time import sleep
 
 
 class BallTracker(object):
@@ -65,65 +69,65 @@ class BallTracker(object):
 
 
 # class Command_BT(mp.Process):
-class Command_BT(object):
-	pubport = None
-	subport = None
-
-	def __init__(self, pport, sport):
-		"""
-		"""
-		# mp.Process.__init__(self)
-		self.pubport = pport
-		self.subport = sport
-
-	# def init(self, pport, sport):
-	# 	self.pubport = pport
-	# 	self.subport = sport
-
-	def start(self):
-		self.run()
-
-	def join(self):
-		pass
-
-	def run(self):
-		bt = BallTracker()
-
-		sub = zmq.Sub(
-			topics=['image_color'],
-			connect_to=('zoidberg.local', self.subport),
-			hwm=1)
-		# pub = zmq.Pub(bind_to=('0.0.0.0', self.pubport))
-
-		print('Started {} on ports: pub {} sub {}'.format('Command_BT', self.pubport, self.subport))
-
-		while True:
-			tpc, msg = sub.recv()
-			if msg:
-				# print('Topic:', tpc, type(msg))
-				im = msg.img
-				width, height = im.shape[:2]
-				center, radius = bt.find(im)
-				if center and radius > 10:
-					x, y = center
-					xx = x-width/2
-					yy = y-height/2
-
-					if True:
-						print('adjust:', xx, yy)
-						cv2.circle(im, (x, y), 10, (0, 0, 255), -1)
-						cv2.imshow('Camera', im)
-						cv2.waitKey(1)
-
-					# t = Msg.Twist()
-					# pub.pub('command', t)
-					# print im.shape
-			else:
-				print('no image')
-
-			sleep(1)
-
-
-if __name__ == '__main__':
-	bt = Command_BT(9000, 9100)
-	bt.start()
+# class Command_BT(object):
+# 	pubport = None
+# 	subport = None
+#
+# 	def __init__(self, pport, sport):
+# 		"""
+# 		"""
+# 		# mp.Process.__init__(self)
+# 		self.pubport = pport
+# 		self.subport = sport
+#
+# 	# def init(self, pport, sport):
+# 	# 	self.pubport = pport
+# 	# 	self.subport = sport
+#
+# 	def start(self):
+# 		self.run()
+#
+# 	def join(self):
+# 		pass
+#
+# 	def run(self):
+# 		bt = BallTracker()
+#
+# 		sub = zmq.Sub(
+# 			topics=['image_color'],
+# 			connect_to=('zoidberg.local', self.subport),
+# 			hwm=1)
+# 		# pub = zmq.Pub(bind_to=('0.0.0.0', self.pubport))
+#
+# 		print('Started {} on ports: pub {} sub {}'.format('Command_BT', self.pubport, self.subport))
+#
+# 		while True:
+# 			tpc, msg = sub.recv()
+# 			if msg:
+# 				# print('Topic:', tpc, type(msg))
+# 				im = msg.img
+# 				width, height = im.shape[:2]
+# 				center, radius = bt.find(im)
+# 				if center and radius > 10:
+# 					x, y = center
+# 					xx = x-width/2
+# 					yy = y-height/2
+#
+# 					if True:
+# 						print('adjust:', xx, yy)
+# 						cv2.circle(im, (x, y), 10, (0, 0, 255), -1)
+# 						cv2.imshow('Camera', im)
+# 						cv2.waitKey(1)
+#
+# 					# t = Msg.Twist()
+# 					# pub.pub('command', t)
+# 					# print im.shape
+# 			else:
+# 				print('no image')
+#
+# 			sleep(1)
+#
+#
+# if __name__ == '__main__':
+# 	bt = Command_BT(9000, 9100)
+# 	bt.start()

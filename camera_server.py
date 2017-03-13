@@ -8,14 +8,15 @@
 from __future__ import division
 from __future__ import print_function
 from ball_tracker import BallTracker
+from face_detector import FaceDetector
 from pygecko.lib import ZmqClass as zmq
 from pygecko.lib import Messages as Msg
 from opencvutils.video import Camera
 import platform
-from time import sleep
+# from time import sleep
 
 
-# --- topics --------------------------------------------------------------
+# --- ROS topics --------------------------------------------------------------
 #   image_raw - raw data from the camera driver, possibly Bayer encoded
 #   image            - monochrome, distorted
 #   image_color      - color, distorted
@@ -40,6 +41,8 @@ class CameraServer(object):
 			exit()
 
 		self.balltracker = BallTracker()
+
+		self.face = FaceDetector()
 
 	def __del__(self):
 		if self.camera:
@@ -75,7 +78,18 @@ class CameraServer(object):
 					msg.set(xx, yy, 0)
 					pub_ball.pub('ball', msg)
 
-				sleep(0.01)
+				faces = self.face.find(frame)
+				if len(faces) > 0:
+					print('found a face!', faces, type(faces))
+					# msg = Msg.Array()
+					# msg.array = [[1,2,3,4], [4,5,6,7]]
+					# msg.array = list(faces)
+					# msg.array = faces
+					# print('msg >>', msg, type(msg.array))
+					# pub_ball.pub('faces', msg)
+					# print(msg)
+
+				# sleep(0.01)
 
 		except KeyboardInterrupt:
 			print('Ctl-C ... exiting')
