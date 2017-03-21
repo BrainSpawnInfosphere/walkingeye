@@ -44,7 +44,7 @@ class pyGeckoQuadruped(mp.Process):
 	sub_cmd       = ('0.0.0.0', 9110)
 	telemetry_pub = ('0.0.0.0', 9120)
 
-	def __init__(self, data):
+	def __init__(self, data={}):
 		mp.Process.__init__(self)
 		# self.ahrs = AHRS()  # compass sensor
 		self.robot = Engine(data)
