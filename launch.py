@@ -7,7 +7,7 @@
 
 from __future__ import division
 from __future__ import print_function
-from Brain import pyGeckoQuadruped
+from Example import pyGeckoQuadruped
 from camera_server import CameraServer
 
 

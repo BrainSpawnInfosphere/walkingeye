@@ -10,7 +10,7 @@ from __future__ import division
 from nose.tools import raises
 import sys
 sys.path.insert(0, '..')
-from Servo import Servo
+from quadruped.Servo import Servo
 # from pyxl320 import DummySerial
 
 

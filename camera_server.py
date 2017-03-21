@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 ##############################################
 # The MIT License (MIT)
 # Copyright (c) 2016 Kevin Walchko
@@ -9,8 +10,8 @@ from __future__ import division
 from __future__ import print_function
 from ball_tracker import BallTracker
 from face_detector import FaceDetector
-from pygecko.lib import ZmqClass as zmq
-from pygecko.lib import Messages as Msg
+from pygecko import ZmqClass as zmq
+from pygecko import Messages as Msg
 from opencvutils.video import Camera
 import platform
 # from time import sleep

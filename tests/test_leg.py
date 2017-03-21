@@ -8,7 +8,7 @@ import numpy as np
 from math import sqrt
 
 sys.path.insert(0, '..')
-from Leg import Leg
+from quadruped.Leg import Leg
 
 
 def test_fk_ik():

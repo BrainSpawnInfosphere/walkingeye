@@ -13,6 +13,6 @@ install:
     - pip install -U pip setuptools
     - pip install -U pyxl320 quaternions
 # command to run tests
-script: cd tests && nosetests -v *.py
+# script: cd tests && nosetests -v *.py
 # script: nosetests -v -w test/
-# script: true
+script: true
