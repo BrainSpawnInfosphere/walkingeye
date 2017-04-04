@@ -7,15 +7,17 @@
 
 from __future__ import print_function
 from __future__ import division
-import os              # check we are not on travis.ci
-import platform        # determine linux or darwin (OSX)
+# import os              # check we are not on travis.ci
+# import platform        # determine linux or darwin (OSX)
 from math import cos, sin, pi, atan2, asin, sqrt
 from quaternions import Quaternion
 
 
-if platform.system().lower() == 'linux' and 'CI' not in os.environ:
+# if platform.system().lower() == 'linux' and 'CI' not in os.environ:
+try:
 	from Adafruit_LSM303 import LSM303
-else:
+# else:
+except ImportError:
 	import random
 
 	print('WARNING: Using fake LSM303 (compass) library')
