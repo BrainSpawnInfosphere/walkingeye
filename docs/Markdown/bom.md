@@ -36,7 +36,7 @@ The 3d printer models (stl format) come from the following sources:
 | xl-320        | 7.5         | 1000         | 7.5       |
 | IMU           | 3.3         | x            |           |
 | Audio Amp     | 5           | 600          | 3         |
-|
+
 
 # Cost
 
