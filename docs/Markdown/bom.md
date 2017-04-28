@@ -25,18 +25,6 @@ The 3d printer models (stl format) come from the following sources:
 * [Legs](https://github.com/mogillc/nico) which are the coxa, femur, and tibia
 * Misc brackets I made using [OpenScad](http://www.openscad.org/)
 
-# Power
-
-| Part          | Voltage (V) | Current (mA) | Power (W) |
-|---            |---          |---           |---        |
-| RPi           | 5           | 2000         | 10        |
-| Pi Camera     |             |              |           |
-| 5V Converter  | 7.5         |              |           |
-| 7.5V Converter| 12          |              |           |
-| xl-320        | 7.5         | 1000         | 7.5       |
-| IMU           | 3.3         | x            |           |
-| Audio Amp     | 5           | 600          | 3         |
-
 
 # Cost
 
