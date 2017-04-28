@@ -10,9 +10,7 @@ I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/produc
 * 802.11n Wifi
 * Bluetooth 4.1 BLE
 
-However, I have done a little testing and it looks like the Pi Zero **might** be
-powerful enough to do the job too. When I get more time, I will investigate it
-more.
+![](pics/sider_pinout.jpg)
 
 ## Pi Camera
 
