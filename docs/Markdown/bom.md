@@ -2,7 +2,7 @@
 
 ![system layout](pics/system_layout.png)
 
-### Raspberry Pi
+## Raspberry Pi
 
 I am currently using a 1.2 GHz quad core [RPi 3](https://www.adafruit.com/products/3055)
 (ARMv8) as the main board running the lite version of Raspbian. It has on-board:
@@ -14,7 +14,7 @@ However, I have done a little testing and it looks like the Pi Zero **might** be
 powerful enough to do the job too. When I get more time, I will investigate it
 more.
 
-### Pi Camera
+## Pi Camera
 
 [PiCamera](https://www.adafruit.com/products/3099) is used to stream images.
 
@@ -25,7 +25,20 @@ The 3d printer models (stl format) come from the following sources:
 * [Legs](https://github.com/mogillc/nico) which are the coxa, femur, and tibia
 * Misc brackets I made using [OpenScad](http://www.openscad.org/)
 
-### Cost
+# Power
+
+| Part          | Voltage (V) | Current (mA) | Power (W) |
+|---            |---          |---           |---        |
+| RPi           | 5           | 2000         | 10        |
+| Pi Camera     |             |              |           |
+| 5V Converter  | 7.5         |              |           |
+| 7.5V Converter| 12          |              |           |
+| xl-320        | 7.5         | 1000         | 7.5       |
+| IMU           | 3.3         | x            |           |
+| Audio Amp     | 5           | 600          | 3         |
+|
+
+# Cost
 
 Here is a parts list of **key components** that I am using. I am not listing
 wires, bread boards, cables, etc. Also note, I have rounded up the costs
