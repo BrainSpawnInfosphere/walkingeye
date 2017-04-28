@@ -21,6 +21,7 @@ them and have Jupyter installed, they are interactive and pretty cool.
 
 - [Software](./software.md)
 - [Hardware](./bom.md)
+- [Power](./power.md)
 - [History](./history.md)
 
 
