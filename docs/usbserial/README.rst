@@ -1,7 +1,7 @@
 USB Serial
 =============
 
-.. figure:: ./usberial.png
+.. figure:: ./usbserial.png
 	:align: center
 
 RPi v3: ``/dev/tty.????``
