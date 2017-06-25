@@ -11,11 +11,11 @@ import numpy as np
 from math import sin, cos, acos, atan2, sqrt, pi, fabs
 from math import radians as d2r
 from math import degrees as r2d
-import logging
+# import logging
 from Servo import Servo
 
 # logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(level=logging.ERROR)
+# logging.basicConfig(level=logging.ERROR)
 
 
 class LegException(Exception):
