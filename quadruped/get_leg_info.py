@@ -9,134 +9,16 @@
 from __future__ import print_function, division
 from pyxl320 import ServoSerial
 from pyxl320.Packet import le, makeReadPacket
-from pyxl320.xl320 import ErrorStatusMsg
 import argparse
 import simplejson as json
 from serial import SerialException
 import sys
-# from pprint import pprint
-
-
-class PacketDecoder(object):
-	F = 0
-	C = 1
-
-	def __init__(self, pkt, offset=0):
-		self.id = pkt[4]  # save servo ID
-		self.instr = pkt[7]  # should be 0x55 (85) for status packet
-		self.len = self.get16b(pkt[5], pkt[6]) - 4  # don't count: instr, error, crc[0,1]
-		self.pkt = pkt[9:-2]  # remove header, crc, and other stuff ... keep only data section
-		self.offset = offset
-		self.error = pkt[8]  # should be 0 if all is well
-
-		# print('data len', self.len)
-		# print('len', len(self.pkt))
-		# print('type', self.type)
-
-	def checkError(self):
-		"""
-		Does the return status packet say there is an error?
-
-		return:
-			True: there is an error and prints info to std out
-			False: all is good with the world ... turtles all the way down
-		"""
-		# ID = pkt[4]
-		# instr = pkt[7]
-		# err = pkt[8]
-		if self.instr == 0x55:
-			if self.error == 0x00:
-				return False
-			else:
-				print('Servo[{}]: {}'.format(self.id, ErrorStatusMsg[self.error]))
-				return True
-		else:
-			print('Servo[{}]: did not give a status message'.format(self.id))
-			return True
-		return True
-
-	@staticmethod
-	def check_base(base):
-		if base < 0:
-			raise Exception('PacketDecoder::base < 0')
-
-	@staticmethod
-	def get16b(low, high):
-		return (high << 8) + low
-
-	def getBase(self, reg):
-		base = reg - self.offset
-
-		if base < 0:
-			raise Exception('PacketDecoder::base < 0')
-
-		if base >= self.len:
-			raise Exception('PacketDecoder::packet not long enough to access this packet')
-
-		return base
-
-	def voltage(self):
-		base = self.getBase(45)
-		return self.pkt[base]/10
-
-	def angle(self):
-		base = self.getBase(37)
-		return self.get16b(self.pkt[base], self.pkt[base+1])/1023 * 300.0
-
-	def load(self):
-		base = 41-self.offset
-		self.check_base(base)
-		load = self.get16b(self.pkt[base], self.pkt[base+1])
-		direction = 'CW' if (load & 1024) == 1024 else 'CCW'
-		percent = (load & 1023)/1023 * 100
-		return percent, direction
-
-	def temperature(self, scale=0):
-		base = 46-self.offset
-		self.check_base(base)
-		temp = 0.0
-		if scale == self.F:
-			temp = self.pkt[base]*9/5+32
-		else:
-			temp = self.pkt[base]*1.0
-		return temp
-
-	def hw_error(self):
-		base = 50-self.offset
-		self.check_base(base)
-		return self.pkt[base]
-
-
-def returnPktError(pkt):
-	"""
-	Does the return status packet say there is an error?
-
-	return:
-		True: there is an error and prints info to std out
-		False: all is good with the world ... turtles all the way down
-	"""
-	ID = pkt[4]
-	instr = pkt[7]
-	err = pkt[8]
-	if instr == 0x55:
-		if err == 0x00:
-			return False
-		else:
-			print('Servo[{}]: {}'.format(ID, ErrorStatusMsg[err]))
-			return True
-	else:
-		print('Servo[{}]: did not get a status message')
-		return True
-	return True
+from packetDecoder import PacketDecoder
 
 
 def writeToFile(data, filename='data.json'):
 	with open(filename, 'w') as outfile:
 		json.dump(data, outfile)
-
-
-# def get16b(l, h):
-# 	return (h << 8) + l
 
 
 def pktToDict(p):
@@ -229,9 +111,12 @@ def getSingle(ID, ser):
 	if ans:
 		ans = ans[0]
 		pd = PacketDecoder(ans, 37)  # data packet starts at register 37
+		# pd.printPacket()
 		if pd.checkError():
 			raise Exception('Crap!')
 		ans = pktToDict(pd)
+	else:
+		ans = None
 
 	return ans
 
