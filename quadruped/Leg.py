@@ -36,18 +36,17 @@ class Leg(object):
 	]
 	s_offsets = [150, 150, 150+90]  # angle offsets to line up with fk
 
+	sit_raw = (150, 270, 100)
+	stand_raw = (150, 175, 172)
+	sit_angles = None
+	stand_angles = None
+
 	def __init__(self, channels):
 		"""
 		Each leg has 3 servos/channels
 		"""
 		if not len(channels) == 3:
 			raise LegException('len(channels) != 3')
-
-		# --- maybe put in an override to change lengths ------
-		# self.coxaLength = lengths['coxaLength']
-		# self.tibiaLength = lengths['tibiaLength']
-		# self.femurLength = lengths['femurLength']
-		# do limits and offsets too
 
 		Servo.bulkServoWrite = True
 
@@ -57,13 +56,22 @@ class Leg(object):
 			self.servos.append(Servo(channels[i]))
 			self.servos[i].setServoLimits(self.s_offsets[i], *self.s_limits[i])
 
-		initAngles = [0, 0, -90+30]  # nico legs have a small offset
+		self.sit_angles = self.convertRawAngles(*self.sit_raw)
+		# initAngles = [0, 0, -90+30]  # nico legs have a small offset
 		# initAngles = [0, 45, -90+30-45]  # nico legs have a small offset
+		initAngles = self.convertRawAngles(*self.stand_raw)
+		self.stand_angles = initAngles
 		self.foot0 = self.fk(*initAngles)  # rest/idle position of the foot/leg
 		# print('foot0', self.foot0)
 
 	def __del__(self):
 		pass
+
+	def sit(self):
+		self.moveFootAngles(*self.sit_angles)
+
+	def stand(self):
+		self.moveFootAngles(*self.stand_angles)
 
 	def convertRawAngles(self, a, b, c):
 		return (a-self.s_offsets[0], b-self.s_offsets[1], c-self.s_offsets[2])

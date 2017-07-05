@@ -69,37 +69,31 @@ class ServoBase(object):
 		if self.ser is None:
 			# self.ser = DummySerial('test')
 			raise Exception('ServoBase::__init__() no serial port')
-		# pass
 
-	# def setSerial(self, serialObj):
-	# 	self.ser = serialObj
-
-	@staticmethod
-	def bulkWrite(ser):
-		if ser is None:
+	def bulkWrite(self):
+		if self.ser is None:
 			raise Exception('bulkWrite no serial port')
-		print('Servo::bulkWrite()')
+		# print('Servo::bulkWrite()')
 		global gBulkData
 		pkt = makeBulkAnglePacket(gBulkData)
-		ser.write(pkt)
+		self.ser.write(pkt)
 		gBulkData = []  # clear global
 
-	@staticmethod
-	def syncWrite(ser):
-		if ser is None:
+	def syncWrite(self):
+		if self.ser is None:
 			raise Exception('syncWrite no serial port')
-		print('Servo::syncWrite()')
+		# print('Servo::syncWrite()')
 		global gSyncData
-		print('gSyncData', gSyncData)
+		# print('gSyncData', gSyncData)
 		pkt = makeSyncAnglePacket(gSyncData)
-		print('pkt', pkt)
-		ser.write(pkt)
-		ser.write(pkt)
+		# print('pkt', pkt)
+		self.ser.write(pkt)
+		# self.ser.write(pkt)
 		gSyncData = []
 
 	def write(self):
 		if self.bulkServoWrite:
-			self.bulkWrite(self.ser)
+			self.bulkWrite()
 		elif self.syncServoWrite(self.ser):
 			self.syncWrite(self.ser)
 		else:
