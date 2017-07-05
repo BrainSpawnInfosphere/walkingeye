@@ -42,6 +42,7 @@ def rot_z(t, c):
 		c[0]*sin(t)+c[1]*cos(t),
 		c[2]
 	])
+	# ans = np.array(rot_z_tuple(t, c))
 
 	return ans
 
@@ -58,10 +59,11 @@ class Gait(object):
 	moveFoot = None
 	rest = None
 
-	def __init__(self, rest, mf):
+	def __init__(self, rest, mf, w):
 		# the resting or idle position/orientation of a leg
 		self.rest = rest
 		self.moveFoot = mf
+		self.write = w
 
 	def command(self, cmd):
 		"""
@@ -70,30 +72,34 @@ class Gait(object):
 		x, y, rz = cmd
 		d = sqrt(x**2+y**2)
 
-		if d > 1.000:
+		# commands should be unit length, oneCyle scales it
+		if 0.0 < d > 1.000:
 			x /= d
 			y /= d
 
-		if -pi > rz > pi:
-			rz = rz  # FIXME
+		# if -pi > rz > pi:
+		# 	rz = rz  # FIXME
 
 		# handle no movement command ... do else where?
 		if d < 0.001:
-			for leg in range(0, 4):
-				self.moveFoot(leg, self.rest)  # move to resting position
-				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(leg, *(self.rest)))
-			# Servo.bulkWrite()
-			Servo.syncWrite(Servo.ser)
+			# for leg in range(0, 4):
+			# 	self.moveFoot(leg, self.rest)  # move to resting position
+			# 	# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(leg, *(self.rest)))
+			# # Servo.bulkWrite()
+			# Servo.syncWrite(Servo.ser)
 			return
 
-		self.oneCyle(x, y, rz)
+		self.oneCycle(x, y, rz)
+
+	def oneCycle(x, y, rz):
+		print('wrong function!')
 
 
 class DiscreteRippleGait(Gait):
 	steps = 0
 
-	def __init__(self, h, r, mf):
-		Gait.__init__(self, r, mf)
+	def __init__(self, h, r, mf, w):
+		Gait.__init__(self, r, mf, w)
 		self.phi = [9/9, 6/9, 3/9, 0/9, 1/9, 2/9, 3/9, 4/9, 5/9, 6/9, 7/9, 8/9]  # foot pos in gait sequence
 		maxl = h  # lifting higher gives me errors
 		minl = maxl/2
@@ -128,9 +134,7 @@ class DiscreteRippleGait(Gait):
 		# print('New  [](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(newpos[0], newpos[1], newpos[2]))
 		return newpos
 
-	def oneCyle(self, x, y, rz):
-
-		scale = 50.0
+	def oneCycle(self, x, y, rz, scale=50.0):
 		cmd = (scale*x, scale*y, rz)
 
 		for i in range(0, self.steps):  # iteration, there are 12 steps in gait cycle
@@ -157,7 +161,8 @@ class DiscreteRippleGait(Gait):
 				print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *ft))
 
 			# Servo.bulkWrite(Servo.ser)
-			Servo.syncWrite(Servo.ser)
+			# Servo.syncWrite(Servo.ser)
+			self.write()
 			time.sleep(0.1)
 
 

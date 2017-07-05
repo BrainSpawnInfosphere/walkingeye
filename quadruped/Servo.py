@@ -10,7 +10,7 @@ from __future__ import division
 import logging
 from pyxl320 import Packet
 from pyxl320.Packet import makeSyncAnglePacket
-from pyxl320 import DummySerial
+# from pyxl320 import DummySerial
 from pyxl320 import xl320
 
 logger = logging.getLogger(__name__)
@@ -67,7 +67,8 @@ class ServoBase(object):
 	def __init__(self):
 		# just put a dummy serial here, because testing needs it in the angle setter
 		if self.ser is None:
-			self.ser = DummySerial('test')
+			# self.ser = DummySerial('test')
+			raise Exception('ServoBase::__init__() no serial port')
 		# pass
 
 	# def setSerial(self, serialObj):
@@ -75,6 +76,8 @@ class ServoBase(object):
 
 	@staticmethod
 	def bulkWrite(ser):
+		if ser is None:
+			raise Exception('bulkWrite no serial port')
 		print('Servo::bulkWrite()')
 		global gBulkData
 		pkt = makeBulkAnglePacket(gBulkData)
@@ -83,11 +86,24 @@ class ServoBase(object):
 
 	@staticmethod
 	def syncWrite(ser):
+		if ser is None:
+			raise Exception('syncWrite no serial port')
 		print('Servo::syncWrite()')
 		global gSyncData
+		print('gSyncData', gSyncData)
 		pkt = makeSyncAnglePacket(gSyncData)
+		print('pkt', pkt)
+		ser.write(pkt)
 		ser.write(pkt)
 		gSyncData = []
+
+	def write(self):
+		if self.bulkServoWrite:
+			self.bulkWrite(self.ser)
+		elif self.syncServoWrite(self.ser):
+			self.syncWrite(self.ser)
+		else:
+			raise Exception('ServoBase::write() not bulk or sync')
 
 
 class Servo(ServoBase):
@@ -134,11 +150,15 @@ class Servo(ServoBase):
 		"""
 
 		# saturates the angle if it is outside of the limits
-		if self.minAngle > angle or angle > self.maxAngle:
+		if self.minAngle > angle > self.maxAngle:
 			# raise Exception('@angle.setter {} > {} > {}'.format(self.minAngle, angle, self.maxAngle))
 			print('@angle.setter error {} > {} > {}'.format(self.minAngle, angle, self.maxAngle))
-			if self.minAngle > angle: angle = self.minAngle
-			elif self.maxAngle < angle: angle = self.maxAngle
+
+			if self.minAngle > angle:
+				angle = self.minAngle
+			elif self.maxAngle < angle:
+				angle = self.maxAngle
+
 			print('@angle.setter now {}'.format(angle))
 
 		# print('servo[{}]: bulkWrite {}'.format(self.ID, self.bulkServoWrite))
@@ -153,6 +173,12 @@ class Servo(ServoBase):
 				# global gBulkData
 				# gBulkData.append([self.ID, angle + self._offset])
 				gSyncData.append([self.ID, angle + self._offset])
+				# self.bulkData.append([self.ID, angle + self._offset])
+				# print('servo[{}]: bulkWrite {}'.format(self.ID, gBulkData))
+			elif self.bulkServoWrite:
+				# global gBulkData
+				gBulkData.append([self.ID, angle + self._offset])
+				# gSyncData.append([self.ID, angle + self._offset])
 				# self.bulkData.append([self.ID, angle + self._offset])
 				# print('servo[{}]: bulkWrite {}'.format(self.ID, gBulkData))
 			else:

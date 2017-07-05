@@ -65,6 +65,9 @@ class Leg(object):
 	def __del__(self):
 		pass
 
+	def convertRawAngles(self, a, b, c):
+		return (a-self.s_offsets[0], b-self.s_offsets[1], c-self.s_offsets[2])
+
 	def fk(self, a, b, g):
 		"""
 		Forward kinematics of the leg, note, angle are all degrees
@@ -170,6 +173,18 @@ class Leg(object):
 
 		except Exception as e:
 			print (e)
+			raise
+
+	def moveFootAngles(self, a, b, c):
+		"""
+		Attempts to move it's foot to coordinates [x,y,z]
+		"""
+		try:
+			for servo, angle in zip(self.servos, (a, b, c)):
+				servo.angle = angle
+
+		except:
+			print('Leg::moveFootAngles() error')
 			raise
 
 	# def reset(self):
