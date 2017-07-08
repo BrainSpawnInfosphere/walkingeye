@@ -13,3 +13,5 @@ to talk to the servos. It has the following pins broken out:
 - 5V
 - CTS
 - Ground
+
+Also, this is a **real FTDI board**, so you don't need to compile and install drivers.
