@@ -11,8 +11,8 @@ from __future__ import division
 import numpy as np
 from math import cos, sin, sqrt, pi
 # from math import radians as d2r
-from Servo import Servo
-import time
+# from Servo import Servo
+# import time
 
 
 def rot_z_tuple(t, c):
@@ -49,7 +49,8 @@ def rot_z(t, c):
 
 class Gait(object):
 	"""
-	Base class for gaits
+	Base class for gaits. Gait only plan all foot locations for 1 complete cycle
+	of the gait.
 	"""
 	# these are the offsets of each leg
 	legOffset = [0, 6, 3, 9]
@@ -58,12 +59,13 @@ class Gait(object):
 	frame = [-pi/4, pi/4, 3*pi/4, -3*pi/4]  # this seem to work better ... wtf?
 	moveFoot = None
 	rest = None
+	scale = 50.0
 
-	def __init__(self, rest, mf, w):
+	def __init__(self, rest):
 		# the resting or idle position/orientation of a leg
 		self.rest = rest
-		self.moveFoot = mf
-		self.write = w
+		# self.moveFoot = mf
+		# self.write = w
 
 	def command(self, cmd):
 		"""
@@ -73,33 +75,35 @@ class Gait(object):
 		d = sqrt(x**2+y**2)
 
 		# commands should be unit length, oneCyle scales it
-		if 0.0 < d > 1.000:
+		if 1.0 < d:
 			x /= d
 			y /= d
 
-		# if -pi > rz > pi:
-		# 	rz = rz  # FIXME
-
 		# handle no movement command ... do else where?
-		if d < 0.001:
-			# for leg in range(0, 4):
-			# 	self.moveFoot(leg, self.rest)  # move to resting position
-			# 	# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(leg, *(self.rest)))
-			# # Servo.bulkWrite()
-			# Servo.syncWrite(Servo.ser)
-			return
+		if d < 0.1 and abs(rz) < 0.1:
+			x = y = 0.0
+			rz = 0.0
 
-		self.oneCycle(x, y, rz)
+			return None
+
+		# if abs(rz) < 0.001:
+		# 	rz = 0.0
+
+		return self.oneCycle(x, y, rz)
 
 	def oneCycle(x, y, rz):
-		print('wrong function!')
+		print('*** wrong function! ***')
+		return None
 
 
 class DiscreteRippleGait(Gait):
+	"""
+	Discrete 12 step gait
+	"""
 	steps = 0
 
-	def __init__(self, h, r, mf, w):
-		Gait.__init__(self, r, mf, w)
+	def __init__(self, h, r):
+		Gait.__init__(self, r)
 		self.phi = [9/9, 6/9, 3/9, 0/9, 1/9, 2/9, 3/9, 4/9, 5/9, 6/9, 7/9, 8/9]  # foot pos in gait sequence
 		maxl = h  # lifting higher gives me errors
 		minl = maxl/2
@@ -134,8 +138,10 @@ class DiscreteRippleGait(Gait):
 		# print('New  [](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(newpos[0], newpos[1], newpos[2]))
 		return newpos
 
-	def oneCycle(self, x, y, rz, scale=50.0):
+	def oneCycle(self, x, y, rz):
+		scale = self.scale
 		cmd = (scale*x, scale*y, rz)
+		ret = []  # 4 leg foot positions for the entire 12 count cycle is returned
 
 		for i in range(0, self.steps):  # iteration, there are 12 steps in gait cycle
 			footPos = []
@@ -147,23 +153,30 @@ class DiscreteRippleGait(Gait):
 				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *(pos)))
 				# if legNum == 0: print('New  [{}](x,y,z): {:.2f}\t{:.2f}\t{:.2f}'.format(i, pos[0], pos[1], pos[2]))
 				footPos.append([index, legNum, pos])  # all in leg frame
+			# print('footPos', footPos)
 
 			# corr = Correction()
 			# c = corr.calcCorrection(footPos)
 			# feet = corr.rotateFeetCorrected(footPos, c)
 
-			feet = footPos
-			# print('----------------------------')
-			for foot in feet:
-				legNum = foot[1]
-				ft = foot[2]
-				self.moveFoot(legNum, ft)
-				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *ft))
+			ret.append(footPos)  # 4 feet at index i: [index, legNum, footposition]
 
-			# Servo.bulkWrite(Servo.ser)
-			# Servo.syncWrite(Servo.ser)
-			self.write()
-			time.sleep(0.1)
+# <<<<<<< HEAD:quadruped/Gait.py
+		return ret
+# =======
+# 			feet = footPos
+# 			# print('----------------------------')
+# 			for foot in feet:
+# 				legNum = foot[1]
+# 				ft = foot[2]
+# 				self.moveFoot(legNum, ft)
+# 				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *ft))
+#
+# 			# Servo.bulkWrite(Servo.ser)
+# 			# Servo.syncWrite(Servo.ser)
+# 			self.write()
+# 			time.sleep(0.1)
+# >>>>>>> master:quadruped/quadruped/Gait.py
 
 
 # class ContinousRippleGait(Gait):
