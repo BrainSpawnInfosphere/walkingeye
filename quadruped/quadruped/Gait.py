@@ -158,7 +158,22 @@ class DiscreteRippleGait(Gait):
 			
 			ret.append(footPos)  # 4 feet at index i: [index, legNum, footposition]
 
+<<<<<<< HEAD:quadruped/Gait.py
 		return ret
+=======
+			feet = footPos
+			# print('----------------------------')
+			for foot in feet:
+				legNum = foot[1]
+				ft = foot[2]
+				self.moveFoot(legNum, ft)
+				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *ft))
+
+			# Servo.bulkWrite(Servo.ser)
+			# Servo.syncWrite(Servo.ser)
+			self.write()
+			time.sleep(0.1)
+>>>>>>> master:quadruped/quadruped/Gait.py
 
 
 # class ContinousRippleGait(Gait):

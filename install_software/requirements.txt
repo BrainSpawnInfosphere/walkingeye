@@ -1,0 +1,8 @@
+wheel
+pip
+setuptools
+opencvutils
+pygecko
+mcp3208
+nxp_imu
+ds4drv
