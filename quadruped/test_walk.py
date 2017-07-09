@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 
-<<<<<<< HEAD
 from __future__ import print_function, division
-from Engine import Engine
-from Gait import DiscreteRippleGait
-=======
 from quadruped import Engine
 from quadruped import DiscreteRippleGait
->>>>>>> master
 from math import pi
 # import time
 
