@@ -7,11 +7,15 @@
 
 from __future__ import print_function
 from __future__ import division
-import multiprocessing as mp
-from math import pi
-from Engine import Engine
-from Gait import DiscreteRippleGait
-from ahrs import AHRS  # attitude and heading reference system
+# import multiprocessing as mp
+# from math import pi
+from quadruped import Engine
+from quadruped import DiscreteRippleGait
+from js import Joystick
+from nxp_imu import IMU
+import platform
+# import time
+# from ahrs import AHRS  # attitude and heading reference system
 
 ##########################
 
@@ -20,82 +24,65 @@ This is a simple demo that walks in a pre-defined path
 """
 
 
-class SimpleQuadruped(mp.Process):
+# class SimpleQuadruped(mp.Process):
+class SimpleQuadruped(object):
 	def __init__(self, data):
-		mp.Process.__init__(self)
-		self.ahrs = AHRS()  # compass sensor
-		self.body = Engine(data)  # legs/servos
-		leg = self.body.getFoot0(0)
-		self.crawl = DiscreteRippleGait(45.0, leg, self.body.moveFoot)  # walking motion
+		# mp.Process.__init__(self)
+		self.robot = Engine(data)
+		leg = self.robot.getFoot0(0)
+		self.gait = {
+			'crawl': DiscreteRippleGait(45.0, leg, self.robot.moveFoot, self.robot.legs[0].servos[0].write)
+		}
+		if platform.system() == 'Linux':
+			self.imu = IMU()
+		else:
+			self.imu = None
 
-		# predefined walking path
-		self.path = [  # x,y,rot
-			[1.0, 0, 0],
-			[1.0, 0, 0],
-			[1.0, 0, 0],
-			[1.0, 0, 0],
-			[1.0, 0, 0],
-			[1.0, 0, 0],
-			[1.0, 0, 0],
-			[1.0, 0, 0],
-			[1.0, 0, 0],
-			[1.0, 0, 0],
-			[0, 0, pi/4],
-			[0, 0, pi/4],
-			[0, 0, pi/4],
-			[0, 0, -pi/4],
-			[0, 0, -pi/4],
-			[0, 0, -pi/4],
-			[-1.0, 0, 0],
-			[-1.0, 0, 0],
-			[-1.0, 0, 0],
-			[-1.0, 0, 0],
-			[-1.0, 0, 0],
-			[-1.0, 0, 0],
-			[-1.0, 0, 0],
-			[-1.0, 0, 0],
-			[-1.0, 0, 0],
-			[-1.0, 0, 0],
-		]
+		self.js = Joystick()
 
 	def run(self):
-		for pose in self.path:
-			x, y, rz = pose
-			# leg = self.body.getFoot0
-			cmd = (x, y, rz)
+		while True:
+			if self.js.valid:
+				ps4 = self.js.get()
+				x, y = ps4['leftStick']
+				rz, _ = ps4['rightStick']
+				cmd = (x, y, rz)
+			else:
+				cmd = (1, 0, 0)
 
 			# read ahrs
-			d = self.ahrs.read(deg=True)
-			roll, pitch, heading = d
-			if (-90.0 > roll > 90.0) or (-90.0 > pitch > 90.0):
-				print('Crap we flipped!!!')
-				cmd = (0, 0, 0)
+			if self.imu:
+				a, m, g = self.imu.read()
+				# roll, pitch, heading = d
+				# if (-90.0 > roll > 90.0) or (-90.0 > pitch > 90.0):
+				# 	print('Crap we flipped!!!')
+				# 	cmd = (0, 0, 0)
+				print('imu', a, m, g)
 
 			print('***********************************')
 			# print('* rest {:.2f} {:.2f} {:.2f}'.format(*leg))
-			print('ahrs[deg]: roll {:.2f} pitch: {:.2f} yaw: {:.2f}'.format(d[0], d[1], d[2]))
+			# print('ahrs[deg]: roll {:.2f} pitch: {:.2f} yaw: {:.2f}'.format(d[0], d[1], d[2]))
 			print('* cmd {:.2f} {:.2f} {:.2f}'.format(*cmd))
-			print('***********************************')
-			self.crawl.command(cmd)
+			# print('***********************************')
+			self.gait['crawl'].command(cmd)
+			# time.sleep(0.1)
 
 
 def run():
 	# angles are always [min, max]
 	# xl-320
 	test = {
-		# 'serialPort': '/dev/serial0',  # real robot
-		# 'legLengths': {
-		# 	'coxaLength': 45,
-		# 	'femurLength': 55,
-		# 	'tibiaLength': 104
-		# },
-		# 'legAngleLimits': [[-90, 90], [-90, 90], [-150, 0]],
-		# 'legOffset': [150, 150, 150+90]
+		# 'serialPort': '/dev/tty.usbserial-AL034G2K',  # sparkfun usb-serial
+		'write': 'bulk'
 	}
 
 	robot = SimpleQuadruped(test)
-	robot.start()
-	robot.join()
+
+	try:
+		robot.run()
+
+	except KeyboardInterrupt:
+		print('bye ...')
 
 
 if __name__ == "__main__":

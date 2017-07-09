@@ -153,12 +153,12 @@ class DiscreteRippleGait(Gait):
 			# feet = corr.rotateFeetCorrected(footPos, c)
 
 			feet = footPos
-			print('----------------------------')
+			# print('----------------------------')
 			for foot in feet:
 				legNum = foot[1]
 				ft = foot[2]
 				self.moveFoot(legNum, ft)
-				print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *ft))
+				# print('Foot[{}]: {:.2f} {:.2f} {:.2f}'.format(legNum, *ft))
 
 			# Servo.bulkWrite(Servo.ser)
 			# Servo.syncWrite(Servo.ser)

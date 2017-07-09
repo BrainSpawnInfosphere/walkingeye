@@ -39,9 +39,9 @@ class Engine(object):
 				print('bye ...')
 				exit(1)
 		else:
-			# print('Using dummy serial port!!!')
-			# ser = DummySerial('test_port')
-			raise Exception('No serial port given')
+			print('Using dummy serial port!!!')
+			ser = ServoSerial('test_port', fake=True)
+			# raise Exception('No serial port given')
 
 		ser.open()
 		Servo.ser = ser  # set static serial port, not sure I like this

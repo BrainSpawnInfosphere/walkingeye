@@ -78,7 +78,7 @@ class ServoBase(object):
 	def bulkWrite(ser):
 		if ser is None:
 			raise Exception('bulkWrite no serial port')
-		print('Servo::bulkWrite()')
+		# print('Servo::bulkWrite()')
 		global gBulkData
 		pkt = makeBulkAnglePacket(gBulkData)
 		ser.write(pkt)
