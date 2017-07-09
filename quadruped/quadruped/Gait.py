@@ -75,21 +75,24 @@ class Gait(object):
 		d = sqrt(x**2+y**2)
 
 		# commands should be unit length, oneCyle scales it
-		if 0.0 < d > 1.000:
+		if 1.0 < d:
 			x /= d
 			y /= d
 
 		# handle no movement command ... do else where?
-		if d < 0.001 and abs(rz) < 0.001:
+		if d < 0.1 and abs(rz) < 0.1:
 			x = y = 0.0
-
-		if abs(rz) < 0.001:
 			rz = 0.0
+
+			return None
+
+		# if abs(rz) < 0.001:
+		# 	rz = 0.0
 
 		return self.oneCycle(x, y, rz)
 
 	def oneCycle(x, y, rz):
-		print('wrong function!')
+		print('*** wrong function! ***')
 		return None
 
 

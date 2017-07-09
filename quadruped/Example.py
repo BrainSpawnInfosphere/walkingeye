@@ -29,9 +29,9 @@ class SimpleQuadruped(object):
 	def __init__(self, data):
 		# mp.Process.__init__(self)
 		self.robot = Engine(data)
-		leg = self.robot.getFoot0(0)
+		netural = self.robot.getFoot0(0)
 		self.gait = {
-			'crawl': DiscreteRippleGait(45.0, leg, self.robot.moveFoot, self.robot.legs[0].servos[0].write)
+			'crawl': DiscreteRippleGait(45.0, netural)
 		}
 		if platform.system() == 'Linux':
 			self.imu = IMU()
@@ -64,7 +64,9 @@ class SimpleQuadruped(object):
 			# print('ahrs[deg]: roll {:.2f} pitch: {:.2f} yaw: {:.2f}'.format(d[0], d[1], d[2]))
 			print('* cmd {:.2f} {:.2f} {:.2f}'.format(*cmd))
 			# print('***********************************')
-			self.gait['crawl'].command(cmd)
+			mov = self.gait['crawl'].command(cmd)
+			if mov:
+				self.robot.move(mov)
 			# time.sleep(0.1)
 
 
@@ -72,7 +74,7 @@ def run():
 	# angles are always [min, max]
 	# xl-320
 	test = {
-		# 'serialPort': '/dev/tty.usbserial-AL034G2K',  # sparkfun usb-serial
+		'serialPort': '/dev/tty.usbserial-AL034G2K',  # sparkfun usb-serial
 		'write': 'bulk'
 	}
 
