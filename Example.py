@@ -14,18 +14,18 @@ from __future__ import print_function
 from __future__ import division
 from quadruped import Engine
 from quadruped import DiscreteRippleGait
+from quadruped.misc_gaits import CircularGait
+from quadruped.misc_gaits import ImpatientGait
 from js import Joystick
 from nxp_imu import IMU
 from mcp3208 import MCP3208
-from ins_nav import AHRS
-from quadruped.misc_gaits import CircularGait, ImpatientGait
+from ins_nav import AHRS                # attitude and heading reference system
 import platform
 import time
-# from ahrs import AHRS  # attitude and heading reference system
 ##########################
 
 
-class SimpleQuadruped(object):
+class WalkingEye(object):
 	imu = None
 	adc = None
 	ir = [0]*8
@@ -87,7 +87,6 @@ class SimpleQuadruped(object):
 					self.ir[i] = self.adc.read(i)
 
 			print('***********************************')
-			# print('* rest {:.2f} {:.2f} {:.2f}'.format(*leg))
 			print('imu', a, m, g)
 			print('ahrs[deg]: roll {:.2f} pitch: {:.2f} yaw: {:.2f}'.format(roll, pitch, heading))
 			print('* cmd {:.2f} {:.2f} {:.2f}'.format(*cmd))
@@ -108,7 +107,7 @@ def run():
 		'write': 'bulk'
 	}
 
-	robot = SimpleQuadruped(test)
+	robot = WalkingEye(test)
 
 	try:
 		robot.run()
